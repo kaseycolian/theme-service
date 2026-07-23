@@ -12,6 +12,8 @@ generated/validated from the palette source and is WCAG AA 2.2 compliant in ever
 | `components.css` | Opt-in class-based component styles (buttons, inputs, dropdown, switch, notices, tabs, …) with full focus/hover/active/disabled/expanded states. |
 | `tokens.json` | Structured mirror of every theme's tokens (for tooling / non-CSS consumers). |
 | `themes.index.json` | Registry: families, modes, and the default — drives theme pickers and the add-theme flow. |
+| `theme-init.js` | **External** (CSP-safe) script: applies the saved/`?theme=` theme before first paint. Load in `<head>`. |
+| `theme-select.js` | **External** (CSP-safe, generated) script: populates & wires any `<select data-theme-select>` + `[data-motion-toggle]`. |
 | `preview.html` | Live theme switcher + usage example. Open it in a browser. |
 
 ## Use it in an app
@@ -40,6 +42,28 @@ generated/validated from the palette source and is WCAG AA 2.2 compliant in ever
 
 Available theme ids: `rink-classic-{dark,light}`, `midnight-arcade-{dark,light}`,
 `hot-neon-{dark,light}`, `synthwave-sunset-{dark,light}`, `acid-arcade-{dark,light}`.
+
+## Theme selector (vanilla / extensions)
+
+Two external scripts do it all — **never** inline them (Manifest V3 / strict CSP block inline
+scripts, which silently leaves the dropdown empty):
+
+```html
+<head>
+  <script src="theme-init.js"></script>   <!-- applies saved/?theme= theme before paint -->
+  <link rel="stylesheet" href="theme.css">
+  <link rel="stylesheet" href="effects.css">
+</head>
+<body>
+  <select data-theme-select aria-label="Theme"></select>
+  <label><input type="checkbox" data-motion-toggle> Reduce motion</label>
+  <script src="theme-select.js"></script>  <!-- fills + wires the selector/toggle -->
+</body>
+```
+
+`theme-select.js` is generated with the theme list baked in (mirrors `themes.index.json`) and
+persists the choice. React/Angular use their own provider instead — see the skill's
+`applying-themes.md`.
 
 ## Framework notes
 

@@ -5,7 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Theme Service — Finalized Themes Preview</title>
 
-<!-- This is exactly how a consuming app wires it up: -->
+<!-- This is exactly how a consuming app wires it up (all scripts EXTERNAL — CSP-safe): -->
+<script src="theme-init.js"></script>
 <link rel="stylesheet" href="theme.css">
 <link rel="stylesheet" href="effects.css">
 <link rel="stylesheet" href="components.css">
@@ -31,10 +32,9 @@
 <div class="bar">
   <strong>Theme Service Preview</strong>
   <label>Theme
-    <select class="select" id="themeSel" style="padding:6px 26px 6px 10px"></select>
+    <select class="select" data-theme-select aria-label="Theme" style="padding:6px 26px 6px 10px"></select>
   </label>
-  <label class="switch"><input type="checkbox" id="motion"><span class="track"><span class="thumb"></span></span> Disable animations</label>
-  <span class="t-muted" id="curId" style="font-family:var(--font-mono)"></span>
+  <label class="switch"><input type="checkbox" data-motion-toggle><span class="track"><span class="thumb"></span></span> Disable animations</label>
 </div>
 
 <main>
@@ -100,38 +100,7 @@
   </div>
 </main>
 
-<script>
-// A consuming app would fetch themes.index.json; over file:// we inline the ids.
-const THEMES = [
-  { id: '', label: 'Auto — Rink Classic (OS light/dark)' },
-  { id: 'rink-classic-dark', label: 'Rink Classic · Dark' },
-  { id: 'rink-classic-light', label: 'Rink Classic · Light' },
-  { id: 'midnight-arcade-dark', label: 'Midnight Arcade · Dark' },
-  { id: 'midnight-arcade-light', label: 'Midnight Arcade · Light' },
-  { id: 'hot-neon-dark', label: 'Hot Neon · Dark' },
-  { id: 'hot-neon-light', label: 'Hot Neon · Light' },
-  { id: 'synthwave-sunset-dark', label: 'Synthwave Sunset · Dark' },
-  { id: 'synthwave-sunset-light', label: 'Synthwave Sunset · Light' },
-  { id: 'acid-arcade-dark', label: 'Acid Arcade · Dark' },
-  { id: 'acid-arcade-light', label: 'Acid Arcade · Light' },
-];
-const sel = document.getElementById('themeSel');
-const curId = document.getElementById('curId');
-sel.innerHTML = THEMES.map(t => `<option value="${t.id}">${t.label}</option>`).join('');
-
-// THE core pattern: set (or clear) data-theme on <html>.
-function applyTheme(id) {
-  if (id) document.documentElement.setAttribute('data-theme', id);
-  else document.documentElement.removeAttribute('data-theme');
-  curId.textContent = id ? `data-theme="${id}"` : 'no data-theme (auto)';
-}
-sel.addEventListener('change', e => applyTheme(e.target.value));
-applyTheme('');
-
-// Disable-animations hook: set data-motion="off" on <html>.
-document.getElementById('motion').addEventListener('change', e => {
-  document.documentElement.setAttribute('data-motion', e.target.checked ? 'off' : '');
-});
-</script>
+<!-- The shipped helper populates & wires the selector/toggle. External = CSP-safe. -->
+<script src="theme-select.js"></script>
 </body>
 </html>

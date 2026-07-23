@@ -17,7 +17,10 @@ There are two paths. Read the one that matches the project, then the stack secti
    - Always: `theme.css` (color tokens for all themes).
    - Almost always: `effects.css` (glow/grid/scrollbar recipes — the neon identity).
    - **New projects only** (or existing apps adopting our components): `components.css`.
-   - Copy `themes.index.json` too — the selector reads it to list themes.
+   - **Vanilla / extension / any non-framework app:** also copy `theme-init.js` and `theme-select.js`
+     (the CSP-safe selector helpers — see "The theme selector" below). React/Angular apps use their
+     own provider instead and don't need these.
+   - Copy `themes.index.json` too (registry reference).
 3. **Record the version.** Create `<vendor>/THEME-SERVICE.md` containing the copied `VERSION`
    (from the source repo root) and the date, e.g. `theme-service v0.1.0 — applied 2026-07-23`.
    This is what `updating-themes.md` diffs against later.
@@ -112,41 +115,50 @@ Requirements:
 - **Persist** to `localStorage` and **re-apply before first paint** to avoid a flash of the wrong theme.
 - Optionally include a "Reduce motion" control that toggles `data-motion="off"` on `<html>`.
 
-### Anti-flash bootstrap (put this inline in `<head>`, before stylesheets render content)
-```html
-<script>
-  try {
-    var t = localStorage.getItem('theme');
-    if (t) document.documentElement.setAttribute('data-theme', t);
-    if (localStorage.getItem('motion') === 'off') document.documentElement.setAttribute('data-motion','off');
-  } catch (e) {}
-</script>
-```
+> **CRITICAL — no inline scripts.** Do **not** put the bootstrap or selector logic in an inline
+> `<script>…</script>`. **Manifest V3 browser extensions and any strict-CSP site block inline
+> scripts**, so the selector silently won't populate (a common failure). Always load JS from
+> **external files** (`<script src="…">`). The theme-service ships two ready-made, CSP-safe helpers
+> for exactly this — use them for vanilla/extension apps.
 
-### Vanilla JS selector
+### Vanilla / browser-extension / any non-framework app (use the shipped helpers)
+You vendored `theme-init.js` and `theme-select.js` in the common setup. Wire them with two
+`<script src>` tags and a marked `<select>` — no inline JS, no fetch, works under MV3 CSP:
+
 ```html
-<select id="theme-select" class="select" aria-label="Theme"></select>
-<script type="module">
-  // themes.index.json copied alongside your theme CSS:
-  const idx = await fetch(new URL('./theme/themes.index.json', import.meta.url)).then(r => r.json());
-  const sel = document.getElementById('theme-select');
-  sel.append(new Option('Auto (default)', ''));
-  for (const t of idx.themes) sel.append(new Option(`${t.label} · ${t.mode}`, t.id));
-  sel.value = localStorage.getItem('theme') || '';
-  sel.addEventListener('change', () => {
-    const id = sel.value;
-    if (id) { document.documentElement.setAttribute('data-theme', id); localStorage.setItem('theme', id); }
-    else { document.documentElement.removeAttribute('data-theme'); localStorage.removeItem('theme'); }
-  });
-</script>
+<head>
+  <!-- Applies the saved/deep-linked theme before first paint (no flash). MUST be external. -->
+  <script src="theme/theme-init.js"></script>
+  <link rel="stylesheet" href="theme/theme.css">
+  <link rel="stylesheet" href="theme/effects.css">
+  <link rel="stylesheet" href="popup.css"><!-- your app's own styles -->
+</head>
+<body>
+  <!-- Anywhere in your UI. theme-select.js finds it by the data-theme-select attribute
+       and fills it with all themes + an "Auto" option. -->
+  <select data-theme-select aria-label="Theme"></select>
+  <!-- Optional motion toggle: -->
+  <label><input type="checkbox" data-motion-toggle> Reduce motion</label>
+
+  <!-- ...your app... -->
+
+  <!-- Populates + wires the selector/toggle. MUST be external (defer/end-of-body both fine). -->
+  <script src="theme/theme-select.js"></script>
+</body>
 ```
-(If `fetch` won't run over `file://`, inline the `themes[]` list instead.)
+That's the whole integration. `theme-select.js` is generated with the current theme list baked in
+(mirrors `themes.index.json`), persists to `localStorage`, and reflects `?theme=<id>` deep-links.
+No build step needed. **Browser extension note:** the theme files sit inside the package (`theme/…`),
+so they load as `'self'` under the default MV3 CSP; if the app uses a bundler, make sure its build
+copies the `theme/` folder into the output (e.g. an esbuild/webpack copy step).
 
 ### Angular
-- Add the vendored CSS to `angular.json` `styles[]` (or `@import` them in `src/styles.css`):
+- Add the vendored CSS to `angular.json` `styles[]` (or `@import` in `src/styles.css`):
   `"src/theme/theme.css", "src/theme/effects.css", "src/theme/components.css"`.
-- Put the anti-flash bootstrap in `src/index.html` `<head>`.
-- Create a tiny service that sets the attribute via `Renderer2`/`DOCUMENT`:
+- For pre-paint theming, load `theme-init.js` via `src/index.html` `<head>` with
+  `<script src="theme-init.js"></script>` (external — never inline), or set the attribute in an
+  `APP_INITIALIZER`.
+- Manage switching with a service (this is already external code, so it's CSP-safe):
 ```ts
 @Injectable({ providedIn: 'root' })
 export class ThemeService {
@@ -160,11 +172,13 @@ export class ThemeService {
 }
 ```
 - Bind a `<select>` in a settings/header component to `ThemeService.set(...)`, options from `themes`.
+  (You don't need `theme-select.js` — the service is your selector wiring.)
 
 ### React
 - Import the CSS once at the app root: `import './theme/theme.css'; import './theme/effects.css'; import './theme/components.css';`
-- Put the anti-flash bootstrap in `index.html` `<head>` (Vite/CRA/Next `_document`).
-- A minimal hook/provider:
+- For pre-paint theming, load `theme-init.js` as an external script in `index.html` `<head>`
+  (Vite/CRA/Next `_document`) — not an inline script.
+- Manage switching with a hook/provider (external code, CSP-safe):
 ```tsx
 import themesIndex from './theme/themes.index.json';
 function useTheme() {
@@ -179,14 +193,19 @@ function useTheme() {
 // render <select value={id} onChange={e=>setId(e.target.value)}> with a "" Auto option + themes.map(...)
 ```
 - Tokens are consumable from CSS Modules, styled-components (`var(--accent-pink)`), Tailwind
-  (`colors: { pink: 'var(--accent-pink)' }`), or inline styles.
+  (`colors: { pink: 'var(--accent-pink)' }`), or inline styles. (No `theme-select.js` needed — the
+  hook is your selector wiring.)
 
 ---
 
 ## Verification (all paths)
 1. App loads with **Rink Classic** default (dark, or light if OS prefers light).
 2. Selector lists **every** theme; switching re-skins the whole UI; choice persists across reload
-   with **no flash** of the previous theme.
+   with **no flash** of the previous theme. **Test in the real runtime** (the actual extension via
+   `chrome://extensions` → Load unpacked, or the served app), not just a `file://` preview — inline
+   scripts that work in a plain file will be **blocked by MV3/CSP** in the real app, leaving the
+   selector empty. If the dropdown is empty, you have an inline-script/CSP problem (use the external
+   `theme-select.js`). Open the console and check for CSP violation errors.
 3. Keyboard-tab shows a visible focus ring on every control (`--focus-ring`).
 4. `data-motion="off"` (or the reduce-motion control / OS setting) stops transitions & glow pulses.
 5. Any app-specific color pairs pass `tools/contrast-checker/` at AA. Walk `wcag-checklist.md`.

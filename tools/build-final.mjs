@@ -20,7 +20,7 @@ import { dirname, join } from 'node:path';
 import { contrastRatio, round2 } from './contrast-checker/contrast.mjs';
 
 const REPO = join(dirname(fileURLToPath(import.meta.url)), '..');
-const VERSION = '0.1.0';
+const VERSION = '0.1.1';
 const DEFAULT_FAMILY = 'rink-classic';
 
 const srcDraft = process.argv.find(a => /^\d+$/.test(a)) || '2';
@@ -121,6 +121,65 @@ if (process.argv.includes('--write')) {
   };
   writeFileSync(join(REPO, 'themes/themes.index.json'), JSON.stringify(index, null, 2) + '\n');
 
+  // ---- CSP-safe helper scripts (external files — work in MV3 extensions & strict-CSP sites) ----
+  const themeInit =
+`/* theme-service v${VERSION} — theme-init.js
+   Applies the saved (or ?theme= / ?motion=) theme BEFORE first paint, so there's no flash.
+   Load in <head> via <script src="theme/theme-init.js"></script> (NOT inline — inline is blocked
+   by Manifest V3 / strict CSP). CSP-safe. */
+(function () {
+  try {
+    var p = new URLSearchParams(location.search);
+    var t = p.get('theme') || localStorage.getItem('theme');
+    if (t) document.documentElement.setAttribute('data-theme', t);
+    if ((p.get('motion') || localStorage.getItem('motion')) === 'off')
+      document.documentElement.setAttribute('data-motion', 'off');
+  } catch (e) {}
+})();
+`;
+  writeFileSync(join(REPO, 'themes/theme-init.js'), themeInit);
+
+  const selectList = [{ id: '', label: `Auto (${families[DEFAULT_FAMILY].label})` }]
+    .concat(Object.values(themes).map(t => ({ id: t.id, label: `${t.label} · ${t.mode[0].toUpperCase()}${t.mode.slice(1)}` })));
+  const themeSelect =
+`/* theme-service v${VERSION} — theme-select.js  (GENERATED; theme list mirrors themes.index.json)
+   Populates and wires any <select data-theme-select> and any [data-motion-toggle] checkbox.
+   Load via <script src="theme/theme-select.js"></script> (NOT inline — MV3/strict CSP blocks inline).
+   Markup you provide:  <select data-theme-select aria-label="Theme"></select>
+                        <input type="checkbox" data-motion-toggle> Reduce motion  (optional)
+   For React/Angular, prefer the framework's own provider (see the skill) instead of this file. */
+(function () {
+  var THEMES = ${JSON.stringify(selectList)};
+  function ready(fn) {
+    if (document.readyState !== 'loading') fn();
+    else document.addEventListener('DOMContentLoaded', fn);
+  }
+  ready(function () {
+    var root = document.documentElement;
+    var saved = '';
+    try { saved = localStorage.getItem('theme') || ''; } catch (e) {}
+    document.querySelectorAll('select[data-theme-select]').forEach(function (sel) {
+      if (!sel.options.length) THEMES.forEach(function (t) { sel.add(new Option(t.label, t.id)); });
+      // Reflect whatever is actually applied (data-theme wins over the stored value, e.g. ?theme=).
+      sel.value = root.getAttribute('data-theme') || saved || '';
+      sel.addEventListener('change', function () {
+        var id = sel.value;
+        if (id) { root.setAttribute('data-theme', id); try { localStorage.setItem('theme', id); } catch (e) {} }
+        else { root.removeAttribute('data-theme'); try { localStorage.removeItem('theme'); } catch (e) {} }
+      });
+    });
+    document.querySelectorAll('[data-motion-toggle]').forEach(function (cb) {
+      cb.checked = root.getAttribute('data-motion') === 'off';
+      cb.addEventListener('change', function () {
+        if (cb.checked) { root.setAttribute('data-motion', 'off'); try { localStorage.setItem('motion', 'off'); } catch (e) {} }
+        else { root.removeAttribute('data-motion'); try { localStorage.removeItem('motion'); } catch (e) {} }
+      });
+    });
+  });
+})();
+`;
+  writeFileSync(join(REPO, 'themes/theme-select.js'), themeSelect);
+
   writeFileSync(join(REPO, 'VERSION'), VERSION + '\n');
-  console.log(`\nWrote themes/theme.css, tokens.json, themes.index.json (v${VERSION}, ${Object.keys(themes).length} themes) + VERSION`);
+  console.log(`\nWrote themes/theme.css, tokens.json, themes.index.json, theme-init.js, theme-select.js (v${VERSION}, ${Object.keys(themes).length} themes) + VERSION`);
 }
