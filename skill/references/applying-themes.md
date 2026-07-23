@@ -21,9 +21,27 @@ There are two paths. Read the one that matches the project, then the stack secti
      (the CSP-safe selector helpers — see "The theme selector" below). React/Angular apps use their
      own provider instead and don't need these.
    - Copy `themes.index.json` too (registry reference).
-3. **Record the version.** Create `<vendor>/THEME-SERVICE.md` containing the copied `VERSION`
-   (from the source repo root) and the date, e.g. `theme-service v0.1.0 — applied 2026-07-23`.
-   This is what `updating-themes.md` diffs against later.
+3. **Record the version + leave instructions for future agents.** Create `<vendor>/THEME-SERVICE.md`
+   with the copied `VERSION`, the date, and a short "for agents" block so anyone (human or agent)
+   working in this repo later follows the same rules. Use this template:
+
+   ```markdown
+   # Theme Service
+
+   This app's theming comes from the shared **theme-service** — version `<VERSION>`, applied `<DATE>`.
+   The files in this folder are vendored copies of the source of truth; do not hand-edit generated
+   token files, and do not hardcode colors — consume the theme tokens (`var(--…)`).
+
+   ## For agents working in this repo
+   Use the **theme-service skill** (or its `AGENTS.md`) for any theme work here — don't improvise. Default request:
+   > Use the theme-service skill to update this app's themes / add a theme, mapping the existing
+   > components onto the theme tokens; build it and confirm every theme renders and passes WCAG AA.
+   Rules: keep everything WCAG AA 2.2 · default theme is Rink Classic · the selector must use the
+   **external** `theme-init.js` / `theme-select.js` (never inline scripts — MV3/strict CSP blocks them).
+   To pull upstream changes: "Update this repo to the latest theme-service version."
+   ```
+
+   The `VERSION` line is also what `updating-themes.md` diffs against later.
 4. **Load order matters:** `theme.css` → `effects.css` → `components.css`.
 
 The default theme applies with **no** `data-theme`. Force one with `data-theme="<id>"` on the root

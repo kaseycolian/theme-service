@@ -7,9 +7,18 @@ into any stack with no build step.
 
 ## Status
 
-**Phase 1 — Palette discovery (in progress).** Choosing the finalized dark + light palettes
-from 12 candidates. Everything under `discovery/` is a trial playground; the finalized
-`themes/` source of truth and the global skill come next.
+**Released — v0.1.1.** The finalized source of truth lives in [`themes/`](themes/) (10 themes across
+5 families × dark/light; default **Rink Classic**). A global Claude Code skill ([`skill/`](skill/)) +
+[`AGENTS.md`](AGENTS.md) apply/update/extend the themes in any repo. `discovery/` holds the palette
+drafts used to choose them (reference only).
+
+## Applying it to another repo
+
+See **[USAGE.md](USAGE.md)** for the copy-paste request and per-case prompts. The short version —
+tell your agent:
+
+> Use the theme-service skill to add multi-theme support + a theme selector to this app, mapping the
+> existing components onto the theme tokens; build it and confirm every theme renders and passes WCAG AA.
 
 ## Open the discovery page
 
