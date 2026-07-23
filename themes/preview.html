@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Theme Service — Finalized Themes Preview</title>
+
+<!-- This is exactly how a consuming app wires it up: -->
+<link rel="stylesheet" href="theme.css">
+<link rel="stylesheet" href="effects.css">
+<link rel="stylesheet" href="components.css">
+
+<style>
+  body { margin: 0; background: var(--bg); color: var(--text); font-family: var(--font-ui); transition: background .2s; }
+  .bar { position: sticky; top: 0; z-index: 50; display: flex; gap: 18px; align-items: center; flex-wrap: wrap;
+         padding: 12px 20px; background: var(--bg-panel); border-bottom: 1px solid var(--border); }
+  .bar strong { font-size: 14px; }
+  .bar label { font-size: 12.5px; color: var(--text-muted); display: inline-flex; gap: 8px; align-items: center; }
+  .bar select { font-family: var(--font-mono); }
+  main { max-width: 960px; margin: 0 auto; padding: 26px 20px 80px; display: grid; grid-template-columns: 1fr 1fr; gap: 26px; }
+  main .full { grid-column: 1 / -1; }
+  @media (max-width: 720px) { main { grid-template-columns: 1fr; } }
+  .block { display: flex; flex-direction: column; gap: 12px; }
+  .block-title { font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-muted); border-bottom: 1px dashed var(--border); padding-bottom: 5px; }
+  .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+  .scrollbox { height: 130px; overflow-y: scroll; }
+</style>
+</head>
+<body class="fx-grid">
+
+<div class="bar">
+  <strong>Theme Service Preview</strong>
+  <label>Theme
+    <select class="select" id="themeSel" style="padding:6px 26px 6px 10px"></select>
+  </label>
+  <label class="switch"><input type="checkbox" id="motion"><span class="track"><span class="thumb"></span></span> Disable animations</label>
+  <span class="t-muted" id="curId" style="font-family:var(--font-mono)"></span>
+</div>
+
+<main>
+  <div class="block">
+    <div class="block-title">Typography</div>
+    <div class="t-h1">Skating Rink</div>
+    <div class="t-h2">Neon Nights</div>
+    <div class="t-h3">Section heading</div>
+    <div class="t-h4">Sub label</div>
+    <p class="t-body">Body copy at a comfortable reading size. <a href="#" class="t-link">An inline link</a>.</p>
+    <p class="t-muted">Muted secondary text for hints and metadata.</p>
+  </div>
+
+  <div class="block">
+    <div class="block-title">Buttons</div>
+    <div class="row">
+      <button class="btn btn-solid a-pink">Pink</button>
+      <button class="btn btn-solid a-green">Green</button>
+      <button class="btn btn-solid a-blue">Blue</button>
+      <button class="btn btn-solid a-purple">Purple</button>
+    </div>
+    <div class="row">
+      <button class="btn btn-outline a-blue">Outline</button>
+      <button class="btn btn-ghost">Ghost</button>
+      <button class="btn btn-solid a-pink" disabled>Disabled</button>
+      <button class="btn-icon" aria-label="Add">+</button>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="block-title">Inputs</div>
+    <label class="field"><span class="field-label">Base URL</span><input class="input" type="text" placeholder="https://example.com"></label>
+    <label class="field"><span class="field-label sub">Format</span>
+      <select class="select"><option>Markdown</option><option>HTML</option></select></label>
+    <div class="row">
+      <label class="choice"><input type="radio" name="s" checked>Whole page</label>
+      <label class="choice"><input type="checkbox" checked>Include hidden</label>
+      <label class="switch"><input type="checkbox" checked><span class="track"><span class="thumb"></span></span>On</label>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="block-title">Feedback</div>
+    <div class="notice info"><span class="icon">&#9432;</span><span>Informational message.</span></div>
+    <div class="notice success"><span class="icon">&#10003;</span><span>Saved successfully.</span></div>
+    <div class="notice error"><span class="icon">&#10007;</span><span>Something went wrong.</span></div>
+    <div class="row">
+      <span class="badge">New</span><span class="badge solid">Beta</span>
+      <button class="chip-toggle" aria-pressed="true">Filter</button>
+      <span class="status ok">&#10003; Ready</span>
+    </div>
+  </div>
+
+  <div class="block full">
+    <div class="block-title">Scroll area (gradient scrollbar in Chrome/Edge) + result box</div>
+    <div class="panel scrollbox fx-scroll">
+      <p class="t-body">Scroll me — the thumb is a pink→purple→blue gradient.</p>
+      <p class="t-body">Line 2</p><p class="t-body">Line 3</p><p class="t-body">Line 4</p>
+      <p class="t-body">Line 5</p><p class="t-body">Line 6</p><p class="t-body">Line 7</p>
+      <p class="t-body">Line 8</p>
+    </div>
+    <div class="result"><div class="result-label">Result</div><div class="result-url">https://app.example.com/generated/route?id=42</div></div>
+  </div>
+</main>
+
+<script>
+// A consuming app would fetch themes.index.json; over file:// we inline the ids.
+const THEMES = [
+  { id: '', label: 'Auto — Rink Classic (OS light/dark)' },
+  { id: 'rink-classic-dark', label: 'Rink Classic · Dark' },
+  { id: 'rink-classic-light', label: 'Rink Classic · Light' },
+  { id: 'midnight-arcade-dark', label: 'Midnight Arcade · Dark' },
+  { id: 'midnight-arcade-light', label: 'Midnight Arcade · Light' },
+  { id: 'hot-neon-dark', label: 'Hot Neon · Dark' },
+  { id: 'hot-neon-light', label: 'Hot Neon · Light' },
+  { id: 'synthwave-sunset-dark', label: 'Synthwave Sunset · Dark' },
+  { id: 'synthwave-sunset-light', label: 'Synthwave Sunset · Light' },
+  { id: 'acid-arcade-dark', label: 'Acid Arcade · Dark' },
+  { id: 'acid-arcade-light', label: 'Acid Arcade · Light' },
+];
+const sel = document.getElementById('themeSel');
+const curId = document.getElementById('curId');
+sel.innerHTML = THEMES.map(t => `<option value="${t.id}">${t.label}</option>`).join('');
+
+// THE core pattern: set (or clear) data-theme on <html>.
+function applyTheme(id) {
+  if (id) document.documentElement.setAttribute('data-theme', id);
+  else document.documentElement.removeAttribute('data-theme');
+  curId.textContent = id ? `data-theme="${id}"` : 'no data-theme (auto)';
+}
+sel.addEventListener('change', e => applyTheme(e.target.value));
+applyTheme('');
+
+// Disable-animations hook: set data-motion="off" on <html>.
+document.getElementById('motion').addEventListener('change', e => {
+  document.documentElement.setAttribute('data-motion', e.target.checked ? 'off' : '');
+});
+</script>
+</body>
+</html>

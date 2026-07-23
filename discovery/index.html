@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Theme Service — Palette Discovery</title>
+<style>
+  :root {
+    --bg: #0c0d12; --panel: #15171f; --border: #262a36; --text: #e7e9f2;
+    --muted: #9aa0b4; --accent: #6ee7ff; --pink: #ff5ada; --purple: #b57fff;
+    font-family: "Trebuchet MS", "Segoe UI", system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); padding: 48px 24px; }
+  .wrap { max-width: 860px; margin: 0 auto; }
+  h1 { font-size: 26px; margin: 0 0 6px; letter-spacing: 0.5px; }
+  h1 .g { background: linear-gradient(90deg, var(--pink), var(--purple), var(--accent)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .lead { color: var(--muted); font-size: 14px; max-width: 62ch; line-height: 1.55; margin: 0 0 32px; }
+  .drafts { display: grid; gap: 18px; }
+  a.card {
+    display: block; text-decoration: none; color: inherit;
+    background: var(--panel); border: 1px solid var(--border); border-radius: 14px;
+    padding: 20px 22px; transition: border-color .15s, transform .15s;
+  }
+  a.card:hover { border-color: var(--accent); transform: translateY(-2px); }
+  a.card:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+  .card .row { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+  .card h2 { font-size: 18px; margin: 0; }
+  .tag { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; padding: 3px 9px; border-radius: 999px; border: 1px solid var(--border); color: var(--muted); }
+  .tag.current { border-color: var(--accent); color: var(--accent); }
+  .tag.frozen { border-color: #4a5266; }
+  .card p { color: var(--muted); font-size: 13px; line-height: 1.5; margin: 10px 0 0; }
+  .swrow { display: flex; gap: 5px; margin-top: 14px; }
+  .sw { width: 22px; height: 22px; border-radius: 5px; border: 1px solid rgba(255,255,255,.15); }
+  .foot { color: var(--muted); font-size: 12px; margin-top: 34px; line-height: 1.6; }
+  .foot code { background: var(--panel); border: 1px solid var(--border); border-radius: 5px; padding: 1px 6px; font-family: Consolas, monospace; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Theme Service — <span class="g">Palette Discovery</span></h1>
+  <p class="lead">Iterative palette selection for a consistent "90s skating rink" neon brand across apps.
+  Each draft is a full, self-contained playground: every candidate palette rendered with the complete
+  component gallery, all WCAG&nbsp;AA&nbsp;2.2 validated. Drafts are kept side by side so you can compare.</p>
+
+  <div class="drafts">
+    <a class="card" href="draft-2/index.html">
+      <div class="row"><h2>Draft 2</h2><span class="tag current">Current</span><span class="tag">10 palettes</span></div>
+      <p>Your feedback applied: subdued grid backdrop, working pink→purple→blue gradient scrollbars
+      (Chrome/Edge), reduced small-text glow, denser notice/badge/chip backgrounds. Per-palette:
+      dark-01 deeper pink &amp; purple on a darker base, dark-03 cleaner cooler violet surfaces,
+      light-06 shifted to an acid/chartreuse green. Miami Nights dropped.</p>
+      <div class="swrow">
+        <span class="sw" style="background:#070110"></span>
+        <span class="sw" style="background:#ff2ec4"></span>
+        <span class="sw" style="background:#5bff3a"></span>
+        <span class="sw" style="background:#3ceaff"></span>
+        <span class="sw" style="background:#b57fff"></span>
+        <span class="sw" style="background:#f3ecff"></span>
+      </div>
+    </a>
+
+    <a class="card" href="draft-1/index.html">
+      <div class="row"><h2>Draft 1</h2><span class="tag frozen">Frozen · reference</span><span class="tag">12 palettes</span></div>
+      <p>The original set — 3 faithful + 3 fresh, each in dark &amp; light. Kept unchanged so you can
+      reference where each draft-2 palette started from.</p>
+      <div class="swrow">
+        <span class="sw" style="background:#0b0219"></span>
+        <span class="sw" style="background:#ff5ada"></span>
+        <span class="sw" style="background:#5bff3a"></span>
+        <span class="sw" style="background:#3ceaff"></span>
+        <span class="sw" style="background:#c39cff"></span>
+        <span class="sw" style="background:#f3ecff"></span>
+      </div>
+    </a>
+  </div>
+
+  <p class="foot">
+    Regenerate palettes from source: <code>node tools/build-palettes.mjs 2 --write</code> (validates AA, refuses to write on failure).<br>
+    Standalone WCAG contrast checker lives in <code>tools/contrast-checker/</code>.
+  </p>
+</div>
+</body>
+</html>

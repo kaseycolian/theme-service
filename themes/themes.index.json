@@ -1,0 +1,102 @@
+{
+  "version": "0.1.0",
+  "default": {
+    "family": "rink-classic",
+    "dark": "rink-classic-dark",
+    "light": "rink-classic-light"
+  },
+  "families": [
+    {
+      "family": "rink-classic",
+      "label": "Rink Classic",
+      "dark": "rink-classic-dark",
+      "light": "rink-classic-light"
+    },
+    {
+      "family": "midnight-arcade",
+      "label": "Midnight Arcade",
+      "dark": "midnight-arcade-dark",
+      "light": "midnight-arcade-light"
+    },
+    {
+      "family": "hot-neon",
+      "label": "Hot Neon",
+      "dark": "hot-neon-dark",
+      "light": "hot-neon-light"
+    },
+    {
+      "family": "synthwave-sunset",
+      "label": "Synthwave Sunset",
+      "dark": "synthwave-sunset-dark",
+      "light": "synthwave-sunset-light"
+    },
+    {
+      "family": "acid-arcade",
+      "label": "Acid Arcade",
+      "dark": "acid-arcade-dark",
+      "light": "acid-arcade-light"
+    }
+  ],
+  "themes": [
+    {
+      "id": "rink-classic-dark",
+      "label": "Rink Classic",
+      "family": "rink-classic",
+      "mode": "dark"
+    },
+    {
+      "id": "midnight-arcade-dark",
+      "label": "Midnight Arcade",
+      "family": "midnight-arcade",
+      "mode": "dark"
+    },
+    {
+      "id": "hot-neon-dark",
+      "label": "Hot Neon",
+      "family": "hot-neon",
+      "mode": "dark"
+    },
+    {
+      "id": "synthwave-sunset-dark",
+      "label": "Synthwave Sunset",
+      "family": "synthwave-sunset",
+      "mode": "dark"
+    },
+    {
+      "id": "acid-arcade-dark",
+      "label": "Acid Arcade",
+      "family": "acid-arcade",
+      "mode": "dark"
+    },
+    {
+      "id": "rink-classic-light",
+      "label": "Rink Classic",
+      "family": "rink-classic",
+      "mode": "light"
+    },
+    {
+      "id": "midnight-arcade-light",
+      "label": "Midnight Arcade",
+      "family": "midnight-arcade",
+      "mode": "light"
+    },
+    {
+      "id": "hot-neon-light",
+      "label": "Hot Neon",
+      "family": "hot-neon",
+      "mode": "light"
+    },
+    {
+      "id": "synthwave-sunset-light",
+      "label": "Synthwave Sunset",
+      "family": "synthwave-sunset",
+      "mode": "light"
+    },
+    {
+      "id": "acid-arcade-light",
+      "label": "Acid Arcade",
+      "family": "acid-arcade",
+      "mode": "light"
+    }
+  ]
+}

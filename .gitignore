@@ -1,0 +1,17 @@
+# Dependencies (none currently, but future-proof)
+node_modules/
+
+# Local machine config written by the installer (never committed — keeps paths off the repo)
+.theme-service.local.json
+*.local.json
+
+# OS / editor cruft
+.DS_Store
+Thumbs.db
+*.swp
+.idea/
+.vscode/*
+!.vscode/extensions.json
+
+# Local Claude/agent scratch that may land in the repo dir
+.claude/
