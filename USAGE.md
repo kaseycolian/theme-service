@@ -19,7 +19,7 @@ onto the tokens, add the CSP-safe theme selector, and verify accessibility.
 |------|-----|
 | **New / greenfield app** | "Set up theming from the theme-service in this project — use the component classes and add a theme selector. Follow the theme-service skill." |
 | **Update to the latest version** | "Update this repo to the latest theme-service version." |
-| **Add a new theme to the service** | "Add a new theme to the theme-service" (then provide a palette, or ask it to guide you). |
+| **Add / edit themes** | "Add a new theme to the theme-service" (provide a palette, ask it to guide you, or design a new style). Full walkthrough: [CREATING-THEMES.md](CREATING-THEMES.md). |
 
 ## Tips that make it go smoothly
 
