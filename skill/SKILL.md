@@ -28,8 +28,9 @@ Confirm the source has `themes/theme.css`, `themes/effects.css`, `themes/compone
 |-------------|-------|
 | Add theming to a **new** project, or a project with **no** theme system yet | `references/applying-themes.md` → "New / greenfield" |
 | Add theming + a **theme selector** to an **existing** app (keep its components, make them render every theme) | `references/applying-themes.md` → "Existing project" |
-| **Update** a repo that already uses these themes to the latest version | `references/updating-themes.md` |
+| **Update** a *consuming app* that already uses these themes to the latest version | `references/updating-themes.md` |
 | **Add a new theme** to the theme-service itself (from a palette, or guided) | `references/adding-a-theme.md` |
+| **Update the theme-service repo itself** (a fork/clone) from its origin — new built-in themes + skill/tool changes, keeping the user's own themes | `references/updating-from-origin.md` |
 
 ## Step 2 — Detect the target stack (before applying)
 
@@ -65,3 +66,12 @@ recolor any pairs.
   tokens — you don't rewrite their components.
 - **Never invent colors.** Only use the tokens/themes from the source. If a needed role has no token,
   flag it (it may warrant `references/adding-a-theme.md`) rather than hardcoding.
+- **Adding/creating themes happens in the SOURCE repo** the config points at — not the app repo. A
+  fork's own themes go in `tools/palettes/local.mjs`; built-ins live in `tools/palettes/draft-*.mjs`.
+  Run `npm run build-themes` (merges built-ins + local; `build-themes:mine` = only local) and **commit
+  in the source repo** to persist (git-local is enough; GitHub optional). The generated `themes/` files
+  are build output (gitignored), never hand-edited.
+- **Never auto-delete or overwrite a user's themes.** Their themes are in `local.mjs`, which the origin
+  never touches; rebuilding only regenerates. Remove a theme only on the user's **explicit** request.
+  When syncing a fork from its origin, follow `references/updating-from-origin.md` and **ask whether to
+  include the origin's built-in themes** before rebuilding.

@@ -7,13 +7,14 @@ detailed, non-agent-specific procedures live in `skill/references/` and are shar
 
 ## What's here
 
-- `themes/` — **source of truth** (all generated + AA-validated):
-  `theme.css` (color tokens for every theme; `:root` = default **Rink Classic**, auto dark/light),
-  `effects.css` (neon glow/grid/scrollbar), `components.css` (opt-in component classes),
-  `tokens.json`, `themes.index.json` (registry), `preview.html` (switcher/demo), `README.md`.
-- `VERSION` — the theme-service version apps record when they vendor the CSS.
-- `tools/` — `build-palettes.mjs` (draft generator), `build-final.mjs` (finalizer → `themes/`),
-  `palettes/` (palette source), `contrast-checker/` (standalone WCAG library + CLI).
+- `themes/` — the distributable themes (all AA-validated). `effects.css`, `components.css`,
+  `preview.html`, `README.md` are committed; `theme.css`, `tokens.json`, `themes.index.json`,
+  `theme-init.js`, `theme-select.js` are **build output** (gitignored) — produced by
+  `npm run build-themes`. Default = **Rink Classic**, auto dark/light.
+- `VERSION` — the theme-service version (single source of truth; `npm run release` bumps + tags it).
+- `tools/` — `build-final.mjs` (build `themes/`), `build-palettes.mjs` (discovery drafts),
+  `release.mjs` (version + tag), `update-from-origin.mjs` (pull origin updates), `palettes/`
+  (`draft-*.mjs` = built-in source; `local.mjs` = a fork's own themes), `contrast-checker/`.
 - `discovery/` — palette-selection playground (drafts). Not consumed by apps.
 - `skill/` — the Claude skill; `skill/references/*.md` are the shared how-to docs.
 - `ARCHITECTURE.md` — how it all fits, the token contract, and framework wiring.
@@ -28,8 +29,10 @@ detailed, non-agent-specific procedures live in `skill/references/` and are shar
      render every theme → `skill/references/applying-themes.md` (Existing project). It contains the
      color-role → token mapping table, the selector snippets (vanilla/Angular/React), and the
      anti-flash bootstrap.
-   - **Update** an app to the latest version → `skill/references/updating-themes.md`.
+   - **Update** a consuming app to the latest version → `skill/references/updating-themes.md`.
    - **Add a new theme** to this repo → `skill/references/adding-a-theme.md`.
+   - **Update this theme-service fork/clone from its origin** (keep the user's themes) →
+     `skill/references/updating-from-origin.md`.
 3. **Verify** with `skill/references/wcag-checklist.md` and the checker in `tools/contrast-checker/`.
 
 ## Non-negotiables
@@ -48,5 +51,12 @@ detailed, non-agent-specific procedures live in `skill/references/` and are shar
 - **Preserve** the target app's existing markup/structure by default — map its colors onto the tokens.
   Only migrate components to the `components.css` classes if the user opted into a full restyle, and
   then keep every existing behavior/handler/ARIA intact.
+- **Adding/creating themes happens in the SOURCE repo** (from the config), not the app repo. A fork's
+  own themes go in `tools/palettes/local.mjs`; run `npm run build-themes` (merges built-ins + local) and
+  **commit in the source repo** (git-local persists; GitHub optional). Never hand-edit the generated
+  `themes/` files.
+- **Never auto-delete or overwrite a user's themes.** Their themes live in `local.mjs` (origin never
+  touches it); rebuilding only regenerates. Remove a theme only on explicit request. When updating a
+  fork from origin, follow `updating-from-origin.md` and **ask before including built-in themes**.
 - **Only use tokens/themes from `themes/`.** Never invent colors. Keep everything AA 2.2 and
   dependency-free. This repo is public — never add secrets or machine-specific paths.

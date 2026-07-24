@@ -8,8 +8,28 @@ generators refuse to write if any color pair fails.
 > Prerequisite: you've cloned the repo (and, for Claude, run the installer — see the README Path 1).
 > Theme work happens **inside this repo**, then you commit the result.
 
-There are three ways in. All end the same way: validated palettes → regenerated `themes/` → a version
-bump. Pick whichever matches what you have.
+There are three ways in. All end the same way: validated palettes → rebuilt `themes/` → commit.
+Pick whichever matches what you have.
+
+---
+
+## Where your themes live & how they persist
+
+Creating/editing themes modifies the **theme-service source repo** your machine points to — **not** the
+app you're theming (apps only get vendored *copies*).
+
+- **Your themes go in `tools/palettes/local.mjs`** (shipped empty). The origin never touches it, so
+  your themes survive every update. Built-in themes live in `tools/palettes/draft-*.mjs` (the origin's).
+  `npm run build-themes` **merges** both into `themes/` (or `build-themes:mine` for only yours).
+- **Persist by committing** in the source repo after building. **Git-local is enough — no GitHub
+  required.** A remote is optional (backup / sync across machines / sharing).
+- **Use your own copy as the source:** fork or copy this repo, then run the installer from *your* copy
+  (or `node install/install.mjs --source <path>`) so agents save into it. The "which repo is my source"
+  pointer is machine-local (`~/.claude/theme-service.local.json`) and **never committed**; change it
+  anytime (re-run install / `--source` / edit the file).
+- **Get the origin's updates without losing your themes:** `npm run update-from-origin` then
+  `npm run build-themes` (see "Own your copy" in the README). You're **asked** whether to include the
+  origin's built-in themes; **nothing is ever auto-deleted**.
 
 ---
 
@@ -57,22 +77,23 @@ then finalize your picks into `themes/`.
 The skill follows [`skill/references/adding-a-theme.md`](skill/references/adding-a-theme.md). The
 manual workflow, if you want to drive it yourself:
 
-1. **Edit the palette source.** Add palette object(s) to the draft that the finalizer sources
-   (`tools/palettes/draft-3.mjs`), or start a new `tools/palettes/draft-N.mjs` for a fresh
-   exploration. Reuse the token shape from existing entries; set a clear `label`/`group`. Optional
-   per-theme background strength via `grid` (0 = off, 0.22 = subdued, ~0.40 = pronounced).
-2. **Validate AA.** `node tools/build-palettes.mjs <N>` reports every pair; fix any failure. Watch the
-   contrast ceilings (deep purple/green as *small* text on dark, and any accent as small text on
-   light, are bounded — use `tools/contrast-checker/` to find the deepest passing value).
-3. **Review (optional).** `node tools/build-palettes.mjs <N> --write` then open
+1. **Add the palette.** If you're a **fork user**, put it in `tools/palettes/local.mjs` (the origin
+   never touches it). If you **own the origin**, add it to the built-in draft the finalizer sources
+   (`tools/palettes/draft-3.mjs`) — or start a new `draft-N.mjs` for a fresh side-by-side exploration.
+   Reuse the token shape from existing entries; set a clear `label`/`group`. Optional per-theme
+   background strength via `grid` (0 = off, 0.22 = subdued, ~0.40 = pronounced).
+2. **Validate AA.** `npm run validate` (built-ins) or just build — `build-final.mjs` validates every
+   pair (built-in **and** local) and refuses to write on any failure. Watch the ceilings (deep
+   purple/green as *small* text on dark, and any accent as small text on light, are bounded — use
+   `tools/contrast-checker/` to find the deepest passing value).
+3. **Review (optional, origin/new families).** `node tools/build-palettes.mjs <N> --write` then open
    `discovery/draft-<N>/index.html` to compare candidates side-by-side.
-4. **Finalize.** `node tools/build-final.mjs --write` regenerates `themes/` (`theme.css`,
-   `tokens.json`, `themes.index.json`, and the selector helpers — the theme list flows into
-   `theme-select.js` automatically). To change the flagship default, set `DEFAULT_FAMILY` in
-   `tools/build-final.mjs`.
-5. **Bump the version** (`VERSION` via `build-final.mjs`) and add a `CHANGELOG.md` entry. Minor bump
-   for additive themes; major for token renames/removals or a default change.
-6. **Commit.** Your new/changed themes are now the source of truth.
+4. **Build.** `npm run build-themes` regenerates `themes/` (merging built-ins + your `local.mjs`;
+   `build-themes:mine` for only yours). The theme list flows into `theme-select.js` automatically. To
+   change the flagship default, set `DEFAULT_FAMILY` in `tools/build-final.mjs`.
+5. **Commit** (git-local persists; push optional). If you own the origin and are cutting a release,
+   `npm run release <patch|minor|major> -- --note "…"` bumps `VERSION`, updates `CHANGELOG.md`, commits,
+   and tags `vX.Y.Z`.
 
 ## Rolling changes out to your apps
 

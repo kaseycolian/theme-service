@@ -1,30 +1,54 @@
 /* =============================================================================
-   build-final.mjs — promote a selected draft into the FINALIZED source of truth.
-   Reads tools/palettes/draft-<n>.mjs (default draft 2), re-validates AA, and emits:
-     themes/theme.css          :root default (auto dark/light) + every [data-theme] block
-     themes/tokens.json        structured mirror of every theme's tokens
-     themes/themes.index.json  registry (families, modes, default) for the add-theme flow
-     VERSION                    repo version stamp (root)
+   build-final.mjs — build the FINALIZED themes/ from source palettes.
+   Merges BUILT-IN themes (tools/palettes/draft-<n>.mjs — the origin's pre-installed
+   set, included unless opted out) with LOCAL themes (tools/palettes/local.mjs — a
+   fork's own themes, ALWAYS included), re-validates AA, and emits:
+     themes/theme.css  tokens.json  themes.index.json  theme-init.js  theme-select.js
+   These are BUILD OUTPUT (gitignored) — regenerate them; never hand-edit.
 
-   Run:  node tools/build-final.mjs            # validate + report
-         node tools/build-final.mjs --write    # + write the files
-         node tools/build-final.mjs 2 --write  # explicit source draft
+   Run:  node tools/build-final.mjs --write             # built-ins + local (default)
+         node tools/build-final.mjs --write --no-builtin # ONLY your local themes
+         node tools/build-final.mjs 3 --write            # explicit source draft for built-ins
 
-   Theme ids are clean `<family>-<mode>` (e.g. rink-classic-dark). The default family
-   renders on :root, dark by default, switching to its light variant under
-   `prefers-color-scheme: light` when no explicit data-theme is set.
+   Whether built-ins are included: --no-builtin / --with-builtin override the machine-
+   local preference (`includeBuiltinThemes` in ~/.claude/theme-service.local.json,
+   default true). VERSION is read from the repo's VERSION file (bump it via release.mjs).
    ============================================================================= */
-import { writeFileSync, mkdirSync } from 'node:fs';
+import { writeFileSync, mkdirSync, readFileSync, existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
+import { homedir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { contrastRatio, round2 } from './contrast-checker/contrast.mjs';
 
 const REPO = join(dirname(fileURLToPath(import.meta.url)), '..');
-const VERSION = '0.2.0';
 const DEFAULT_FAMILY = 'rink-classic';
 
+const VERSION = (() => {
+  try { return readFileSync(join(REPO, 'VERSION'), 'utf8').trim() || '0.0.0'; } catch { return '0.0.0'; }
+})();
+
+// ---------- Which built-in draft, and whether to include built-ins ----------
 const srcDraft = process.argv.find(a => /^\d+$/.test(a)) || '3';
-const { palettes: P } = await import(`./palettes/draft-${srcDraft}.mjs`);
+function localConfig() {
+  const p = join(homedir(), '.claude', 'theme-service.local.json');
+  try { return existsSync(p) ? JSON.parse(readFileSync(p, 'utf8')) : {}; } catch { return {}; }
+}
+let includeBuiltins = localConfig().includeBuiltinThemes !== false;  // default true
+if (process.argv.includes('--no-builtin')) includeBuiltins = false;
+if (process.argv.includes('--with-builtin')) includeBuiltins = true;
+
+const { palettes: BUILTINS } = await import(`./palettes/draft-${srcDraft}.mjs`);
+let LOCAL = {};
+try { ({ palettes: LOCAL } = await import('./palettes/local.mjs')); } catch { LOCAL = {}; }
+
+// Source entries: [draftKey, palette, origin]. Built-ins first (if included), then local.
+const entries = [];
+if (includeBuiltins) for (const [k, p] of Object.entries(BUILTINS)) entries.push([k, p, 'built-in']);
+for (const [k, p] of Object.entries(LOCAL)) entries.push([k, p, 'local']);
+if (!entries.length) {
+  console.error('No themes to build. Add themes to tools/palettes/local.mjs, or allow built-ins (drop --no-builtin).');
+  process.exit(1);
+}
 
 // token key -> CSS custom property
 const VARMAP = {
@@ -36,18 +60,17 @@ const VARMAP = {
 const accents = ['pink', 'green', 'blue', 'purple'];
 const cap = a => a[0].toUpperCase() + a.slice(1);
 
-// Derive finalized metadata from a draft id like "dark-01-rink-classic".
+// Derive finalized metadata from a draft key like "dark-01-rink-classic".
 function meta(draftId, p) {
   const m = draftId.match(/^(?:dark|light)-\d+-(.+)$/);
   const familyPart = m ? m[1] : draftId;
   const noBg = familyPart.endsWith('-no-background');
   const family = noBg ? familyPart.slice(0, -'-no-background'.length) : familyPart;
-  // Finalized id keeps mode adjacent to family, with the modifier last: rink-classic-dark-no-background
   const id = `${family}-${p.mode}${noBg ? '-no-background' : ''}`;
   return { id, family, mode: p.mode, label: p.label, noBg };
 }
 
-// ---------- AA validation (same matrix as the draft generator) ----------
+// ---------- AA validation (built-ins AND local) ----------
 function checksFor(p) {
   const c = [];
   const add = (fg, bg, min) => c.push({ min, ratio: round2(contrastRatio(p[fg], p[bg])) });
@@ -57,32 +80,44 @@ function checksFor(p) {
   return c;
 }
 let failures = 0;
-for (const [id, p] of Object.entries(P)) {
-  const bad = checksFor(p).filter(x => x.ratio < x.min).length;
-  if (bad) { failures += bad; console.log(`FAIL ${id} — ${bad}`); }
+for (const [id, p, origin] of entries) {
+  let bad;
+  try { bad = checksFor(p).filter(x => x.ratio < x.min).length; }
+  catch (e) { console.error(`ERROR ${origin} "${id}": ${e.message} (missing/invalid token?)`); failures++; continue; }
+  if (bad) { failures += bad; console.log(`FAIL ${origin} "${id}" — ${bad} AA failure(s)`); }
 }
-console.log(`Finalizing draft ${srcDraft}: ${failures === 0 ? 'ALL PASS' : failures + ' FAILURES'}`);
+console.log(`Building themes (built-ins: ${includeBuiltins ? 'draft-' + srcDraft : 'excluded'}, local: ${Object.keys(LOCAL).length}) — ${failures === 0 ? 'ALL PASS' : failures + ' PROBLEM(S)'}`);
 
-// ---------- Assemble finalized model ----------
-const themes = {};        // id -> { meta, tokens{cssVar:value}, glow }
-for (const [draftId, p] of Object.entries(P)) {
+// ---------- Assemble finalized model (collision-checked) ----------
+const themes = {};        // id -> theme
+const origins = {};       // id -> origin (for error messages)
+for (const [draftId, p, origin] of entries) {
   const mt = meta(draftId, p);
+  if (themes[mt.id]) {
+    console.error(`Theme id collision: "${mt.id}" from ${origin} "${draftId}" already defined by ${origins[mt.id]}. Rename your local theme.`);
+    process.exit(1);
+  }
   const tokens = {};
   for (const [k, v] of Object.entries(VARMAP)) tokens[v] = p[k];
-  themes[mt.id] = { ...mt, colorScheme: p.mode, glow: p.mode === 'light' ? '0.35' : '1', grid: p.grid, tokens };
+  themes[mt.id] = { ...mt, colorScheme: p.mode, glow: p.mode === 'light' ? '0.35' : '1', grid: p.grid, origin, tokens };
+  origins[mt.id] = `${origin} "${draftId}"`;
 }
 const families = {};
 for (const t of Object.values(themes)) {
   families[t.family] ??= { family: t.family, label: t.label.replace(/ \(No Background\)$/, '') };
-  // The primary dark/light for a family is the WITH-background variant, not the no-bg one.
-  if (!t.noBg) families[t.family][t.mode] = t.id;
+  if (!t.noBg) families[t.family][t.mode] = t.id;  // primary dark/light = the WITH-background variant
 }
-const defDark = families[DEFAULT_FAMILY].dark;
-const defLight = families[DEFAULT_FAMILY].light;
+
+// Pick a default family robustly (prefer rink-classic; else first family with both modes; else any).
+const hasBoth = f => f.dark && f.light;
+const defFam = (families[DEFAULT_FAMILY] && hasBoth(families[DEFAULT_FAMILY])) ? families[DEFAULT_FAMILY]
+  : Object.values(families).find(hasBoth) || Object.values(families)[0];
+const defDark = defFam.dark || defFam.light || Object.values(themes)[0].id;
+const defLight = defFam.light || defDark;
 
 // ---------- Emit ----------
 if (process.argv.includes('--write')) {
-  if (failures !== 0) { console.error('Refusing to write: fix contrast failures first.'); process.exit(1); }
+  if (failures !== 0) { console.error('Refusing to write: fix the problems above first.'); process.exit(1); }
   mkdirSync(join(REPO, 'themes'), { recursive: true });
 
   const block = (sel, t, indent = '') => {
@@ -92,39 +127,42 @@ if (process.argv.includes('--write')) {
   };
 
   let css = `/* =============================================================================
-   Theme Service — finalized themes. v${VERSION}. Source: draft-${srcDraft}.
-   GENERATED by tools/build-final.mjs — do not edit by hand; edit the palette source
-   and regenerate. Pair with effects.css + components.css.
+   Theme Service — finalized themes. v${VERSION}. Built-ins: ${includeBuiltins ? 'draft-' + srcDraft : 'excluded'}; local: ${Object.keys(LOCAL).length}.
+   GENERATED by tools/build-final.mjs — build output, not committed. Edit the palette
+   source (tools/palettes/draft-*.mjs = built-in; local.mjs = yours) and rebuild.
+   Pair with effects.css + components.css.
 
    Usage: include theme.css (+ effects.css + components.css). With no data-theme,
-   the default (${families[DEFAULT_FAMILY].label}) renders — dark, or light under
-   prefers-color-scheme: light. Force any theme with <html data-theme="<id>">.
+   the default (${defFam.label}) renders${defLight !== defDark ? ' — dark, or light under prefers-color-scheme: light' : ''}.
+   Force any theme with <html data-theme="<id>">.
    Theme ids: ${Object.keys(themes).join(', ')}.
    ============================================================================= */\n\n`;
 
-  css += `/* Default theme (${families[DEFAULT_FAMILY].label}) — auto dark/light by OS preference. */\n`;
+  css += `/* Default theme (${defFam.label}). */\n`;
   css += block(':root', themes[defDark]) + '\n\n';
-  css += `@media (prefers-color-scheme: light) {\n`;
-  css += block(':root:not([data-theme])', themes[defLight], '  ') + '\n}\n\n';
+  if (defLight !== defDark) {
+    css += `@media (prefers-color-scheme: light) {\n`;
+    css += block(':root:not([data-theme])', themes[defLight], '  ') + '\n}\n\n';
+  }
 
   css += `/* All themes — force with data-theme="<id>". */\n`;
   for (const t of Object.values(themes)) css += block(`[data-theme="${t.id}"]`, t) + '\n\n';
   writeFileSync(join(REPO, 'themes/theme.css'), css);
 
   const tokensJson = {
-    version: VERSION, source: `draft-${srcDraft}`,
-    default: { family: DEFAULT_FAMILY, dark: defDark, light: defLight },
+    version: VERSION, builtinSource: includeBuiltins ? `draft-${srcDraft}` : null, localThemes: Object.keys(LOCAL).length,
+    default: { family: defFam.family, dark: defDark, light: defLight },
     themes: Object.fromEntries(Object.values(themes).map(t =>
-      [t.id, { label: t.label, family: t.family, mode: t.mode, colorScheme: t.colorScheme, glowStrength: Number(t.glow),
+      [t.id, { label: t.label, family: t.family, mode: t.mode, origin: t.origin, colorScheme: t.colorScheme, glowStrength: Number(t.glow),
         ...(t.grid !== undefined ? { gridOpacity: t.grid } : {}), tokens: t.tokens }])),
   };
   writeFileSync(join(REPO, 'themes/tokens.json'), JSON.stringify(tokensJson, null, 2) + '\n');
 
   const index = {
     version: VERSION,
-    default: { family: DEFAULT_FAMILY, dark: defDark, light: defLight },
+    default: { family: defFam.family, dark: defDark, light: defLight },
     families: Object.values(families),
-    themes: Object.values(themes).map(t => ({ id: t.id, label: t.label, family: t.family, mode: t.mode })),
+    themes: Object.values(themes).map(t => ({ id: t.id, label: t.label, family: t.family, mode: t.mode, origin: t.origin })),
   };
   writeFileSync(join(REPO, 'themes/themes.index.json'), JSON.stringify(index, null, 2) + '\n');
 
@@ -146,7 +184,7 @@ if (process.argv.includes('--write')) {
 `;
   writeFileSync(join(REPO, 'themes/theme-init.js'), themeInit);
 
-  const selectList = [{ id: '', label: `Auto (${families[DEFAULT_FAMILY].label})` }]
+  const selectList = [{ id: '', label: `Auto (${defFam.label})` }]
     .concat(Object.values(themes).map(t => ({ id: t.id, label: `${t.label} · ${t.mode[0].toUpperCase()}${t.mode.slice(1)}` })));
   const themeSelect =
 `/* theme-service v${VERSION} — theme-select.js  (GENERATED; theme list mirrors themes.index.json)
@@ -167,7 +205,6 @@ if (process.argv.includes('--write')) {
     try { saved = localStorage.getItem('theme') || ''; } catch (e) {}
     document.querySelectorAll('select[data-theme-select]').forEach(function (sel) {
       if (!sel.options.length) THEMES.forEach(function (t) { sel.add(new Option(t.label, t.id)); });
-      // Reflect whatever is actually applied (data-theme wins over the stored value, e.g. ?theme=).
       sel.value = root.getAttribute('data-theme') || saved || '';
       sel.addEventListener('change', function () {
         var id = sel.value;
@@ -187,6 +224,5 @@ if (process.argv.includes('--write')) {
 `;
   writeFileSync(join(REPO, 'themes/theme-select.js'), themeSelect);
 
-  writeFileSync(join(REPO, 'VERSION'), VERSION + '\n');
-  console.log(`\nWrote themes/theme.css, tokens.json, themes.index.json, theme-init.js, theme-select.js (v${VERSION}, ${Object.keys(themes).length} themes) + VERSION`);
+  console.log(`\nWrote themes/{theme.css, tokens.json, themes.index.json, theme-init.js, theme-select.js} — v${VERSION}, ${Object.keys(themes).length} themes.`);
 }

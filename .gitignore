@@ -1,6 +1,15 @@
 # Dependencies (none currently, but future-proof)
 node_modules/
 
+# Generated theme distributables (BUILD OUTPUT — run `npm run build-themes` to produce).
+# Not committed so forks pull upstream updates conflict-free, then rebuild locally.
+# (Hand-authored files in themes/ — effects.css, components.css, preview.html, README.md — stay committed.)
+themes/theme.css
+themes/tokens.json
+themes/themes.index.json
+themes/theme-init.js
+themes/theme-select.js
+
 # Local machine config written by the installer (never committed — keeps paths off the repo)
 .theme-service.local.json
 *.local.json

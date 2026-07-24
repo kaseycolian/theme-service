@@ -32,28 +32,32 @@ candidate palettes, generate + review, iterate, then finalize the picks. This is
 discovery→finalize flow; it supports either brand-consistent variants or a deliberately new aesthetic.
 
 ## Then, for any option
-1. **Add the palette object(s)** to the palette source. For a new candidate round (Option 3), create a
-   new `tools/palettes/draft-<n>.mjs`; to add directly to the finalized set, add to the draft that
-   `tools/build-final.mjs` sources (currently `draft-3.mjs`) using the same key shape
-   (`<mode>-NN-<family>`), giving a clear `label` and `group`. Optional per-theme background strength
-   via a `grid` field (0 = off, 0.22 = subdued default, ~0.40 = pronounced).
-2. **Validate AA** — run `node tools/build-palettes.mjs <n>` (or the finalizer's report). Fix any
-   failing pair. Remember the ceilings: deep purple/green as **small text** on dark, and any accent as
-   small text on light, are contrast-bound; adjust luminance until ≥4.5 (use `tools/contrast-checker/`
-   to find the deepest passing value). The generator **refuses to write** while anything fails.
-3. **Regenerate**:
-   - Discovery preview (optional review): `node tools/build-palettes.mjs <n> --write` → open
-     `discovery/draft-<n>/index.html`.
-   - Finalize into the source of truth: `node tools/build-final.mjs --write` → updates
-     `themes/theme.css`, `tokens.json`, `themes.index.json`.
-4. **Bump the version** in `tools/build-final.mjs` (`VERSION`) — minor bump for additive themes — and
-   add a `CHANGELOG.md` entry describing what was added.
-5. **Verify** in `themes/preview.html` (the new theme appears in the switcher and renders correctly),
-   then walk `wcag-checklist.md`.
-6. Downstream apps pick up the new theme by running the **update flow** (`updating-themes.md`); a
-   data-driven selector shows it automatically.
+1. **Add the palette object(s)** to the palette source — in the SOURCE repo the config points at (not
+   the app repo):
+   - **Fork user / adding to your own set:** put it in `tools/palettes/local.mjs` (the origin never
+     touches it, so it survives updates). This is the default for anyone who isn't the origin owner.
+   - **Origin owner / new candidate round (Option 3):** add to the built-in draft `build-final.mjs`
+     sources (`draft-3.mjs`), or create a new `tools/palettes/draft-<n>.mjs` to explore.
+   Use the key shape `<mode>-NN-<family>` with a clear `label`/`group`. Optional per-theme background
+   strength via a `grid` field (0 = off, 0.22 = subdued default, ~0.40 = pronounced). Add a
+   `-no-background` suffix to a key for a grid-off variant.
+2. **Validate AA** — `npm run build-themes` (or `node tools/build-palettes.mjs <n>` for a draft)
+   validates every pair — **built-in and local** — and **refuses to write** on any failure. Watch the
+   ceilings: deep purple/green as **small text** on dark, and any accent as small text on light, are
+   contrast-bound; adjust luminance until ≥4.5 (use `tools/contrast-checker/` for the deepest passing
+   value).
+3. **Build.** `npm run build-themes` regenerates `themes/` (merging built-ins + `local.mjs`; use
+   `npm run build-themes:mine` to build only local themes). For a new-family exploration, review first
+   with `node tools/build-palettes.mjs <n> --write` → `discovery/draft-<n>/index.html`.
+4. **Verify** in `themes/preview.html` (the new theme appears in the switcher and renders correctly),
+   then walk `wcag-checklist.md`. **Never delete existing themes** to make room — only add.
+5. **Commit** in the source repo (git-local persists; push optional). **Origin owner cutting a
+   release:** `npm run release <patch|minor|major> -- --note "…"` bumps `VERSION`, updates `CHANGELOG`,
+   commits, and tags `vX.Y.Z`.
+6. Downstream apps pick up new themes via the **update flow** (`updating-themes.md`); a data-driven
+   selector shows them automatically. Forks pick up origin changes via `updating-from-origin.md`.
 
 ## Changing the default/flagship theme
 Set `DEFAULT_FAMILY` in `tools/build-final.mjs` to the family you want on `:root`, re-run
-`node tools/build-final.mjs --write`, bump the version, and note it in the CHANGELOG (apps relying on
-the auto default will change appearance — call this out).
+`npm run build-themes`, and (origin owner) `npm run release` with a note — apps relying on the auto
+default will change appearance, so call it out.

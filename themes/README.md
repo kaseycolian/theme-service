@@ -1,7 +1,10 @@
-# Finalized Themes — Source of Truth
+# Finalized Themes
 
-This folder is the **canonical theme system**. Apps consume these files; everything is
-generated/validated from the palette source and is WCAG AA 2.2 compliant in every state.
+Apps consume these files. They're validated to WCAG AA 2.2 in every state. The token/registry/helper
+files are **build output** — run `npm run build-themes` from the repo root to (re)generate them
+(they're gitignored, not committed, so forks can pull origin updates conflict-free). The
+hand-authored `effects.css`, `components.css`, and `preview.html` are committed. Source of truth =
+the palette files (`tools/palettes/draft-*.mjs` built-in + `local.mjs` yours).
 
 ## Files
 

@@ -6,23 +6,28 @@ task-oriented how-tos are in `skill/references/`.
 ## Layers (a value flows down, never up)
 
 ```
-tools/palettes/draft-<n>.mjs      ← palette SOURCE (hand-authored hex values)
-        │  node tools/build-palettes.mjs <n> --write   (validates AA)
+tools/palettes/draft-<n>.mjs   ← BUILT-IN palette source (origin's; committed)
+tools/palettes/local.mjs       ← LOCAL palette source (a fork's own themes; committed in the fork)
+        │  npm run build-themes   (build-final.mjs: merge built-ins[gated] + local; validates AA)
         ▼
-discovery/draft-<n>/               ← review playground (per-draft: index.html, styles/, palettes/, data/)
-        │  (user picks the winning palettes)
-        │  node tools/build-final.mjs --write           (validates AA, refuses on failure)
+themes/  (BUILD OUTPUT — gitignored, not committed; regenerate any time)
+  theme.css  tokens.json  themes.index.json  theme-init.js  theme-select.js
+themes/  (COMMITTED, hand-authored): effects.css  components.css  preview.html  README.md
+        │  (vendored/copied into each app; version recorded in the app's THEME-SERVICE.md)
         ▼
-themes/                            ← SOURCE OF TRUTH (generated)
-  theme.css  tokens.json  themes.index.json
-  effects.css  components.css  preview.html
-        │  (vendored/copied into each app; version recorded)
-        ▼
-consuming apps                     ← include theme.css+effects.css+components.css, set data-theme
+consuming apps                 ← include theme.css+effects.css+components.css, set data-theme
+
+discovery/draft-<n>/  ← optional review playground (owner): node tools/build-palettes.mjs <n> --write
 ```
 
-Never hand-edit generated files (`themes/theme.css`, `tokens.json`, `themes.index.json`, and the
-`discovery/*/palettes/*.css`). Edit the palette source and regenerate.
+- **Built-ins vs local:** `build-final.mjs` merges the origin's built-in themes (from `draft-3.mjs`,
+  included unless `--no-builtin` / the machine-local `includeBuiltinThemes:false`) with a fork's own
+  themes (`local.mjs`, always). Local ids must not collide with built-ins (the build errors if so).
+- **Generated files are build output** — `theme.css`, `tokens.json`, `themes.index.json`,
+  `theme-init.js`, `theme-select.js` are gitignored so forks pull origin updates conflict-free, then
+  rebuild. Never hand-edit them; edit the palette source and run `npm run build-themes`.
+- **VERSION** is the single source of truth (`build-final.mjs` reads it); `npm run release` bumps it,
+  updates `CHANGELOG.md`, commits, and tags `vX.Y.Z`.
 
 ## Token contract
 
@@ -63,10 +68,20 @@ Structural tokens (theme-independent, in `components.css` `:root`): `--font-ui -
 ## Distribution & versioning
 
 - `skill/` installs into `~/.claude/skills/theme-service` (junction on Windows, symlink elsewhere) via
-  `install/`. The installer writes `~/.claude/theme-service.local.json` (repo path) **outside** the
-  repo — no machine paths are ever committed. `AGENTS.md` mirrors the skill for non-Claude agents.
-- Apps **vendor** a copy of the theme CSS and record the `VERSION`; the update flow diffs that against
-  the repo `VERSION` to propagate changes. `CHANGELOG.md` documents each version.
+  `install/`. Two modes: `npm run install-all` (link skill + build themes) and `npm run
+  install-no-themes` (link skill only). `AGENTS.md` mirrors the skill for non-Claude agents.
+- **Machine-local config** `~/.claude/theme-service.local.json` (OUTSIDE the repo, gitignored, never in
+  commit history): `{ repo, version, includeBuiltinThemes, history[] }`. It's the **changeable source
+  pointer** (which theme-service clone this machine uses — set on install; change via re-install /
+  `--source` / editing it), the built-ins preference, and the **install/update history** (agents read
+  it). No machine paths are ever committed.
+- **Forks & updates:** anyone clones/forks the origin as their own source. Their themes live in
+  `local.mjs`; the origin never touches it. `npm run update-from-origin` fetches + merges the origin
+  (conflict-free, since generated files aren't committed), then `npm run build-themes` rebuilds —
+  optionally excluding the origin's built-ins. Nothing is ever auto-deleted.
+- Consuming apps **vendor** a copy of the theme CSS and record the `VERSION` in their `THEME-SERVICE.md`
+  tracking log; the app update flow diffs against the repo `VERSION`. `CHANGELOG.md` + git tags
+  document each version.
 
 ## Public-git safety
 

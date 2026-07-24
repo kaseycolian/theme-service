@@ -20,15 +20,16 @@ guided workflow to add and change themes. Pick your path:
 Install once, then apply the existing themes to any repo on your machine. No palette/creation work.
 
 1. **Clone** this repo anywhere.
-2. **Install the skill** (links it into `~/.claude/skills` and records this repo's location so agents
-   can find it — nothing is written inside the repo):
+2. **Install** — two modes. Both link the skill into `~/.claude/skills` and write a machine-local
+   pointer to this repo (nothing is written *inside* the repo):
    ```sh
-   npm run install-skill          # cross-platform (Node) — the easy one-liner
-   # or run the platform script directly:
-   #   Windows:      pwsh -File install/install.ps1
-   #   macOS/Linux:  bash install/install.sh
+   npm run install-all         # install the skill AND build the themes (recommended)
+   npm run install-no-themes    # install the skill only — don't generate any themes
+   # (the platform scripts install/install.ps1 · install/install.sh still link the skill)
    ```
-   Re-run any time to refresh (e.g. after moving the repo). All three do the same thing.
+   The theme files (`themes/theme.css`, `tokens.json`, …) are **build output**, not committed —
+   `install-all` produces them; run `npm run build-themes` any time to (re)generate. Re-run install
+   to refresh the link.
 3. **Apply to any repo.** Open that repo in Claude Code (or another agent) and say:
    > Use the theme-service skill to add multi-theme support + a theme selector to this app, mapping
    > the existing components onto the theme tokens; build it and confirm every theme renders and
@@ -59,24 +60,53 @@ You don't have to choose Path 2 to use the service — Path 1 is complete on its
 
 ---
 
+## Own your copy: your themes + my updates
+
+This repo is the **origin**. Fork or clone it and it becomes **your** source of truth.
+
+- **Your themes live in `tools/palettes/local.mjs`** (shipped empty). Add themes there, run
+  `npm run build-themes`, and **commit** — they persist. **Git-local is enough; GitHub is optional**
+  (add your own remote only to back up / sync across machines / share). The origin never edits
+  `local.mjs`, so your themes are never touched by updates.
+- **Pull my updates without losing your themes.** The generated `themes/` aren't committed and your
+  `local.mjs` is origin-untouched, so syncing is conflict-free:
+  ```sh
+  # one-time: point at this origin
+  npm run update-from-origin -- --set-upstream https://github.com/kaseycolian/theme-service.git
+  npm run update-from-origin        # fetch + merge my latest  (or  -- --tag vX.Y.Z)
+  npm run build-themes              # rebuild incl. my built-in themes
+  npm run build-themes:mine         # …or rebuild with ONLY your themes
+  ```
+  An agent-driven update **asks** whether to include my built-in themes. **Nothing is ever
+  auto-deleted** — themes are removed only when you ask. Your machine's install/update log lives in
+  `~/.claude/theme-service.local.json` (never committed) for you and agents to review.
+- **"Which repo is my source"** is a machine-local pointer (`~/.claude/theme-service.local.json`,
+  gitignored, never in commit history). Change it by re-running the installer from the clone you want,
+  or `node install/install.mjs --source <path>`.
+
+---
+
 ## What's in the box
 
 ```
-themes/            SOURCE OF TRUTH (generated, AA-validated) — theme.css, tokens.json,
-                   themes.index.json, effects.css, components.css, theme-init.js,
-                   theme-select.js, preview.html, README.md
+themes/            The distributable themes. effects.css, components.css, preview.html, README.md are
+                   committed; theme.css / tokens.json / themes.index.json / theme-init.js /
+                   theme-select.js are BUILD OUTPUT (gitignored) — run `npm run build-themes`.
+tools/             build-final.mjs (build themes/), build-palettes.mjs (discovery drafts),
+                   release.mjs (version + tag), update-from-origin.mjs (pull origin updates),
+                   palettes/ (draft-*.mjs = built-in source; local.mjs = YOUR themes),
+                   contrast-checker/ (standalone WCAG library + CLI)
 skill/             The Claude Code skill (SKILL.md + references/) — how agents apply/update/add themes
 AGENTS.md          Agent-agnostic mirror of the skill (for non-Claude agents)
-tools/             build-palettes.mjs (draft generator), build-final.mjs (finalizer),
-                   palettes/ (palette source), contrast-checker/ (standalone WCAG library + CLI)
 discovery/         Palette-selection playground (draft-1/2/3) — reference for how themes were chosen
-install/           install.mjs (npm run install-skill) / install.ps1 / install.sh — link the
-                   skill + write the machine-local repo pointer
-package.json       npm scripts: install-skill, validate, build-themes (no dependencies)
+install/           install.mjs (cross-platform) / install.ps1 / install.sh — link the skill + write
+                   the machine-local pointer (~/.claude/theme-service.local.json)
+package.json       scripts: install-all, install-no-themes, build-themes, build-themes:mine,
+                   update-from-origin, release, validate (no dependencies)
 USAGE.md           How to ask an agent to APPLY the themes to a repo
 CREATING-THEMES.md How to CREATE or EDIT themes (Path 2)
 ARCHITECTURE.md    How it all fits: the layers, token contract, theming mechanism, framework wiring
-CHANGELOG.md  VERSION
+CHANGELOG.md  VERSION   (VERSION is the single source of truth; `npm run release` bumps + tags it)
 ```
 
 ## The themes
@@ -96,17 +126,20 @@ are in [`themes/README.md`](themes/README.md).
 - **`discovery/index.html`** — the draft playground: every candidate palette rendered with the full
   component gallery, side by side, with computed AA ratios. Reference for the creation process.
 
-## Regenerate / validate (Path 2 tooling)
+## Build / validate / release (tooling)
 
 ```sh
-node tools/build-palettes.mjs 3            # validate a discovery draft's palettes (AA report)
-node tools/build-palettes.mjs 3 --write     # regenerate a draft's palette CSS + contrast data
-node tools/build-final.mjs --write          # regenerate the finalized themes/ from the source draft
+npm run build-themes           # build themes/ (built-in + your local.mjs themes)
+npm run build-themes:mine      # build themes/ with ONLY your local themes (exclude built-ins)
+npm run validate               # AA-check the built-in palette source (no write)
+npm run release minor -- --note "what changed"   # bump VERSION + CHANGELOG + git tag vX.Y.Z
 ```
 
-The generators **refuse to write if any pair fails WCAG AA**. The standalone checker is in
-[`tools/contrast-checker/`](tools/contrast-checker/) (library + CLI, usable in any project).
+The generators **refuse to write if any pair fails WCAG AA** (your own `local.mjs` themes are validated
+too). The standalone checker is in [`tools/contrast-checker/`](tools/contrast-checker/) (library + CLI,
+usable in any project).
 
-Versioning: additive theme/token changes bump the minor version; token renames/removals or a
-default-theme change bump the major. Apps record the version they vendored and use `CHANGELOG.md` +
-the update flow to migrate.
+**Versioning:** `VERSION` is the single source of truth (`build-final.mjs` reads it). `npm run release`
+bumps it, prepends a `CHANGELOG.md` entry, commits, and creates the git tag `vX.Y.Z` (push with
+`git push --follow-tags`). Additive theme/token changes → minor; token renames/removals or a
+default-theme change → major. Consuming apps record the version they vendored and use the update flow.
