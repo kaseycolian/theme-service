@@ -171,6 +171,14 @@ Notes:
   `color-mix(in srgb, var(--accent-x) N%, var(--bg-panel))` (opaque) instead of rgba literals.
 - You usually only need `theme.css` (+ `effects.css` if you want the glow) for this path;
   `components.css` is optional and only if the app adopts our component classes.
+- **The neon effects are opt-in via classes** — the tokens re-color everything, but the *effects*
+  only paint on an element carrying their class. Most importantly, the **retro grid backdrop needs
+  `.fx-grid` on a background surface** (e.g. the main content area or a full-popup wrapper); without
+  it, the "with background" themes look flat because there's no element for the checkerboard to render
+  on. It respects each theme's `--fx-grid-opacity`, so it shows on grid themes and **auto-hides on the
+  "(No Background)" variants**. Similarly, the gradient scrollbar needs `.fx-scroll` on a scroll area,
+  and the mirrored gradient bars use `.fx-bar-top` / `.fx-bar-bottom`. If the user wants the grid
+  backdrop, add `.fx-grid` to a sensible full-width surface; otherwise leave it off.
 
 ### B3. Ensure a themeable root
 Confirm the mapped variables resolve: since they live on `:root`, any element can read them. If the
