@@ -1,4 +1,4 @@
-/* theme-service v0.1.1 — theme-init.js
+/* theme-service v0.2.0 — theme-init.js
    Applies the saved (or ?theme= / ?motion=) theme BEFORE first paint, so there's no flash.
    Load in <head> via <script src="theme/theme-init.js"></script> (NOT inline — inline is blocked
    by Manifest V3 / strict CSP). CSP-safe. */

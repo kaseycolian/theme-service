@@ -4,6 +4,22 @@ All notable changes to the theme-service. Apps record the version they vendored 
 (plus `updating-themes.md`) to migrate. Versioning: minor bump for additive themes/tokens, major for
 breaking token renames/removals or a default-theme change.
 
+## 0.2.0 — 2026-07-23
+
+Per-theme background strength + "(No Background)" variants.
+
+- New per-theme token **`--fx-grid-opacity`** controls the retro checkerboard backdrop
+  (`0` = off, `0.22` = subdued default, `0.40` = pronounced). `effects.css` now reads it:
+  `.fx-grid::before { opacity: var(--fx-grid-opacity, 0.22) }`.
+- **6 new themes (16 total)** — "(No Background)" variants (grid off, solid bg) for:
+  `rink-classic-{dark,light}`, `midnight-arcade-{dark,light}`, `hot-neon-dark`, `acid-arcade-light`.
+  Ids follow `<family>-<mode>-no-background`.
+- The three faithful **dark** themes (`rink-classic-dark`, `midnight-arcade-dark`, `hot-neon-dark`)
+  now render a **more pronounced grid (0.40)** — a small visual change if the app uses `.fx-grid`.
+  All other themes unchanged. No color/token-value changes → AA results identical.
+- Sourced from `discovery/draft-3`. Additive — new themes appear automatically in data-driven
+  selectors (`theme-select.js` regenerated with all 16) after the update flow.
+
 ## 0.1.1 — 2026-07-23
 
 Selector integration hardened for strict-CSP / Manifest V3 contexts.

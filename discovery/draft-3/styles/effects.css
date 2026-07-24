@@ -1,22 +1,21 @@
 /* =============================================================================
-   Theme Service — effects.css (finalized). The "90s skating rink" neon recipes,
-   expressed purely as tokens so they work identically across every theme.
-   Pair with theme.css (colors) + components.css (component styles).
-   Scoped to :root so it applies app-wide once included.
+   effects.css — the "90s skating rink" neon recipes, expressed purely as tokens.
+   Every glow/gradient/grid derives from the four accent tokens via color-mix,
+   scaled by --glow-strength and gated by --motion. Nothing here hardcodes a hue,
+   so it works identically across all 12 palettes.
    ============================================================================= */
 
-:root {
-  /* Motion gate: 1 = animations on, 0 = off (flipped by reduced-motion + toggle below).
-     theme.css sets --glow-strength per theme (1 dark / 0.35 light); default here as a
-     fallback if effects.css is ever used without theme.css. */
-  --motion: 1;
+[data-palette] {
+  /* Glow intensity. Dark = full neon. Light = dialed way back (saturated solids). */
   --glow-strength: 1;
+  /* Motion gate: 1 = animations on, 0 = off. Flipped by reduced-motion + toggle below. */
+  --motion: 1;
 
-  /* Retro crossing-gradient grid backdrop colors (subdued). */
+  /* ---- Retro crossing-gradient grid backdrop colors (draft-2: subdued) ---- */
   --grid-line-h: color-mix(in srgb, var(--accent-blue) 10%, transparent);
   --grid-line-v: color-mix(in srgb, var(--accent-pink) 8%, transparent);
 
-  /* Text-shadow neon glow (tight core + wide halo), per accent — for HEADINGS. */
+  /* ---- Text-shadow neon glow (tight core + wide halo), per accent ---- */
   --tglow-pink:   0 0 calc(5px * var(--glow-strength)) color-mix(in srgb, var(--accent-pink)   90%, transparent),
                   0 0 calc(15px * var(--glow-strength)) color-mix(in srgb, var(--accent-pink)  45%, transparent);
   --tglow-green:  0 0 calc(5px * var(--glow-strength)) color-mix(in srgb, var(--accent-green)  90%, transparent),
@@ -26,13 +25,14 @@
   --tglow-purple: 0 0 calc(5px * var(--glow-strength)) color-mix(in srgb, var(--accent-purple) 90%, transparent),
                   0 0 calc(15px * var(--glow-strength)) color-mix(in srgb, var(--accent-purple)45%, transparent);
 
-  /* Reduced glow for SMALL text (labels, notices, badges, status, mono). */
+  /* Reduced glow for SMALL text (labels, notices, badges, status, mono) — keeps a
+     hint of neon but stays crisp/readable. Single tight halo, lower alpha. */
   --tglow-pink-sm:   0 0 calc(4px * var(--glow-strength)) color-mix(in srgb, var(--accent-pink)   40%, transparent);
   --tglow-green-sm:  0 0 calc(4px * var(--glow-strength)) color-mix(in srgb, var(--accent-green)  40%, transparent);
   --tglow-blue-sm:   0 0 calc(4px * var(--glow-strength)) color-mix(in srgb, var(--accent-blue)   40%, transparent);
   --tglow-purple-sm: 0 0 calc(4px * var(--glow-strength)) color-mix(in srgb, var(--accent-purple) 40%, transparent);
 
-  /* Box-shadow "lit tube" glow (outer + inset), per accent. */
+  /* ---- Box-shadow "lit tube" glow (outer + inset), per accent ---- */
   --bglow-pink:   0 0 calc(8px * var(--glow-strength)) color-mix(in srgb, var(--accent-pink)   55%, transparent),
             inset 0 0 calc(8px * var(--glow-strength)) color-mix(in srgb, var(--accent-pink)   18%, transparent);
   --bglow-green:  0 0 calc(8px * var(--glow-strength)) color-mix(in srgb, var(--accent-green)  55%, transparent),
@@ -42,7 +42,7 @@
   --bglow-purple: 0 0 calc(8px * var(--glow-strength)) color-mix(in srgb, var(--accent-purple) 55%, transparent),
             inset 0 0 calc(8px * var(--glow-strength)) color-mix(in srgb, var(--accent-purple) 18%, transparent);
 
-  /* Doubled glow for :hover on solid/outline controls. */
+  /* Doubled glow for :hover on solid/outline controls */
   --bglow-pink-hi:   0 0 calc(16px * var(--glow-strength)) color-mix(in srgb, var(--accent-pink)   70%, transparent),
                inset 0 0 calc(12px * var(--glow-strength)) color-mix(in srgb, var(--accent-pink)   25%, transparent);
   --bglow-green-hi:  0 0 calc(16px * var(--glow-strength)) color-mix(in srgb, var(--accent-green)  70%, transparent),
@@ -53,13 +53,39 @@
                inset 0 0 calc(12px * var(--glow-strength)) color-mix(in srgb, var(--accent-purple) 25%, transparent);
 }
 
+/* Light palettes: keep the same hues, dial the bloom way down (saturated solids). */
+[data-palette^="light-"] { --glow-strength: 0.35; }
+
 /* -----------------------------------------------------------------------------
-   Motion off — two ways, both resolve to --motion: 0. Our components gate motion
-   through this token (see --dur / --press in components.css), so no blanket
-   !important reset is needed — a host app's own animations are left untouched.
+   Motion off — two independent ways, both resolve to --motion: 0:
+     1) OS setting: prefers-reduced-motion: reduce
+     2) Manual: [data-motion="off"] on any ancestor (the page's toggle)
    ----------------------------------------------------------------------------- */
-[data-motion="off"] { --motion: 0; }
-@media (prefers-reduced-motion: reduce) { :root { --motion: 0; } }
+[data-motion="off"] [data-palette],
+[data-motion="off"][data-palette] { --motion: 0; }
+
+@media (prefers-reduced-motion: reduce) {
+  [data-palette] { --motion: 0; }
+}
+
+/* When motion is off, neutralize transitions/animations/transforms everywhere in scope. */
+[data-motion="off"] *,
+[data-motion="off"] *::before,
+[data-motion="off"] *::after {
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.001ms !important;
+  scroll-behavior: auto !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-palette] *,
+  [data-palette] *::before,
+  [data-palette] *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
 
 /* -----------------------------------------------------------------------------
    Reusable effect classes
@@ -75,8 +101,8 @@
     linear-gradient(transparent calc(100% - 1px), var(--grid-line-h) calc(100% - 1px)),
     linear-gradient(90deg, transparent calc(100% - 1px), var(--grid-line-v) calc(100% - 1px));
   background-size: 32px 32px;
-  /* Per-theme background strength: theme.css sets --fx-grid-opacity (0 = off, ~0.4 = pronounced).
-     Default 0.22 = the subdued baseline for themes that don't override it. */
+  /* Per-theme background strength: themes set --fx-grid-opacity (0 = off, ~0.4 = pronounced).
+     Default 0.22 = the subdued draft-2 level, for themes that don't override it. */
   opacity: var(--fx-grid-opacity, 0.22);
   pointer-events: none;
   z-index: -1;
@@ -100,13 +126,17 @@
   box-shadow: 0 -2px 12px color-mix(in srgb, var(--accent-blue) calc(30% * var(--glow-strength)), transparent);
 }
 
-/* Themed pink→purple→blue neon scrollbars. IMPORTANT: do NOT set standard
-   scrollbar-width/scrollbar-color — Chromium 121+ ignores ::-webkit-scrollbar rules
-   when those are present, which kills the gradient. Chrome/Edge/Safari get the
-   gradient thumb; Firefox falls back to its default (accessible) scrollbar.
-   Add class `fx-scroll` to any scroll container. */
+/* Themed pink→purple→blue neon scrollbars for ANY scroll area inside a theme.
+   IMPORTANT: we deliberately do NOT set standard `scrollbar-width`/`scrollbar-color`.
+   Chromium 121+ ignores ::-webkit-scrollbar rules the moment those standard props are
+   present — which is exactly why the gradient wasn't showing in draft-1. With them gone,
+   Chrome/Edge/Safari render the gradient thumb; Firefox falls back to its default
+   (accessible) scrollbar. Scoped to [data-palette] so every themed scroll region gets it. */
+[data-palette] ::-webkit-scrollbar,
 .fx-scroll::-webkit-scrollbar { width: 11px; height: 11px; }
+[data-palette] ::-webkit-scrollbar-track,
 .fx-scroll::-webkit-scrollbar-track { background: color-mix(in srgb, var(--text) 6%, transparent); border-radius: 6px; }
+[data-palette] ::-webkit-scrollbar-thumb,
 .fx-scroll::-webkit-scrollbar-thumb {
   background: linear-gradient(180deg, var(--accent-pink), var(--accent-purple) 55%, var(--accent-blue));
   border: 2px solid var(--bg-panel);
@@ -114,13 +144,16 @@
   background-clip: padding-box;
   box-shadow: 0 0 8px color-mix(in srgb, var(--accent-pink) calc(60% * var(--glow-strength)), transparent);
 }
+[data-palette] ::-webkit-scrollbar-thumb:hover,
 .fx-scroll::-webkit-scrollbar-thumb:hover { filter: brightness(1.12); }
 
-/* Optional subtle glow pulse — opt-in, motion-gated (stops when motion is off). */
+/* Optional subtle glow pulse — opt-in, motion-gated (stops when --motion:0). */
 @keyframes fx-pulse {
   from { filter: brightness(1); }
   to   { filter: brightness(1.12); }
 }
-.fx-pulse { animation: fx-pulse 1.8s ease-in-out infinite alternate; }
+.fx-pulse {
+  animation: fx-pulse 1.8s ease-in-out infinite alternate;
+  animation-play-state: running;
+}
 [data-motion="off"] .fx-pulse { animation: none; }
-@media (prefers-reduced-motion: reduce) { .fx-pulse { animation: none; } }

@@ -20,10 +20,10 @@ import { dirname, join } from 'node:path';
 import { contrastRatio, round2 } from './contrast-checker/contrast.mjs';
 
 const REPO = join(dirname(fileURLToPath(import.meta.url)), '..');
-const VERSION = '0.1.1';
+const VERSION = '0.2.0';
 const DEFAULT_FAMILY = 'rink-classic';
 
-const srcDraft = process.argv.find(a => /^\d+$/.test(a)) || '2';
+const srcDraft = process.argv.find(a => /^\d+$/.test(a)) || '3';
 const { palettes: P } = await import(`./palettes/draft-${srcDraft}.mjs`);
 
 // token key -> CSS custom property
@@ -39,8 +39,12 @@ const cap = a => a[0].toUpperCase() + a.slice(1);
 // Derive finalized metadata from a draft id like "dark-01-rink-classic".
 function meta(draftId, p) {
   const m = draftId.match(/^(?:dark|light)-\d+-(.+)$/);
-  const family = m ? m[1] : draftId;
-  return { id: `${family}-${p.mode}`, family, mode: p.mode, label: p.label };
+  const familyPart = m ? m[1] : draftId;
+  const noBg = familyPart.endsWith('-no-background');
+  const family = noBg ? familyPart.slice(0, -'-no-background'.length) : familyPart;
+  // Finalized id keeps mode adjacent to family, with the modifier last: rink-classic-dark-no-background
+  const id = `${family}-${p.mode}${noBg ? '-no-background' : ''}`;
+  return { id, family, mode: p.mode, label: p.label, noBg };
 }
 
 // ---------- AA validation (same matrix as the draft generator) ----------
@@ -65,12 +69,13 @@ for (const [draftId, p] of Object.entries(P)) {
   const mt = meta(draftId, p);
   const tokens = {};
   for (const [k, v] of Object.entries(VARMAP)) tokens[v] = p[k];
-  themes[mt.id] = { ...mt, colorScheme: p.mode, glow: p.mode === 'light' ? '0.35' : '1', tokens };
+  themes[mt.id] = { ...mt, colorScheme: p.mode, glow: p.mode === 'light' ? '0.35' : '1', grid: p.grid, tokens };
 }
 const families = {};
 for (const t of Object.values(themes)) {
-  families[t.family] ??= { family: t.family, label: t.label };
-  families[t.family][t.mode] = t.id;
+  families[t.family] ??= { family: t.family, label: t.label.replace(/ \(No Background\)$/, '') };
+  // The primary dark/light for a family is the WITH-background variant, not the no-bg one.
+  if (!t.noBg) families[t.family][t.mode] = t.id;
 }
 const defDark = families[DEFAULT_FAMILY].dark;
 const defLight = families[DEFAULT_FAMILY].light;
@@ -82,7 +87,8 @@ if (process.argv.includes('--write')) {
 
   const block = (sel, t, indent = '') => {
     const lines = Object.entries(t.tokens).map(([v, val]) => `${indent}  ${v}: ${val};`);
-    return `${indent}${sel} {\n${indent}  color-scheme: ${t.colorScheme};\n${indent}  --glow-strength: ${t.glow};\n${lines.join('\n')}\n${indent}}`;
+    const gridLine = t.grid !== undefined ? `\n${indent}  --fx-grid-opacity: ${t.grid};` : '';
+    return `${indent}${sel} {\n${indent}  color-scheme: ${t.colorScheme};\n${indent}  --glow-strength: ${t.glow};${gridLine}\n${lines.join('\n')}\n${indent}}`;
   };
 
   let css = `/* =============================================================================
@@ -109,7 +115,8 @@ if (process.argv.includes('--write')) {
     version: VERSION, source: `draft-${srcDraft}`,
     default: { family: DEFAULT_FAMILY, dark: defDark, light: defLight },
     themes: Object.fromEntries(Object.values(themes).map(t =>
-      [t.id, { label: t.label, family: t.family, mode: t.mode, colorScheme: t.colorScheme, glowStrength: Number(t.glow), tokens: t.tokens }])),
+      [t.id, { label: t.label, family: t.family, mode: t.mode, colorScheme: t.colorScheme, glowStrength: Number(t.glow),
+        ...(t.grid !== undefined ? { gridOpacity: t.grid } : {}), tokens: t.tokens }])),
   };
   writeFileSync(join(REPO, 'themes/tokens.json'), JSON.stringify(tokensJson, null, 2) + '\n');
 
