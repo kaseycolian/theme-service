@@ -4,10 +4,14 @@ Use when a project already consumes these themes and the theme-service has chang
 new components, new themes, tweaks). Goal: bring the app up to the current version with minimal,
 correct changes — and never regress accessibility.
 
-## 1. Determine both versions
-- **App version:** read `<vendor>/THEME-SERVICE.md` (or `themes.lock`) in the target repo.
-- **Source version:** read `VERSION` at the theme-service repo root (locate it per `SKILL.md` Step 0).
-- If they match and no files differ, there's nothing to do — say so.
+## 1. Read the repo's tracking log first
+Open `<vendor>/THEME-SERVICE.md`. It tells you the repo is already themed, the **App version**, the
+**Applied configuration** (component styling depth, fonts, selector choice, whether old themes were
+kept), and the **History** of prior work. **Honor those decisions** — e.g. don't restyle components if
+the record says colors-only, don't replace fonts if they were kept, don't touch a selector the user
+chose to keep — unless the user now asks to change them. Also read `VERSION` at the theme-service repo
+root (locate it per `SKILL.md` Step 0). If the versions match and no files differ, there's nothing to
+do — say so.
 
 ## 2. See what changed in the source
 Compare the app's vendored copies against the source `themes/` files:
@@ -35,5 +39,7 @@ Compare the app's vendored copies against the source `themes/` files:
 - Confirm motion-off still works and no theme flashes on load.
 
 ## 5. Record it
-Update `<vendor>/THEME-SERVICE.md` with the new version + date. Summarize what changed for the user
-(themes added, tokens changed, any manual repoints you made).
+In `<vendor>/THEME-SERVICE.md`: bump the current version, refresh "Applied configuration" if any
+decision changed, and **append a new dated History entry** (never rewrite past ones) summarizing this
+update — e.g. `2026-08-01 — Updated to v0.3.0. Added 2 themes (auto in selector); repointed --border`.
+Then summarize the same for the user.

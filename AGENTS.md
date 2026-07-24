@@ -34,11 +34,19 @@ detailed, non-agent-specific procedures live in `skill/references/` and are shar
 
 ## Non-negotiables
 
+- **Confirm before changing (existing apps).** Ask the user the Step 0 questions in
+  `skill/references/applying-themes.md`: component **styling depth** (colors-only vs full restyle),
+  **fonts** (replace vs keep), any **existing selector** (replace vs wire-in; keep vs delete old
+  themes), and **selector placement**. Don't restyle components or replace fonts without opt-in.
+- **Keep the tracking log.** Every themed repo has a `THEME-SERVICE.md` (version + decisions + dated
+  History). Check for it first — if present, the repo is already themed: read it and follow
+  `skill/references/updating-themes.md` instead of re-applying. Always append a History entry.
 - **Vendor** the theme CSS into the target repo (copy into `src/theme/` or `assets/theme/`); never
-  hardcode an absolute path to this repo in app code. Record the copied `VERSION` in the app.
+  hardcode an absolute path to this repo in app code.
 - **Default** = Rink Classic (dark, auto-light by OS). Force a theme with `data-theme="<id>"` on
   `<html>`; disable animation with `data-motion="off"`.
-- **Preserve** the target app's existing markup/structure — map its colors onto the tokens, don't
-  rewrite its components.
+- **Preserve** the target app's existing markup/structure by default — map its colors onto the tokens.
+  Only migrate components to the `components.css` classes if the user opted into a full restyle, and
+  then keep every existing behavior/handler/ARIA intact.
 - **Only use tokens/themes from `themes/`.** Never invent colors. Keep everything AA 2.2 and
   dependency-free. This repo is public — never add secrets or machine-specific paths.

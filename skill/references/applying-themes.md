@@ -7,6 +7,44 @@ There are two paths. Read the one that matches the project, then the stack secti
 
 ---
 
+## Step 0 — Confirm the approach with the user (do this FIRST)
+
+Applying to a real app involves choices that materially change the result and are annoying to undo.
+**Ask the user these before doing the work** (Claude: use AskUserQuestion; other agents: ask plainly).
+Summarize their choices back, then record them in `THEME-SERVICE.md` (see Common setup step 3). If the
+session is genuinely non-interactive, use the **recommended default** and note the assumption in the
+history log so a later session can revisit it.
+
+1. **Component styling depth — how much should the app's components change?**
+   - **Colors only (recommended default):** apply the theme tokens (and, if wanted, the glow/effects)
+     to the app's *existing* components. They keep their current shape, layout, and behavior — just
+     re-colored. Lowest risk, smallest diff. Change as little of the components' own styling as
+     possible while pulling the palette through.
+   - **Full restyle to match the theme-service look:** components adopt the same **look, feel, and
+     interaction** as the gallery in `discovery/draft-2/index.html` (and `themes/preview.html`) by
+     using the `components.css` classes — while **preserving all existing functionality**. Bigger
+     visual change and more work; only do it if the user opts in. Do **not** rewrite the whole UI
+     without this explicit go-ahead.
+   - If they're unsure, offer a **visual before/after** (a small scratch page or screenshots of a few
+     key components both ways). Say up front it takes extra time/tokens, and only build it on request.
+
+2. **Fonts — replace the app's fonts with the theme fonts** (`--font-ui` / `--font-mono`), or keep the
+   app's current fonts and apply colors/effects only? (Default: **keep the app's fonts** unless they
+   want the full retro-neon look.)
+
+3. **Existing theme selector (ask only if the app already has one):**
+   - **Replace** the app's selector with the theme-service one, or **wire the new themes into the
+     existing dropdown** (keep their control, add our themes as options + persistence)?
+   - **Existing themes:** remove the app's old themes, or keep them **alongside** the new ones?
+
+4. **Selector placement** — propose a logical spot and confirm it (see "Selector placement" below).
+
+For a **new / greenfield** project there's no existing selector/themes/components to reconcile, so
+skip 1–3's "existing" parts; still confirm **selector placement** (per the intended UX and any user
+requirements) and that using the full component classes is wanted (usually yes).
+
+---
+
 ## Common setup (both paths)
 
 1. **Choose a vendor folder** in the target repo for the copied theme files:
@@ -21,27 +59,40 @@ There are two paths. Read the one that matches the project, then the stack secti
      (the CSP-safe selector helpers — see "The theme selector" below). React/Angular apps use their
      own provider instead and don't need these.
    - Copy `themes.index.json` too (registry reference).
-3. **Record the version + leave instructions for future agents.** Create `<vendor>/THEME-SERVICE.md`
-   with the copied `VERSION`, the date, and a short "for agents" block so anyone (human or agent)
-   working in this repo later follows the same rules. Use this template:
+3. **Write / update the tracking log `<vendor>/THEME-SERVICE.md`.** This is the record future agent
+   sessions read to know this repo already uses the theme-service, what was decided, and what changed.
+   On the **first** apply, create it from this template; on any later apply/update, **append a new
+   History entry** (never rewrite past entries) and refresh the "Applied configuration" + version.
 
    ```markdown
    # Theme Service
 
-   This app's theming comes from the shared **theme-service** — version `<VERSION>`, applied `<DATE>`.
+   This app's theming comes from the shared **theme-service** — currently on version `<VERSION>`.
    The files in this folder are vendored copies of the source of truth; do not hand-edit generated
    token files, and do not hardcode colors — consume the theme tokens (`var(--…)`).
 
    ## For agents working in this repo
-   Use the **theme-service skill** (or its `AGENTS.md`) for any theme work here — don't improvise. Default request:
-   > Use the theme-service skill to update this app's themes / add a theme, mapping the existing
-   > components onto the theme tokens; build it and confirm every theme renders and passes WCAG AA.
-   Rules: keep everything WCAG AA 2.2 · default theme is Rink Classic · the selector must use the
-   **external** `theme-init.js` / `theme-select.js` (never inline scripts — MV3/strict CSP blocks them).
-   To pull upstream changes: "Update this repo to the latest theme-service version."
+   This repo **already uses the theme-service** (see History below). Use the **theme-service skill**
+   (or its `AGENTS.md`) for any theme work here — don't improvise, and don't re-apply from scratch.
+   - Update to latest:  "Update this repo to the latest theme-service version."
+   - Add/change themes:  see the theme-service repo's `CREATING-THEMES.md`.
+   Rules: keep WCAG AA 2.2 · default theme is Rink Classic · the selector uses the **external**
+   `theme-init.js` / `theme-select.js` (never inline scripts — MV3/strict CSP blocks them).
+
+   ## Applied configuration (current decisions on record)
+   - Component styling: `<colors-only | full-restyle>`
+   - Fonts: `<kept app fonts | replaced with theme fonts>`
+   - Selector: `<theme-service selector | wired into existing dropdown>` — placement: `<where>`
+   - Existing themes: `<none | removed | kept alongside>`
+
+   ## History
+   <!-- Append one entry per apply/update. Most recent last. Never edit past entries. -->
+   - `<YYYY-MM-DD>` — Applied theme-service `v<VERSION>`. `<one-line summary: what was done + key decisions>`.
    ```
 
-   The `VERSION` line is also what `updating-themes.md` diffs against later.
+   The version line is also what `updating-themes.md` diffs against later. If a `THEME-SERVICE.md`
+   already exists, the app was themed before — read its History and "Applied configuration" and follow
+   `updating-themes.md` instead of applying fresh.
 4. **Load order matters:** `theme.css` → `effects.css` → `components.css`.
 
 The default theme applies with **no** `data-theme`. Force one with `data-theme="<id>"` on the root
@@ -66,10 +117,22 @@ Use the component classes directly; the app inherits the full look for free.
 
 ---
 
-## Path B — Existing project (extend to multi-theme, keep existing components)
+## Path B — Existing project (extend to multi-theme)
 
-The app already has its own markup and CSS. You will **not** rewrite its components. Instead you
-make its existing styles consume theme tokens, so every theme re-skins the current UI. Steps:
+The app already has its own markup and CSS. Which of the Step 0 **component-styling-depth** choices
+the user made decides how far you go:
+
+- **Colors only (default):** do **not** rewrite components. Make the app's *existing* styles consume
+  theme tokens (B1–B2), so every theme re-skins the current UI with minimal change. This is the bulk
+  of this section.
+- **Full restyle:** in addition to the token mapping, migrate the app's components to the
+  `components.css` classes (`.btn`, `.input`, `.notice`, `.drop`, `.switch`, `.tab`, …) so they match
+  the gallery's look/feel/interaction — **preserving every existing behavior, handler, and ARIA
+  attribute**. Do this component-by-component, verifying functionality after each; never bulk-replace
+  markup blind. Fall back to colors-only for anything risky, and tell the user what you left.
+
+If the user chose to **replace fonts**, also point the app's font stack at `--font-ui` / `--font-mono`
+(e.g. set them on `body`/`:root`); otherwise leave the app's fonts alone. Steps (colors-only path):
 
 ### B1. Audit the app's current colors
 Find hardcoded colors (hex/rgb/hsl/named) in the app's CSS/SCSS/styled-components/inline styles.
@@ -114,7 +177,15 @@ Confirm the mapped variables resolve: since they live on `:root`, any element ca
 app scopes styles oddly (e.g. shadow DOM in Angular), `theme.css` on `:root` still cascades in
 (custom properties pierce shadow boundaries).
 
-### B4. Add the theme selector + persistence (below), listing **all** themes.
+### B4. Add / reconcile the theme selector (per the Step 0 decision)
+- **No existing selector:** add the theme-service selector (below), listing **all** themes, placed per
+  "Selector placement".
+- **Replace the existing selector:** swap their control for the theme-service one; remove their old
+  theme CSS/JS if the user chose to delete old themes, or keep it if they're kept alongside.
+- **Wire into the existing dropdown:** keep the app's selector control and add the theme-service theme
+  ids as options; on change, set `data-theme` + persist (reuse the app's persistence or `theme-select.js`
+  logic). If keeping old themes alongside, make sure their values and the new `data-theme` ids don't
+  collide.
 
 ### B5. Verify each theme renders
 Load the app, switch through every theme, and confirm text/controls stay legible and the layout is
@@ -132,6 +203,17 @@ Requirements:
 - On change: set `document.documentElement.setAttribute('data-theme', id)` (or remove it for Auto).
 - **Persist** to `localStorage` and **re-apply before first paint** to avoid a flash of the wrong theme.
 - Optionally include a "Reduce motion" control that toggles `data-motion="off"` on `<html>`.
+
+### Selector placement
+Put the picker where it reads as an intentional part of the UI, not bolted on:
+- **Existing app:** place it where users look for appearance/settings controls **and** where it sits
+  naturally beside neighboring elements — e.g. the header/toolbar, a settings menu or panel, or the
+  footer. Match the **size, spacing, and alignment** of adjacent controls. If the user chose
+  *full restyle*, style the control like the theme (`.select` / `.drop`); if *colors-only*, match the
+  app's own control styling so it blends in. Avoid cramped or arbitrary spots. Propose the location and
+  confirm before wiring it in.
+- **New app:** place it per the intended UX and any user requirements — commonly a settings screen, an
+  "Appearance" section, or a header control. If the layout isn't specified, ask.
 
 > **CRITICAL — no inline scripts.** Do **not** put the bootstrap or selector logic in an inline
 > `<script>…</script>`. **Manifest V3 browser extensions and any strict-CSP site block inline
@@ -227,4 +309,11 @@ function useTheme() {
 3. Keyboard-tab shows a visible focus ring on every control (`--focus-ring`).
 4. `data-motion="off"` (or the reduce-motion control / OS setting) stops transitions & glow pulses.
 5. Any app-specific color pairs pass `tools/contrast-checker/` at AA. Walk `wcag-checklist.md`.
-6. Update `<vendor>/THEME-SERVICE.md` with the version + date applied.
+6. If the user chose *full restyle*, confirm each migrated component still **works** (clicks, keyboard,
+   ARIA, form submits) — not just that it looks right.
+7. **Write / append `<vendor>/THEME-SERVICE.md`**: set the current version + "Applied configuration"
+   (the Step 0 decisions) and **append a dated History entry** summarizing what you did (and any
+   defaults you assumed in a non-interactive run). This is how the next session knows the repo is
+   already themed and what was decided.
+8. Summarize for the user: what changed, the decisions applied, and anything you deliberately left
+   (e.g. components kept as colors-only).
