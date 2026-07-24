@@ -1,0 +1,11 @@
+{
+  "name": "theme-service",
+  "private": true,
+  "description": "Shared neon dark/light theme system (WCAG AA 2.2) + Claude Code skill for applying, updating, and creating themes across repos. Version is tracked in the VERSION file.",
+  "license": "MIT",
+  "scripts": {
+    "install-skill": "node install/install.mjs",
+    "validate": "node tools/build-palettes.mjs 3",
+    "build-themes": "node tools/build-final.mjs --write"
+  }
+}

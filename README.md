@@ -23,11 +23,12 @@ Install once, then apply the existing themes to any repo on your machine. No pal
 2. **Install the skill** (links it into `~/.claude/skills` and records this repo's location so agents
    can find it — nothing is written inside the repo):
    ```sh
-   # Windows (PowerShell)
-   pwsh -File install/install.ps1
-   # macOS / Linux
-   bash install/install.sh
+   npm run install-skill          # cross-platform (Node) — the easy one-liner
+   # or run the platform script directly:
+   #   Windows:      pwsh -File install/install.ps1
+   #   macOS/Linux:  bash install/install.sh
    ```
+   Re-run any time to refresh (e.g. after moving the repo). All three do the same thing.
 3. **Apply to any repo.** Open that repo in Claude Code (or another agent) and say:
    > Use the theme-service skill to add multi-theme support + a theme selector to this app, mapping
    > the existing components onto the theme tokens; build it and confirm every theme renders and
@@ -39,6 +40,10 @@ Install once, then apply the existing themes to any repo on your machine. No pal
 
 Later, to pull in updates after you (or an upstream) change the themes:
 > Update this repo to the latest theme-service version.
+
+**Using a non-Claude agent?** You can skip the skill install entirely — point your agent at
+[`AGENTS.md`](AGENTS.md) in this repo. It mirrors the skill's instructions and the detailed how-tos in
+`skill/references/`, so any agent can apply/update/create themes by following it.
 
 ### Path 2 — Create or edit themes
 
@@ -65,7 +70,9 @@ AGENTS.md          Agent-agnostic mirror of the skill (for non-Claude agents)
 tools/             build-palettes.mjs (draft generator), build-final.mjs (finalizer),
                    palettes/ (palette source), contrast-checker/ (standalone WCAG library + CLI)
 discovery/         Palette-selection playground (draft-1/2/3) — reference for how themes were chosen
-install/           install.ps1 / install.sh — link the skill + write the machine-local repo pointer
+install/           install.mjs (npm run install-skill) / install.ps1 / install.sh — link the
+                   skill + write the machine-local repo pointer
+package.json       npm scripts: install-skill, validate, build-themes (no dependencies)
 USAGE.md           How to ask an agent to APPLY the themes to a repo
 CREATING-THEMES.md How to CREATE or EDIT themes (Path 2)
 ARCHITECTURE.md    How it all fits: the layers, token contract, theming mechanism, framework wiring
