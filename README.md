@@ -8,6 +8,9 @@ Every theme passes **WCAG AA 2.2** in all states.
 Ships with **16 themes** (5 families × dark/light, plus "No Background" variants). Default is
 **Rink Classic** (dark, auto-light by OS). See them in `themes/preview.html`.
 
+**New here?** Start with the **[Visual Overview](docs/OVERVIEW.md)** — diagrams of what it is, how you
+use it, and the clone / save / update workflow (local + optional GitHub).
+
 ---
 
 ## Two ways to use it
