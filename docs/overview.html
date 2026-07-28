@@ -50,7 +50,8 @@
   .connector--dashed { stroke-dasharray: 5 6; opacity: .9; }
 
   #hero-export { position: relative; padding: 28px; border-radius: 18px;
-                 background: var(--bg); border: 1px solid var(--border); overflow: hidden; }
+                 background: var(--bg); border: 1px solid var(--border); overflow: hidden;
+                 max-width: 960px; margin: 0 auto; }
   .hero-row { display: flex; align-items: center; justify-content: space-between; gap: 18px;
               flex-wrap: wrap; }
   .hero-row .node-card { flex: 1 1 150px; min-width: 140px; }
@@ -61,7 +62,11 @@
   .flow-caption { font-size: 10.5px; letter-spacing: 1px; text-transform: uppercase;
                   color: var(--text-muted); text-align: center; margin: 2px 0 0; }
   .hero-arrow { flex: 0 0 46px; align-self: center; }
-  @media (max-width: 720px) { .hero-arrow { transform: rotate(90deg); } }
+  @media (max-width: 720px) {
+    .hero-row { flex-direction: column; align-items: stretch; }
+    .hero-row .node-card { flex: 1 1 auto; }
+    .hero-arrow { transform: rotate(90deg); }
+  }
 </style>
 </head>
 <body class="fx-grid">
