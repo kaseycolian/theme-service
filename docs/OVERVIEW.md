@@ -5,6 +5,15 @@ The diagrams below render as graphics on GitHub. *(Content-first diagrams. A pol
 visual version is in progress — see [overview.html](overview.html) for the hero, which re-skins
 live across all themes.)*
 
+## Polished-graphic status
+
+- ✅ **Pass 1 — Hero.** [overview.html](overview.html): the "What it is" pipeline, fully themed,
+  re-skins live across all 16 themes. Establishes the reusable node/connector component system.
+- ⬜ **Pass 2 — Remaining diagrams.** Workflows A–D + "two ways in", styled with the same system.
+- ⬜ **Image export.** PNG/SVG of each diagram for embedding directly in Markdown.
+- ⬜ **Hero polish.** A few `aria` tidy-ups, remove unused CSS, add the positioned dashed
+  skill→build connector (currently conveyed by caption text).
+
 ---
 
 ## What it is (in one picture)
