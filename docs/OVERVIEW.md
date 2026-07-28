@@ -1,8 +1,9 @@
 # Theme Service — Visual Overview
 
 A human-friendly tour of what this service is, how you work with it, and the workflows you'll hit.
-The diagrams below render as graphics on GitHub. *(First-pass diagrams — the content is what we're
-nailing down; a polished graphic version comes next.)*
+The diagrams below render as graphics on GitHub. *(Content-first diagrams. A polished, themed
+visual version is in progress — see [overview.html](overview.html) for the hero, which re-skins
+live across all themes.)*
 
 ---
 
