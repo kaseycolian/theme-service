@@ -39,8 +39,8 @@ You never have to touch theme creation to get value — Path 1 stands alone.
 ```mermaid
 flowchart TD
   U(("You")) --> Q{"What do you want?"}
-  Q -->|"Use the themes as-is"| P1["Install the skill →<br/>apply 16 themes to any app"]
-  Q -->|"Make your own themes"| P2["Add themes: paste a palette,<br/>be guided, or design a new style"]
+  Q -->|"1"| P1["Path 1 — Use the themes as-is<br/>Install the skill → apply 16 themes to any app<br/>▶ npm run install-all"]
+  Q -->|"2"| P2["Path 2 — Make your own themes<br/>Add a palette, be guided, or design a new style<br/>▶ npm run build-themes"]
   P1 --> D1["Apps get a theme picker,<br/>every theme AA-validated"]
   P2 --> D2["Your themes join the set —<br/>reusable across all your apps"]
 ```
@@ -68,7 +68,7 @@ sequenceDiagram
   Agent->>App: Vendor theme CSS + map the app's colors to tokens
   Agent->>App: Add a theme picker (all themes) + persistence
   Agent->>App: Verify WCAG AA, write THEME-SERVICE.md tracking log
-  Agent-->>You: Done — switch themes live; nothing else changed
+  Agent-->>You: Done — switch themes live, nothing else changed
 ```
 
 Later: *"Update this app to the latest theme-service version"* re-syncs it — new themes show up in the
