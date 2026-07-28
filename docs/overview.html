@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="rink-classic-dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Theme Service — Visual Overview</title>
+
+<!-- Real theme assets, exactly as a consuming app wires them (external = CSP-safe) -->
+<script src="../themes/theme-init.js"></script>
+<link rel="stylesheet" href="../themes/theme.css">
+<link rel="stylesheet" href="../themes/effects.css">
+<link rel="stylesheet" href="../themes/components.css">
+
+<style>
+  body { margin: 0; background: var(--bg); color: var(--text); font-family: var(--font-ui);
+         transition: background .2s, color .2s; }
+  .topbar { position: sticky; top: 0; z-index: 50; display: flex; gap: 18px; align-items: center;
+            flex-wrap: wrap; padding: 12px 20px; background: var(--bg-panel);
+            border-bottom: 1px solid var(--border); }
+  .topbar strong { font-size: 14px; }
+  .topbar label { font-size: 12.5px; color: var(--text-muted); display: inline-flex; gap: 8px;
+                  align-items: center; }
+  .topbar select { font-family: var(--font-mono); }
+  main { max-width: 1040px; margin: 0 auto; padding: 32px 20px 80px; }
+  .page-title { font-size: 24px; margin: 0 0 6px; }
+  .page-lead { color: var(--text-muted); max-width: 64ch; line-height: 1.55; margin: 0 0 28px; }
+</style>
+</head>
+<body class="fx-grid">
+
+<div class="topbar">
+  <strong>Theme Service — Visual Overview</strong>
+  <label>Theme
+    <select class="select" data-theme-select aria-label="Theme" style="padding:6px 26px 6px 10px"></select>
+  </label>
+  <label class="switch"><input type="checkbox" data-motion-toggle>
+    <span class="track"><span class="thumb"></span></span> Disable animations</label>
+</div>
+
+<main>
+  <h1 class="page-title">What it is, in one picture</h1>
+  <p class="page-lead">One consistent "90s skating rink" neon look — 16 themes, dark + light, all
+  WCAG&nbsp;AA — that any agent can drop into any app. Switch the theme above: this page re-skins
+  through the same tokens every app gets.</p>
+
+  <section id="hero-export">
+    <!-- Hero pipeline diagram goes here (Task 3) -->
+    <p style="color:var(--text-muted)">[hero placeholder]</p>
+  </section>
+</main>
+
+<!-- Shipped helper populates &amp; wires the selector/toggle. External = CSP-safe. -->
+<script src="../themes/theme-select.js"></script>
+</body>
+</html>
