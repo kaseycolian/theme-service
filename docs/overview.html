@@ -48,6 +48,20 @@
   .connector  { fill: none; stroke: url(#grad-flow); stroke-width: 2.5; filter: url(#glow-flow);
                 stroke-linecap: round; }
   .connector--dashed { stroke-dasharray: 5 6; opacity: .9; }
+
+  #hero-export { position: relative; padding: 28px; border-radius: 18px;
+                 background: var(--bg); border: 1px solid var(--border); overflow: hidden; }
+  .hero-row { display: flex; align-items: center; justify-content: space-between; gap: 18px;
+              flex-wrap: wrap; }
+  .hero-row .node-card { flex: 1 1 150px; min-width: 140px; }
+  .hero-skill { margin-top: 22px; display: flex; justify-content: center; }
+  .hero-skill .node-card { max-width: 380px; text-align: center; }
+  .hero-flow-svg { position: absolute; inset: 0; width: 100%; height: 100%;
+                   pointer-events: none; }
+  .flow-caption { font-size: 10.5px; letter-spacing: 1px; text-transform: uppercase;
+                  color: var(--text-muted); text-align: center; margin: 2px 0 0; }
+  .hero-arrow { flex: 0 0 46px; align-self: center; }
+  @media (max-width: 720px) { .hero-arrow { transform: rotate(90deg); } }
 </style>
 </head>
 <body class="fx-grid">
@@ -68,24 +82,52 @@
   through the same tokens every app gets.</p>
 
   <section id="hero-export">
-    <div class="diagram" style="display:flex; gap:60px; align-items:center; padding:20px 0;">
-      <svg width="0" height="0" style="position:absolute">
-        <defs>
-          <linearGradient id="grad-flow" x1="0" y1="0" x2="1" y2="0">
-            <stop offset="0%"  stop-color="var(--accent-pink)"/>
-            <stop offset="50%" stop-color="var(--accent-purple)"/>
-            <stop offset="100%" stop-color="var(--accent-blue)"/>
-          </linearGradient>
-          <filter id="glow-flow" x="-50%" y="-50%" width="200%" height="200%">
-            <feGaussianBlur stdDeviation="2.5" result="b"/>
-            <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
-          </filter>
-        </defs>
+    <svg width="0" height="0" style="position:absolute">
+      <defs>
+        <linearGradient id="grad-flow" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stop-color="var(--accent-pink)"/>
+          <stop offset="50%" stop-color="var(--accent-purple)"/>
+          <stop offset="100%" stop-color="var(--accent-blue)"/>
+        </linearGradient>
+        <filter id="glow-flow" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="2.5" result="b"/>
+          <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+      </defs>
+    </svg>
+
+    <div class="hero-row">
+      <div class="node-card">
+        <span class="node-label">Source</span>
+        <span class="node-sub">built-in + your palettes<br>tools/palettes/*.mjs</span></div>
+      <svg class="hero-arrow" width="46" height="24" viewBox="0 0 46 24" aria-hidden="true">
+        <path class="connector" d="M2 12 H36"/>
+        <path class="connector" d="M30 6 L40 12 L30 18"/>
       </svg>
-      <div class="node-card"><span class="node-label">Source</span>
-        <span class="node-sub">tools/palettes/*.mjs</span></div>
+      <div class="node-card node-card--accent" style="--node-accent: var(--accent-purple)">
+        <span class="node-label">Build</span>
+        <span class="node-sub">npm run build-themes<br>validates WCAG AA</span></div>
+      <svg class="hero-arrow" width="46" height="24" viewBox="0 0 46 24" aria-hidden="true">
+        <path class="connector" d="M2 12 H36"/>
+        <path class="connector" d="M30 6 L40 12 L30 18"/>
+      </svg>
       <div class="node-card node-card--accent" style="--node-accent: var(--accent-blue)">
-        <span class="node-label">Build</span><span class="node-sub">npm run build-themes</span></div>
+        <span class="node-label">themes/ output</span>
+        <span class="node-sub">theme.css · tokens.json · helpers</span></div>
+      <svg class="hero-arrow" width="46" height="24" viewBox="0 0 46 24" aria-hidden="true">
+        <path class="connector" d="M2 12 H36"/>
+        <path class="connector" d="M30 6 L40 12 L30 18"/>
+      </svg>
+      <div class="node-card">
+        <span class="node-label">Your apps</span>
+        <span class="node-sub">vendor the CSS + a theme picker</span></div>
+    </div>
+
+    <div class="hero-skill">
+      <div class="node-card" style="--node-accent: var(--accent-green)">
+        <span class="node-label">Claude skill / AGENTS.md</span>
+        <span class="node-sub">apply · update · create</span>
+        <p class="flow-caption">drives the build &amp; wires your apps</p></div>
     </div>
   </section>
 </main>
