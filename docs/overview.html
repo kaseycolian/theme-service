@@ -12,15 +12,17 @@
 <link rel="stylesheet" href="../themes/components.css">
 
 <style>
+  html, * { box-sizing: border-box; }
   body { margin: 0; background: var(--bg); color: var(--text); font-family: var(--font-ui);
-         transition: background .2s, color .2s; }
+         transition: background .2s, color .2s; overflow-x: hidden; }
   .topbar { position: sticky; top: 0; z-index: 50; display: flex; gap: 18px; align-items: center;
             flex-wrap: wrap; padding: 12px 20px; background: var(--bg-panel);
             border-bottom: 1px solid var(--border); }
+  .topbar > * { min-width: 0; max-width: 100%; }
   .topbar strong { font-size: 14px; }
   .topbar label { font-size: 12.5px; color: var(--text-muted); display: inline-flex; gap: 8px;
-                  align-items: center; }
-  .topbar select { font-family: var(--font-mono); }
+                  align-items: center; min-width: 0; max-width: 100%; flex-shrink: 1; }
+  .topbar select { font-family: var(--font-mono); width: 100%; min-width: 0; }
   main { max-width: 1040px; margin: 0 auto; padding: 32px 20px 80px; }
   .page-title { font-size: 24px; margin: 0 0 6px; }
   .page-lead { color: var(--text-muted); max-width: 64ch; line-height: 1.55; margin: 0 0 28px; }
