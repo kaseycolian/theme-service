@@ -17,12 +17,21 @@
          transition: background .2s, color .2s; }
   .topbar { position: sticky; top: 0; z-index: 50; display: flex; gap: 18px; align-items: center;
             flex-wrap: wrap; padding: 12px 20px; background: var(--bg-panel);
-            border-bottom: 1px solid var(--border); max-width: 100%; }
+            border-bottom: 1px solid var(--border); max-width: 100%; justify-content: flex-start; }
   .topbar > * { min-width: 0; max-width: 100%; }
   .topbar strong { font-size: 14px; }
   .topbar label { font-size: 12.5px; color: var(--text-muted); display: inline-flex; gap: 8px;
                   align-items: center; min-width: 0; max-width: 100%; }
   .topbar select[data-theme-select] { font-family: var(--font-mono); max-width: 100%; min-width: 0; width: 100%; }
+  .ov-cta { margin-left: auto; text-decoration: none; font-size: 13px; font-weight: 600;
+            padding: 7px 14px; border-radius: 999px; color: var(--text);
+            border: 1px solid color-mix(in srgb, var(--accent-purple) 55%, var(--border));
+            background: color-mix(in srgb, var(--accent-purple) 14%, transparent);
+            box-shadow: 0 0 12px color-mix(in srgb, var(--accent-purple) 30%, transparent);
+            white-space: nowrap; }
+  .ov-cta:hover { border-color: var(--accent-pink); box-shadow: 0 0 16px color-mix(in srgb, var(--accent-pink) 40%, transparent); }
+  .ov-cta:focus-visible { outline: 3px solid var(--accent-blue); outline-offset: 2px; }
+  @media (max-width: 720px) { .ov-cta { margin-left: 0; } }
   main { max-width: 1040px; margin: 0 auto; padding: 32px 20px 80px; }
   .page-title { font-size: 24px; margin: 0 0 6px; }
   .page-lead { color: var(--text-muted); max-width: 64ch; line-height: 1.55; margin: 0 0 28px; }
@@ -51,6 +60,20 @@
                 stroke-linecap: round; }
   .connector--dashed { stroke-dasharray: 5 6; opacity: .9; }
 
+  /* --- Shared flow layout helpers (reused by all overview sections) --- */
+  .ov-section { margin-top: 56px; }
+  .ov-section > h2 { font-size: 19px; margin: 0 0 4px; }
+  .ov-section > .ov-lead { color: var(--text-muted); margin: 0 0 20px; max-width: 64ch; line-height: 1.55; }
+  .flow-row { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .flow-col { display: flex; flex-direction: column; gap: 12px; }
+  .flow-row .node-card { flex: 1 1 160px; min-width: 150px; }
+  .flow-arrow { flex: 0 0 40px; align-self: center; }
+  @media (max-width: 720px) {
+    .flow-row { flex-direction: column; align-items: stretch; }
+    .flow-row .node-card { flex: 1 1 auto; }
+    .flow-arrow { transform: rotate(90deg); align-self: center; }
+  }
+
   #hero-export { position: relative; padding: 28px; border-radius: 18px;
                  background: var(--bg); border: 1px solid var(--border); overflow: hidden;
                  max-width: 960px; margin: 0 auto; }
@@ -59,11 +82,17 @@
   .hero-row .node-card { flex: 1 1 150px; min-width: 140px; }
   .hero-skill { margin-top: 22px; display: flex; justify-content: center; }
   .hero-skill .node-card { max-width: 380px; text-align: center; }
-  .hero-flow-svg { position: absolute; inset: 0; width: 100%; height: 100%;
-                   pointer-events: none; }
   .flow-caption { font-size: 10.5px; letter-spacing: 1px; text-transform: uppercase;
                   color: var(--text-muted); text-align: center; margin: 2px 0 0; }
   .hero-arrow { flex: 0 0 46px; align-self: center; }
+  /* Coordinates are tuned for the unwrapped 4-across hero row, which only occurs once the row
+     has room to lay out without wrapping (~990px+); hidden otherwise so it never floats
+     disconnected from the cards it's meant to link. */
+  .hero-skill-connector { display: none; position: absolute; inset: 0; width: 100%; height: 100%;
+                           pointer-events: none; }
+  @media (min-width: 990px) {
+    .hero-skill-connector { display: block; }
+  }
   @media (max-width: 720px) {
     .hero-row { flex-direction: column; align-items: stretch; }
     .hero-row .node-card { flex: 1 1 auto; }
@@ -76,10 +105,11 @@
 <div class="topbar">
   <strong>Theme Service — Visual Overview</strong>
   <label>Theme
-    <select class="select" data-theme-select aria-label="Theme" style="padding:6px 26px 6px 10px"></select>
+    <select class="select" data-theme-select style="padding:6px 26px 6px 10px"></select>
   </label>
   <label class="switch"><input type="checkbox" data-motion-toggle>
     <span class="track"><span class="thumb"></span></span> Disable animations</label>
+  <a class="ov-cta" href="../themes/preview.html">See Built-In Themes →</a>
 </div>
 
 <main>
@@ -89,7 +119,7 @@
   through the same tokens every app gets.</p>
 
   <section id="hero-export">
-    <svg width="0" height="0" style="position:absolute">
+    <svg width="0" height="0" style="position:absolute" aria-hidden="true">
       <defs>
         <linearGradient id="grad-flow" x1="0" y1="0" x2="1" y2="0">
           <stop offset="0%" stop-color="var(--accent-pink)"/>
@@ -131,10 +161,152 @@
     </div>
 
     <div class="hero-skill">
-      <div class="node-card" style="--node-accent: var(--accent-green)">
+      <div class="node-card" id="hero-skill-card" style="--node-accent: var(--accent-green)">
         <span class="node-label">Claude skill / AGENTS.md</span>
         <span class="node-sub">apply · update · create</span>
         <p class="flow-caption">drives the build &amp; wires your apps</p></div>
+    </div>
+
+    <svg class="hero-skill-connector" viewBox="0 0 960 256" preserveAspectRatio="none" aria-hidden="true">
+      <path class="connector connector--dashed" d="M480,141 Q410,100 357,122"/>
+    </svg>
+  </section>
+
+  <section class="ov-section" id="two-ways">
+    <h2>Who uses it, and the two ways in</h2>
+    <p class="ov-lead">You never have to touch theme creation to get value — Path 1 stands alone.</p>
+    <div class="flow-row">
+      <div class="node-card node-card--accent" style="--node-accent: var(--accent-purple)">
+        <span class="node-label">You</span>
+        <span class="node-sub">what do you want?</span></div>
+      <svg class="flow-arrow" width="40" height="24" viewBox="0 0 46 24" aria-hidden="true">
+        <path class="connector" d="M2 12 H36"/><path class="connector" d="M30 6 L40 12 L30 18"/></svg>
+      <div class="flow-col" style="flex:1 1 320px">
+        <div class="flow-row">
+          <div class="node-card" style="--node-accent: var(--accent-pink)">
+            <span class="node-label">Path 1 — Use the themes as-is</span>
+            <span class="node-sub">install the skill → apply 16 themes to any app<br>npm run install-all</span></div>
+          <svg class="flow-arrow" width="40" height="24" viewBox="0 0 46 24" aria-hidden="true">
+            <path class="connector" d="M2 12 H36"/><path class="connector" d="M30 6 L40 12 L30 18"/></svg>
+          <div class="node-card">
+            <span class="node-label">Apps get a theme picker</span>
+            <span class="node-sub">every theme AA-validated</span></div>
+        </div>
+        <div class="flow-row">
+          <div class="node-card" style="--node-accent: var(--accent-blue)">
+            <span class="node-label">Path 2 — Make your own themes</span>
+            <span class="node-sub">add a palette, be guided, or design a new style<br>npm run build-themes</span></div>
+          <svg class="flow-arrow" width="40" height="24" viewBox="0 0 46 24" aria-hidden="true">
+            <path class="connector" d="M2 12 H36"/><path class="connector" d="M30 6 L40 12 L30 18"/></svg>
+          <div class="node-card">
+            <span class="node-label">Your themes join the set</span>
+            <span class="node-sub">reusable across all your apps</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="ov-section" id="wf-apply">
+    <h2>Workflow A — Apply the themes to an app</h2>
+    <p class="ov-lead">You ask; the agent does the wiring and confirms the choices that matter before changing anything.</p>
+    <div class="flow-col" style="max-width:640px">
+      <div class="node-card node-card--accent" style="--node-accent: var(--accent-pink)">
+        <span class="node-label">"Apply the theme-service to this app"</span>
+        <span class="node-sub">you → Claude (skill)</span></div>
+      <div style="align-self:center"><svg class="flow-arrow" style="transform:rotate(90deg)" width="40" height="24" viewBox="0 0 46 24" aria-hidden="true"><path class="connector" d="M2 12 H36"/><path class="connector" d="M30 6 L40 12 L30 18"/></svg></div>
+      <div class="node-card">
+        <span class="node-label">Locate the source</span>
+        <span class="node-sub">reads machine-local config</span></div>
+      <div style="align-self:center"><svg class="flow-arrow" style="transform:rotate(90deg)" width="40" height="24" viewBox="0 0 46 24" aria-hidden="true"><path class="connector" d="M2 12 H36"/><path class="connector" d="M30 6 L40 12 L30 18"/></svg></div>
+      <div class="node-card node-card--accent" style="--node-accent: var(--accent-purple)">
+        <span class="node-label">Confirm the choices that matter</span>
+        <span class="node-sub">restyle depth? fonts? existing selector? placement?</span></div>
+      <div style="align-self:center"><svg class="flow-arrow" style="transform:rotate(90deg)" width="40" height="24" viewBox="0 0 46 24" aria-hidden="true"><path class="connector" d="M2 12 H36"/><path class="connector" d="M30 6 L40 12 L30 18"/></svg></div>
+      <div class="node-card">
+        <span class="node-label">Vendor CSS + map colors to tokens</span>
+        <span class="node-sub">agent → your app repo</span></div>
+      <div style="align-self:center"><svg class="flow-arrow" style="transform:rotate(90deg)" width="40" height="24" viewBox="0 0 46 24" aria-hidden="true"><path class="connector" d="M2 12 H36"/><path class="connector" d="M30 6 L40 12 L30 18"/></svg></div>
+      <div class="node-card">
+        <span class="node-label">Add a theme picker + persistence</span>
+        <span class="node-sub">all themes selectable</span></div>
+      <div style="align-self:center"><svg class="flow-arrow" style="transform:rotate(90deg)" width="40" height="24" viewBox="0 0 46 24" aria-hidden="true"><path class="connector" d="M2 12 H36"/><path class="connector" d="M30 6 L40 12 L30 18"/></svg></div>
+      <div class="node-card">
+        <span class="node-label">Verify WCAG AA + write tracking log</span>
+        <span class="node-sub">THEME-SERVICE.md</span></div>
+      <div style="align-self:center"><svg class="flow-arrow" style="transform:rotate(90deg)" width="40" height="24" viewBox="0 0 46 24" aria-hidden="true"><path class="connector" d="M2 12 H36"/><path class="connector" d="M30 6 L40 12 L30 18"/></svg></div>
+      <div class="node-card node-card--accent" style="--node-accent: var(--accent-green)">
+        <span class="node-label">Done — switch themes live</span>
+        <span class="node-sub">nothing else changed</span></div>
+    </div>
+  </section>
+
+  <section class="ov-section" id="wf-clone">
+    <h2>Workflow B — Clone / save / update, with your own storage</h2>
+    <p class="ov-lead">Your themes live on your machine and persist with a plain local commit — GitHub is optional. You can still pull upstream updates anytime without losing your themes.</p>
+    <div class="flow-col" style="max-width:720px">
+      <div class="node-card"><span class="node-label">Origin — theme-service</span>
+        <span class="node-sub">clone or fork (once)</span></div>
+      <div style="align-self:center"><svg class="flow-arrow" style="transform:rotate(90deg)" width="40" height="24" viewBox="0 0 46 24" aria-hidden="true"><path class="connector" d="M2 12 H36"/><path class="connector" d="M30 6 L40 12 L30 18"/></svg></div>
+      <div class="node-card node-card--accent" style="--node-accent: var(--accent-purple)">
+        <span class="node-label">Your machine — local clone</span>
+        <span class="node-sub">add your themes → tools/palettes/local.mjs → npm run build-themes → git commit (saved locally ✔, no GitHub required)</span></div>
+      <div style="align-self:center"><svg class="flow-arrow" style="transform:rotate(90deg)" width="40" height="24" viewBox="0 0 46 24" aria-hidden="true"><path class="connector" d="M2 12 H36"/><path class="connector" d="M30 6 L40 12 L30 18"/></svg></div>
+      <div class="node-card"><span class="node-label">npm run update-from-origin</span>
+        <span class="node-sub">fetch + merge, conflict-free — your local.mjs is never touched; nothing auto-deleted</span></div>
+      <div style="align-self:center"><svg class="flow-arrow" style="transform:rotate(90deg)" width="40" height="24" viewBox="0 0 46 24" aria-hidden="true"><path class="connector connector--dashed" d="M2 12 H36"/><path class="connector connector--dashed" d="M30 6 L40 12 L30 18"/></svg></div>
+      <div class="node-card" style="--node-accent: var(--accent-blue); border-style:dashed">
+        <span class="node-label">Optional: git push → your own GitHub</span>
+        <span class="node-sub">backup · sync machines · share</span></div>
+    </div>
+    <p class="node-sub" style="margin-top:12px">Solid = local (works with just local git). Dashed = optional GitHub.</p>
+  </section>
+
+  <section class="ov-section" id="wf-create">
+    <h2>Workflow C — Create or edit a theme</h2>
+    <p class="ov-lead">Three on-ramps, one destination: a validated palette that becomes a reusable theme.</p>
+    <div class="flow-row">
+      <div class="node-card node-card--accent" style="--node-accent: var(--accent-purple)">
+        <span class="node-label">Add / edit a theme</span><span class="node-sub">how?</span></div>
+      <svg class="flow-arrow" width="40" height="24" viewBox="0 0 46 24" aria-hidden="true">
+        <path class="connector" d="M2 12 H36"/><path class="connector" d="M30 6 L40 12 L30 18"/></svg>
+      <div class="flow-col" style="flex:1 1 300px">
+        <div class="node-card" style="--node-accent: var(--accent-pink)"><span class="node-label">I have a palette</span>
+          <span class="node-sub">give colors → agent fills gaps + validates AA</span></div>
+        <div class="node-card" style="--node-accent: var(--accent-blue)"><span class="node-label">Guide me</span>
+          <span class="node-sub">describe a vibe → agent proposes + iterates</span></div>
+        <div class="node-card" style="--node-accent: var(--accent-green)"><span class="node-label">A whole new style</span>
+          <span class="node-sub">design candidates in a discovery draft, compare side-by-side</span></div>
+      </div>
+      <svg class="flow-arrow" width="40" height="24" viewBox="0 0 46 24" aria-hidden="true">
+        <path class="connector" d="M2 12 H36"/><path class="connector" d="M30 6 L40 12 L30 18"/></svg>
+      <div class="flow-col" style="flex:1 1 180px">
+        <div class="node-card"><span class="node-label">local.mjs (yours)</span>
+          <span class="node-sub">npm run build-themes — AA-validated</span></div>
+        <div class="node-card"><span class="node-label">git commit</span>
+          <span class="node-sub">saved locally</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="ov-section" id="wf-release">
+    <h2>Workflow D — Releasing (origin owner)</h2>
+    <p class="ov-lead">One command cuts a versioned, tagged release that forks can pull.</p>
+    <div class="flow-row">
+      <div class="node-card"><span class="node-label">Make changes</span></div>
+      <svg class="flow-arrow" width="40" height="24" viewBox="0 0 46 24" aria-hidden="true">
+        <path class="connector" d="M2 12 H36"/><path class="connector" d="M30 6 L40 12 L30 18"/></svg>
+      <div class="node-card node-card--accent" style="--node-accent: var(--accent-purple)">
+        <span class="node-label">npm run release minor -- --note '…'</span>
+        <span class="node-sub">bump VERSION · CHANGELOG entry · git tag vX.Y.Z</span></div>
+      <svg class="flow-arrow" width="40" height="24" viewBox="0 0 46 24" aria-hidden="true">
+        <path class="connector" d="M2 12 H36"/><path class="connector" d="M30 6 L40 12 L30 18"/></svg>
+      <div class="node-card" style="--node-accent: var(--accent-blue)">
+        <span class="node-label">git push --follow-tags</span></div>
+      <svg class="flow-arrow" width="40" height="24" viewBox="0 0 46 24" aria-hidden="true">
+        <path class="connector" d="M2 12 H36"/><path class="connector" d="M30 6 L40 12 L30 18"/></svg>
+      <div class="node-card" style="--node-accent: var(--accent-green)">
+        <span class="node-label">Forks update</span>
+        <span class="node-sub">via update-from-origin</span></div>
     </div>
   </section>
 </main>

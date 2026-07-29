@@ -13,7 +13,14 @@
 
 <style>
   body { margin: 0; background: var(--bg); color: var(--text); font-family: var(--font-ui); transition: background .2s; }
-  .bar { position: sticky; top: 0; z-index: 50; display: flex; gap: 18px; align-items: center; flex-wrap: wrap;
+  .ov-nav { position: sticky; top: 0; z-index: 51; display: flex; gap: 16px; align-items: center;
+            padding: 10px 18px; background: var(--bg-panel); border-bottom: 1px solid var(--border); }
+  .ov-nav strong { font-size: 13.5px; }
+  .ov-nav-back { text-decoration: none; font-size: 13px; font-weight: 600; color: var(--text);
+                 padding: 5px 12px; border-radius: 999px; border: 1px solid var(--border); white-space: nowrap; }
+  .ov-nav-back:hover { border-color: var(--accent-pink); }
+  .ov-nav-back:focus-visible { outline: 3px solid var(--accent-blue); outline-offset: 2px; }
+  .bar { position: sticky; top: 42px; z-index: 50; display: flex; gap: 18px; align-items: center; flex-wrap: wrap;
          padding: 12px 20px; background: var(--bg-panel); border-bottom: 1px solid var(--border); }
   .bar strong { font-size: 14px; }
   .bar label { font-size: 12.5px; color: var(--text-muted); display: inline-flex; gap: 8px; align-items: center; }
@@ -28,6 +35,11 @@
 </style>
 </head>
 <body class="fx-grid">
+
+<div class="ov-nav">
+  <a class="ov-nav-back" href="../docs/overview.html">← Overview</a>
+  <strong>Built-In Themes — Live Preview</strong>
+</div>
 
 <div class="bar">
   <strong>Theme Service Preview</strong>

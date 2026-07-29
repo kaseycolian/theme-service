@@ -95,6 +95,13 @@ manual workflow, if you want to drive it yourself:
    `npm run release <patch|minor|major> -- --note "…"` bumps `VERSION`, updates `CHANGELOG.md`, commits,
    and tags `vX.Y.Z`.
 
+**Publishing to the live site (origin repo).** The GitHub Pages home (`docs/overview.html`) links a
+live "Built-In Themes" preview (`themes/preview.html`), which renders the built `theme.css`. The Pages
+workflow (`.github/workflows/pages.yml`) auto-detects the **highest-numbered `discovery/draft-N`** and
+builds themes from it, so finalizing a new draft as the highest `draft-N` automatically becomes the
+live preview on the next push to `main` — no extra publish step. Convention: highest `draft-N` = the
+latest finalized set.
+
 ## Rolling changes out to your apps
 
 Once a theme is added or changed here, bring any app up to date with the update flow — no manual

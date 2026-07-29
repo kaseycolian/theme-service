@@ -9,10 +9,13 @@ live across all themes.)*
 
 - ✅ **Pass 1 — Hero.** [overview.html](overview.html): the "What it is" pipeline, fully themed,
   re-skins live across all 16 themes. Establishes the reusable node/connector component system.
-- ⬜ **Pass 2 — Remaining diagrams.** Workflows A–D + "two ways in", styled with the same system.
-- ⬜ **Image export.** PNG/SVG of each diagram for embedding directly in Markdown.
-- ⬜ **Hero polish.** A few `aria` tidy-ups, remove unused CSS, add the positioned dashed
+- ✅ **Pass 2 — Remaining diagrams.** Workflows A–D + "two ways in", styled with the same system.
+- ⛔ **Image export — dropped.** The graphics live on the page (it's the human quick-view / GitHub
+  Pages home), so no PNG/SVG export is needed.
+- ✅ **Hero polish.** A few `aria` tidy-ups, remove unused CSS, add the positioned dashed
   skill→build connector (currently conveyed by caption text).
+- 🌐 **Live demo:** the [overview page](overview.html) is the repo's GitHub Pages home; its "See
+  Built-In Themes" button opens the live [product preview](../themes/preview.html).
 
 ---
 

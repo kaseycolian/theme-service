@@ -24,3 +24,7 @@ Thumbs.db
 
 # Local Claude/agent scratch that may land in the repo dir
 .claude/
+
+# Build output and local development directories (never commit)
+_site/
+scratch/

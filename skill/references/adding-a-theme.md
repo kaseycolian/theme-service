@@ -56,6 +56,12 @@ discovery→finalize flow; it supports either brand-consistent variants or a del
    commits, and tags `vX.Y.Z`.
 6. Downstream apps pick up new themes via the **update flow** (`updating-themes.md`); a data-driven
    selector shows them automatically. Forks pick up origin changes via `updating-from-origin.md`.
+7. **Publishing to the live site (origin repo).** The GitHub Pages home (`docs/overview.html`) links a
+   live "Built-In Themes" preview (`themes/preview.html`), which renders the built `theme.css`. The
+   Pages workflow (`.github/workflows/pages.yml`) auto-detects the **highest-numbered
+   `discovery/draft-N`** and builds themes from it, so when you finalize a new draft as the highest
+   `draft-N`, it automatically becomes the live preview on the next push to `main` — no extra publish
+   step. Convention: highest `draft-N` = the latest finalized set.
 
 ## Changing the default/flagship theme
 Set `DEFAULT_FAMILY` in `tools/build-final.mjs` to the family you want on `:root`, re-run
