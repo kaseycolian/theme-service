@@ -63,6 +63,9 @@ detailed, non-agent-specific procedures live in `skill/references/` and are shar
   `.github/workflows/pages.yml` auto-detects the **highest-numbered `discovery/draft-N`** and builds
   themes from it — finalizing a new draft as the highest `draft-N` makes it the live preview on the
   next push to `main`, no extra publish step. Convention: highest `draft-N` = the latest finalized set.
+  To work on those two pages locally, run **`npm run dev:overview-site`** (build + serve `_site/` with
+  the deployed clean URLs, rebuild on change; `:build` / `:serve` variants exist). The `dev:overview-site*`
+  scripts are maintainer-only site tooling — they are NOT part of installing or using the theme service.
 - **Never auto-delete or overwrite a user's themes.** Their themes live in `local.mjs` (origin never
   touches it); rebuilding only regenerates. Remove a theme only on explicit request. When updating a
   fork from origin, follow `updating-from-origin.md` and **ask before including built-in themes**.

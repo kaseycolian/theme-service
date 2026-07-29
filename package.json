@@ -11,6 +11,11 @@
     "build-themes:mine": "node tools/build-final.mjs --write --no-builtin",
     "update-from-origin": "node tools/update-from-origin.mjs",
     "release": "node tools/release.mjs",
-    "validate": "node tools/build-palettes.mjs 3"
+    "validate": "node tools/build-palettes.mjs 3",
+
+    "//dev:overview-site": "LOCAL DEV of this repo's informational GitHub Pages site (docs/overview.html + themes/preview.html) ONLY. Not needed to install or use the theme service.",
+    "dev:overview-site": "node tools/serve-site.mjs",
+    "dev:overview-site:build": "node tools/build-site.mjs",
+    "dev:overview-site:serve": "node tools/serve-site.mjs --no-build --no-watch"
   }
 }
