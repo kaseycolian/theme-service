@@ -5,9 +5,17 @@
    so it works identically across all 12 palettes.
    ============================================================================= */
 
+/* Glow intensity — full neon on dark, dialed back on light. Each generated
+   palette file declares its own; this is only the fallback for a [data-palette]
+   with no file behind it, so it has to LOSE to those blocks.
+
+   :where() is what makes it lose. Declared plainly in the block below, it tied
+   with [data-palette="…"] — both are specificity (0,1,0) — and won on source
+   order, since every palette file is linked before this one. That pinned all 16
+   sections to full glow and made the light palettes' 0.35 unreachable. */
+:where([data-palette]) { --glow-strength: 1; }
+
 [data-palette] {
-  /* Glow intensity. Dark = full neon. Light = dialed way back (saturated solids). */
-  --glow-strength: 1;
   /* Motion gate: 1 = animations on, 0 = off. Flipped by reduced-motion + toggle below. */
   --motion: 1;
 
