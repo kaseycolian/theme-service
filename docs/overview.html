@@ -277,6 +277,28 @@
       </div>
     </div>
   </section>
+
+  <section class="ov-section" id="wf-release">
+    <h2>Workflow D — Releasing (origin owner)</h2>
+    <p class="ov-lead">One command cuts a versioned, tagged release that forks can pull.</p>
+    <div class="flow-row">
+      <div class="node-card"><span class="node-label">Make changes</span></div>
+      <svg class="flow-arrow" width="40" height="24" viewBox="0 0 46 24" aria-hidden="true">
+        <path class="connector" d="M2 12 H36"/><path class="connector" d="M30 6 L40 12 L30 18"/></svg>
+      <div class="node-card node-card--accent" style="--node-accent: var(--accent-purple)">
+        <span class="node-label">npm run release minor -- --note '…'</span>
+        <span class="node-sub">bump VERSION · CHANGELOG entry · git tag vX.Y.Z</span></div>
+      <svg class="flow-arrow" width="40" height="24" viewBox="0 0 46 24" aria-hidden="true">
+        <path class="connector" d="M2 12 H36"/><path class="connector" d="M30 6 L40 12 L30 18"/></svg>
+      <div class="node-card" style="--node-accent: var(--accent-blue)">
+        <span class="node-label">git push --follow-tags</span></div>
+      <svg class="flow-arrow" width="40" height="24" viewBox="0 0 46 24" aria-hidden="true">
+        <path class="connector" d="M2 12 H36"/><path class="connector" d="M30 6 L40 12 L30 18"/></svg>
+      <div class="node-card" style="--node-accent: var(--accent-green)">
+        <span class="node-label">Forks update</span>
+        <span class="node-sub">via update-from-origin</span></div>
+    </div>
+  </section>
 </main>
 
 <!-- Shipped helper populates &amp; wires the selector/toggle. External = CSP-safe. -->
