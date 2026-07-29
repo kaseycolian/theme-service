@@ -39,6 +39,7 @@ const home = rewrite(readFileSync('docs/overview.html', 'utf8'), 'docs/overview.
   ['href="overview.html"', 'href="./"'],  // brand self-link -> site root
   ['../themes/preview.html', 'preview/'], // CTA -> clean preview URL (must precede the generic themes/ rewrite)
   ['../themes/', 'themes/'],              // asset links (css/js)
+  ['../assets/', 'assets/'],              // favicon + its themer
 ]);
 writeFileSync('_site/index.html', home);
 
@@ -60,8 +61,19 @@ cpSync('themes', '_site/themes', {
   filter: (src) => !src.endsWith('preview.html'),
 });
 
-// Sanity: the four load-bearing files must exist
-for (const f of ['_site/index.html', '_site/preview/index.html', '_site/themes/theme.css', '_site/themes/theme-init.js']) {
+// Site assets (favicon + the script that re-colors it per theme). Served from
+// /assets/ for both pages: the home page's ../assets/ was rewritten above, and
+// /preview/ resolves ../assets/ to the same place.
+// (skip full-resolution image sources — they're gitignored, so they don't exist
+// in CI; excluding them keeps a local dry-run identical to the real deploy)
+cpSync('assets', '_site/assets', {
+  recursive: true,
+  filter: (src) => !src.endsWith('header-image.png'),
+});
+
+// Sanity: the load-bearing files must exist
+for (const f of ['_site/index.html', '_site/preview/index.html', '_site/themes/theme.css', '_site/themes/theme-init.js',
+                 '_site/assets/favicon.svg', '_site/assets/favicon-theme.js']) {
   if (!existsSync(f)) {
     console.error(`ASSEMBLE FAIL: missing ${f}`);
     process.exit(1);
