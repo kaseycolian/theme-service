@@ -51,6 +51,20 @@
                 stroke-linecap: round; }
   .connector--dashed { stroke-dasharray: 5 6; opacity: .9; }
 
+  /* --- Shared flow layout helpers (reused by all overview sections) --- */
+  .ov-section { margin-top: 56px; }
+  .ov-section > h2 { font-size: 19px; margin: 0 0 4px; }
+  .ov-section > .ov-lead { color: var(--text-muted); margin: 0 0 20px; max-width: 64ch; line-height: 1.55; }
+  .flow-row { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .flow-col { display: flex; flex-direction: column; gap: 12px; }
+  .flow-row .node-card { flex: 1 1 160px; min-width: 150px; }
+  .flow-arrow { flex: 0 0 40px; align-self: center; }
+  @media (max-width: 720px) {
+    .flow-row { flex-direction: column; align-items: stretch; }
+    .flow-row .node-card { flex: 1 1 auto; }
+    .flow-arrow { transform: rotate(90deg); align-self: center; }
+  }
+
   #hero-export { position: relative; padding: 28px; border-radius: 18px;
                  background: var(--bg); border: 1px solid var(--border); overflow: hidden;
                  max-width: 960px; margin: 0 auto; }
@@ -146,6 +160,40 @@
     <svg class="hero-skill-connector" viewBox="0 0 960 256" preserveAspectRatio="none" aria-hidden="true">
       <path class="connector connector--dashed" d="M480,141 Q410,100 357,122"/>
     </svg>
+  </section>
+
+  <section class="ov-section" id="two-ways">
+    <h2>Who uses it, and the two ways in</h2>
+    <p class="ov-lead">You never have to touch theme creation to get value — Path 1 stands alone.</p>
+    <div class="flow-row">
+      <div class="node-card node-card--accent" style="--node-accent: var(--accent-purple)">
+        <span class="node-label">You</span>
+        <span class="node-sub">what do you want?</span></div>
+      <svg class="flow-arrow" width="40" height="24" viewBox="0 0 46 24" aria-hidden="true">
+        <path class="connector" d="M2 12 H36"/><path class="connector" d="M30 6 L40 12 L30 18"/></svg>
+      <div class="flow-col" style="flex:1 1 320px">
+        <div class="flow-row">
+          <div class="node-card" style="--node-accent: var(--accent-pink)">
+            <span class="node-label">Path 1 — Use the themes as-is</span>
+            <span class="node-sub">install the skill → apply 16 themes to any app<br>npm run install-all</span></div>
+          <svg class="flow-arrow" width="40" height="24" viewBox="0 0 46 24" aria-hidden="true">
+            <path class="connector" d="M2 12 H36"/><path class="connector" d="M30 6 L40 12 L30 18"/></svg>
+          <div class="node-card">
+            <span class="node-label">Apps get a theme picker</span>
+            <span class="node-sub">every theme AA-validated</span></div>
+        </div>
+        <div class="flow-row">
+          <div class="node-card" style="--node-accent: var(--accent-blue)">
+            <span class="node-label">Path 2 — Make your own themes</span>
+            <span class="node-sub">add a palette, be guided, or design a new style<br>npm run build-themes</span></div>
+          <svg class="flow-arrow" width="40" height="24" viewBox="0 0 46 24" aria-hidden="true">
+            <path class="connector" d="M2 12 H36"/><path class="connector" d="M30 6 L40 12 L30 18"/></svg>
+          <div class="node-card">
+            <span class="node-label">Your themes join the set</span>
+            <span class="node-sub">reusable across all your apps</span></div>
+        </div>
+      </div>
+    </div>
   </section>
 </main>
 
