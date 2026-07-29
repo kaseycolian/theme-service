@@ -139,6 +139,12 @@ npm run validate               # AA-check the built-in palette source (no write)
 npm run release minor -- --note "what changed"   # bump VERSION + CHANGELOG + git tag vX.Y.Z
 ```
 
+`release` commits only `VERSION` + `CHANGELOG.md`, so it **refuses on a dirty tree** — otherwise the tag
+would point at a commit missing the work it claims to ship. Commit your feature work first (or pass
+`--allow-dirty` if you mean it). `--note` is required: it is the entry apps read to decide whether an
+upgrade affects them. It prints the bump rule and `X.Y.Z -> X.Y.Z` and asks to confirm before writing;
+pass `--yes` to skip that.
+
 The generators **refuse to write if any pair fails WCAG AA** (your own `local.mjs` themes are validated
 too). The standalone checker is in [`tools/contrast-checker/`](tools/contrast-checker/) (library + CLI,
 usable in any project).

@@ -10,7 +10,10 @@
     "build-themes": "node tools/build-final.mjs --write",
     "build-themes:mine": "node tools/build-final.mjs --write --no-builtin",
     "update-from-origin": "node tools/update-from-origin.mjs",
+
+    "//release": "Bump VERSION + prepend CHANGELOG.md + tag vX.Y.Z. Commit feature work FIRST — it refuses on a dirty tree. Usage: npm run release <patch|minor|major> -- --note \"what changed\"   (--note is required; the -- is what passes it through npm. Flags: --allow-dirty, --yes)",
     "release": "node tools/release.mjs",
+
     "validate": "node tools/build-palettes.mjs 3",
 
     "//dev:overview-site": "LOCAL DEV of this repo's informational GitHub Pages site (docs/overview.html + themes/preview.html) ONLY. Not needed to install or use the theme service.",

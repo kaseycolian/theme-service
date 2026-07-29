@@ -93,7 +93,8 @@ manual workflow, if you want to drive it yourself:
    change the flagship default, set `DEFAULT_FAMILY` in `tools/build-final.mjs`.
 5. **Commit** (git-local persists; push optional). If you own the origin and are cutting a release,
    `npm run release <patch|minor|major> -- --note "…"` bumps `VERSION`, updates `CHANGELOG.md`, commits,
-   and tags `vX.Y.Z`.
+   and tags `vX.Y.Z`. Commit first for real: it commits only those two files, so it **refuses on a
+   dirty tree** rather than tag a commit without your themes in it. New themes are additive → `minor`.
 
 **Publishing to the live site (origin repo).** The GitHub Pages home (`docs/overview.html`) links a
 live "Built-In Themes" preview (`themes/preview.html`), which renders the built `theme.css`. The Pages
