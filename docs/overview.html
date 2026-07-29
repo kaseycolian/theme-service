@@ -250,6 +250,33 @@
     </div>
     <p class="node-sub" style="margin-top:12px">Solid = local (works with just local git). Dashed = optional GitHub.</p>
   </section>
+
+  <section class="ov-section" id="wf-create">
+    <h2>Workflow C — Create or edit a theme</h2>
+    <p class="ov-lead">Three on-ramps, one destination: a validated palette that becomes a reusable theme.</p>
+    <div class="flow-row">
+      <div class="node-card node-card--accent" style="--node-accent: var(--accent-purple)">
+        <span class="node-label">Add / edit a theme</span><span class="node-sub">how?</span></div>
+      <svg class="flow-arrow" width="40" height="24" viewBox="0 0 46 24" aria-hidden="true">
+        <path class="connector" d="M2 12 H36"/><path class="connector" d="M30 6 L40 12 L30 18"/></svg>
+      <div class="flow-col" style="flex:1 1 300px">
+        <div class="node-card" style="--node-accent: var(--accent-pink)"><span class="node-label">I have a palette</span>
+          <span class="node-sub">give colors → agent fills gaps + validates AA</span></div>
+        <div class="node-card" style="--node-accent: var(--accent-blue)"><span class="node-label">Guide me</span>
+          <span class="node-sub">describe a vibe → agent proposes + iterates</span></div>
+        <div class="node-card" style="--node-accent: var(--accent-green)"><span class="node-label">A whole new style</span>
+          <span class="node-sub">design candidates in a discovery draft, compare side-by-side</span></div>
+      </div>
+      <svg class="flow-arrow" width="40" height="24" viewBox="0 0 46 24" aria-hidden="true">
+        <path class="connector" d="M2 12 H36"/><path class="connector" d="M30 6 L40 12 L30 18"/></svg>
+      <div class="flow-col" style="flex:1 1 180px">
+        <div class="node-card"><span class="node-label">local.mjs (yours)</span>
+          <span class="node-sub">npm run build-themes — AA-validated</span></div>
+        <div class="node-card"><span class="node-label">git commit</span>
+          <span class="node-sub">saved locally</span></div>
+      </div>
+    </div>
+  </section>
 </main>
 
 <!-- Shipped helper populates &amp; wires the selector/toggle. External = CSP-safe. -->
