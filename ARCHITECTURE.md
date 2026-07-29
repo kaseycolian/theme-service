@@ -12,7 +12,8 @@ tools/palettes/local.mjs       ← LOCAL palette source (a fork's own themes; co
         ▼
 themes/  (BUILD OUTPUT — gitignored, not committed; regenerate any time)
   theme.css  tokens.json  themes.index.json  theme-init.js  theme-select.js
-themes/  (COMMITTED, hand-authored): effects.css  components.css  preview.html  README.md
+themes/  (COMMITTED, hand-authored): effects.css  components.css  dropdown.css  dropdown.js
+                                     preview.html  README.md
         │  (vendored/copied into each app; version recorded in the app's THEME-SERVICE.md)
         ▼
 consuming apps                 ← include theme.css+effects.css+components.css, set data-theme

@@ -5,12 +5,23 @@
    Scoped to :root so it applies app-wide once included.
    ============================================================================= */
 
+/* --glow-strength is theme.css's to set — 1 on dark themes, 0.35 on light. The
+   declaration below is only a fallback for effects.css loaded WITHOUT theme.css,
+   so it has to LOSE to every [data-theme] block.
+
+   :where() is what makes it lose. Declared plainly in the :root block below it
+   tied with [data-theme="…"] — both are specificity (0,1,0) — and won on source
+   order, because every page loads effects.css after theme.css. That pinned the
+   whole site to full glow and made the light themes' 0.35 dead code for as long
+   as it stood. :where() drops this to (0,0,0), so any theme now overrides it and
+   the fallback still applies when no theme.css is present. */
+:where(:root) { --glow-strength: 1; }
+
 :root {
-  /* Motion gate: 1 = animations on, 0 = off (flipped by reduced-motion + toggle below).
-     theme.css sets --glow-strength per theme (1 dark / 0.35 light); default here as a
-     fallback if effects.css is ever used without theme.css. */
+  /* Motion gate: 1 = animations on, 0 = off (flipped by reduced-motion + toggle
+     below). Stays at :root specificity: no theme sets it, and the reduced-motion
+     rules that flip it are in this file. */
   --motion: 1;
-  --glow-strength: 1;
 
   /* Retro crossing-gradient grid backdrop colors (subdued). */
   --grid-line-h: color-mix(in srgb, var(--accent-blue) 10%, transparent);

@@ -4,6 +4,32 @@ All notable changes to the theme-service. Apps record the version they vendored 
 (plus `updating-themes.md`) to migrate. Versioning: minor bump for additive themes/tokens, major for
 breaking token renames/removals or a default-theme change.
 
+## 0.4.0 — 2026-07-29
+
+Themed dropdown component, plus `--glow-strength` finally applying per theme.
+
+- **New `themes/dropdown.css` + `themes/dropdown.js`** — a progressively enhanced `<select>`,
+  styled entirely from tokens. Supports plain / icon / color-swatch / secondary-text / grouped
+  (`<optgroup>`) / empty / disabled lists via `data-ac-*` attributes on the markup. Additive and
+  opt-in: without the script a plain `<select>` still renders and still works, so vendoring these
+  two files is optional. The site header's theme picker now uses it.
+- **Fix — `--glow-strength` was pinned to `1` for every theme.** `effects.css` declared it inside a
+  `:root` block as a fallback for being loaded without `theme.css`. `:root` and `[data-theme="…"]`
+  have identical specificity, and every page loads `effects.css` second, so the fallback won on
+  source order and the 8 light themes' `0.35` had never taken effect. Now declared as
+  `:where(:root)`, which loses to any theme.
+  **Visible change for consuming apps:** every glow built on `effects.css` (headings, borders,
+  fills, scrollbar) is dialed back on the **light** themes — which is what those themes always
+  specified. Dark themes render identically. No token values changed, so AA results are unchanged.
+- `tools/build-palettes.mjs` now emits `--glow-strength` per palette, so the discovery pages gate
+  glow the same way the built themes do.
+- `themes/preview.html` reorganized into component categories (`section.cat` > `.cat-grid` >
+  `.block`), and `discovery/draft-3` rebuilt on the same system so a specimen designed on one page
+  drops into the other unchanged.
+- `discovery/draft-3` contrast report regenerated: it was stale at **19** pairs per palette against
+  the checker's **26** (the `--bg-elevated` pairs added for the dropdown panel were missing from the
+  committed data). All 16 themes remain **AA at 26/26**.
+
 ## 0.3.0 — 2026-07-24
 
 Forkable/updatable service: fork-local themes (local.mjs), conflict-free upstream sync (update-from-origin) with opt-in built-ins, two install modes, and release tagging. Generated theme files are now build output (gitignored). No consuming-app token changes.

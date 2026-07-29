@@ -14,6 +14,7 @@
 <link rel="stylesheet" href="../themes/theme.css">
 <link rel="stylesheet" href="../themes/effects.css">
 <link rel="stylesheet" href="../themes/components.css">
+<link rel="stylesheet" href="../themes/dropdown.css">
 
 <!-- Site chrome. Shared with themes/preview.html so the header can't drift
      between the two pages. Must come after components.css. -->
@@ -124,13 +125,24 @@
       <span class="track"><span class="thumb"></span></span>Reduce motion
     </label>
 
-    <label class="theme-console">
-      <span class="tc-cap">Theme</span>
+    <!-- A <div>, not a <label>: once dropdown.js enhances this the real control is
+         a <button>, which a wrapping label would not name or focus. -->
+    <div class="theme-console">
+      <span class="tc-cap" id="tc-cap">Theme</span>
       <!-- Live palette readout: painted from --accent-* in CSS, so a theme change
            re-colors them with no JS at all. -->
       <span class="tc-lamps" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
-      <select data-theme-select aria-label="Theme"></select>
-    </label>
+      <!-- data-ac-dropdown opts this into themes/dropdown.js, which groups the
+           list by family and gives each theme its own accent swatch. Without that
+           script it stays a plain <select> and still switches themes.
+           aria-labelledby, not aria-label, so the enhanced trigger announces as
+           "Theme, <current theme>" the way a native select does.
+           data-ac-anchor sizes the panel to the whole console rather than to the
+           button inside it — the cap and lamps read as part of the control, so a
+           panel starting after them looks detached. -->
+      <select data-theme-select data-ac-dropdown data-ac-anchor=".theme-console"
+              aria-labelledby="tc-cap"></select>
+    </div>
 
   </div>
 </header>
@@ -334,7 +346,9 @@
   </section>
 </main>
 
-<!-- Shipped helper populates &amp; wires the selector/toggle. External = CSP-safe. -->
+<!-- Shipped helpers, external = CSP-safe. dropdown.js first so the selector is
+     enhanced as it is populated; either order works, this one just skips a rebuild. -->
+<script src="../themes/dropdown.js"></script>
 <script src="../themes/theme-select.js"></script>
 </body>
 </html>

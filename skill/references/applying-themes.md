@@ -58,6 +58,10 @@ requirements) and that using the full component classes is wanted (usually yes).
    - **Vanilla / extension / any non-framework app:** also copy `theme-init.js` and `theme-select.js`
      (the CSP-safe selector helpers — see "The theme selector" below). React/Angular apps use their
      own provider instead and don't need these.
+   - **Optional, both or neither:** `dropdown.css` + `dropdown.js` — the accessible dropdown/listbox
+     (grouped options, icons, swatches, secondary text, full keyboard + screen-reader model). Copy
+     them if the app wants that control, or wants the theme selector rendered with swatches and
+     family groups. Skip them and the selector stays a native `<select>`.
    - Copy `themes.index.json` too (registry reference).
 3. **Write / update the tracking log `<vendor>/THEME-SERVICE.md`.** This is the record future agent
    sessions read to know this repo already uses the theme-service, what was decided, and what changed.
@@ -93,7 +97,7 @@ requirements) and that using the full component classes is wanted (usually yes).
    The version line is also what `updating-themes.md` diffs against later. If a `THEME-SERVICE.md`
    already exists, the app was themed before — read its History and "Applied configuration" and follow
    `updating-themes.md` instead of applying fresh.
-4. **Load order matters:** `theme.css` → `effects.css` → `components.css`.
+4. **Load order matters:** `theme.css` → `effects.css` → `components.css` → `dropdown.css`.
 
 The default theme applies with **no** `data-theme`. Force one with `data-theme="<id>"` on the root
 `<html>` element. Theme ids come from `themes.index.json` (`themes[].id`), e.g.
