@@ -57,6 +57,9 @@ detailed, non-agent-specific procedures live in `skill/references/` and are shar
   `themes/` files.
 - **Publishing to the live site (origin repo only).** The GitHub Pages home (`docs/overview.html`)
   links a live "Built-In Themes" preview (`themes/preview.html`) that renders the built `theme.css`.
+  Both pages share one header: markup is duplicated (differing only in which `.pagenav-seg` carries
+  `aria-current`), styles live once in `assets/site-header.css` — edit there, not in either page's
+  `<style>`. That file is site chrome only; it is NOT part of what a consuming app vendors.
   `.github/workflows/pages.yml` auto-detects the **highest-numbered `discovery/draft-N`** and builds
   themes from it — finalizing a new draft as the highest `draft-N` makes it the live preview on the
   next push to `main`, no extra publish step. Convention: highest `draft-N` = the latest finalized set.

@@ -1,0 +1,262 @@
+/* =============================================================================
+   The A11Y Way — site header. Shared by docs/overview.html and themes/preview.html.
+
+   ONE source of truth: both pages link this file, so the header cannot drift
+   between them. Load it AFTER components.css — a few rules here deliberately
+   override component defaults at equal specificity and rely on source order.
+
+   Four zones, always in this DOM order:
+
+       brand ....... who this is        (identity)
+       page nav .... where you are      (Overview / Themes)
+       motion ...... a preference       (quiet, lowest priority)
+       theme ....... the product itself (loudest, always reachable)
+
+   The theme console is the point of the whole site, so it gets the strongest
+   treatment and never leaves the top-right. The responsive rules only ever
+   RE-FLOW the four zones, never reorder them, so tab order always matches
+   reading order.
+
+   Every value is a theme token, so the header re-skins with the page it sits on.
+   ============================================================================= */
+
+.site-header, .site-header *, .skip-link { box-sizing: border-box; }
+
+/* ---------------------------------------------------------------------------
+   Skip link — first thing in the tab order, invisible until focused.
+   --------------------------------------------------------------------------- */
+.skip-link {
+  position: fixed; top: 10px; left: 10px; z-index: 100;
+  transform: translateY(calc(-100% - 14px));
+  transition: transform var(--dur) ease;
+  padding: 10px 16px; border-radius: var(--radius-sm);
+  background: var(--bg-elevated); color: var(--text);
+  border: 2px solid var(--accent-blue);
+  font-family: var(--font-ui); font-size: 13px; font-weight: 700;
+  text-decoration: none;
+}
+.skip-link:focus-visible {
+  transform: translateY(0);
+  outline: 3px solid var(--focus-ring); outline-offset: 2px;
+}
+
+/* ---------------------------------------------------------------------------
+   The rail
+   --------------------------------------------------------------------------- */
+.site-header {
+  position: sticky; top: 0; z-index: 50;
+  /* Translucent so the page's neon grid shows through as the content scrolls
+     under it — the header reads as glass over the rink, not a solid slab. */
+  background: color-mix(in srgb, var(--bg-panel) 88%, transparent);
+  -webkit-backdrop-filter: blur(10px) saturate(1.15);
+  backdrop-filter: blur(10px) saturate(1.15);
+}
+
+/* The lit tube along the bottom edge. Deliberately the same pink->purple->blue
+   ramp as the #grad-flow gradient the overview diagrams draw their connectors
+   with, so the header edge and the diagrams read as one system. It re-colors
+   with the theme, which makes it a readout as well as a rule. */
+.site-header::after {
+  content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 2px;
+  pointer-events: none;
+  background: linear-gradient(90deg, var(--accent-pink), var(--accent-purple), var(--accent-blue));
+  box-shadow: 0 0 calc(10px * var(--glow-strength))
+              color-mix(in srgb, var(--accent-purple) 45%, transparent);
+}
+
+.hdr-inner {
+  max-width: 1600px; margin: 0 auto;
+  padding: 11px clamp(16px, 3vw, 32px);
+  display: flex; align-items: center; gap: 18px;
+}
+
+/* ---------------------------------------------------------------------------
+   Brand — the favicon's arch mark, then the wordmark. The separator dot is the
+   only always-lit piece of the lockup; the words stay quiet.
+   --------------------------------------------------------------------------- */
+.brand {
+  display: inline-flex; align-items: center; gap: 11px;
+  text-decoration: none; color: var(--text); min-width: 0;
+  margin-right: 4px; border-radius: var(--radius-sm);
+}
+.brand:focus-visible { outline: 3px solid var(--focus-ring); outline-offset: 4px; }
+
+.brand-mark { width: 26px; height: 26px; flex: none; overflow: visible; }
+.brand-mark path { fill: none; stroke-linecap: round; }
+.bm-outer { stroke: var(--accent-pink);  stroke-width: 12; }
+.bm-inner { stroke: var(--accent-green); stroke-width: 6; }
+.bm-bar   { stroke: var(--accent-pink);  stroke-width: 9; }
+.brand-mark {
+  filter: drop-shadow(0 0 calc(3px * var(--glow-strength))
+                      color-mix(in srgb, var(--accent-pink) 55%, transparent));
+  transition: transform var(--dur) ease;
+}
+.brand:hover .brand-mark { transform: translateY(calc(var(--motion) * -1px)); }
+
+.brand-name {
+  display: inline-flex; align-items: baseline; gap: 7px;
+  font-size: 13px; white-space: nowrap; min-width: 0;
+}
+.brand-title {
+  font-weight: 800; letter-spacing: .13em; text-transform: uppercase;
+}
+.brand-dot { color: var(--accent-pink); font-weight: 700; }
+.brand-tag {
+  font-family: var(--font-mono); font-size: 11.5px; font-weight: 400;
+  letter-spacing: .06em; color: var(--text-muted);
+}
+
+/* ---------------------------------------------------------------------------
+   Page nav — a two-stop segmented control. Both destinations are always
+   visible and the current one is lit, so the header answers "where am I"
+   without a duplicate page title shouting it.
+   --------------------------------------------------------------------------- */
+.pagenav {
+  display: inline-flex; align-items: center; gap: 3px;
+  padding: 3px; margin-right: auto; min-width: 0;
+  background: color-mix(in srgb, var(--text) 7%, transparent);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+}
+.pagenav-seg {
+  display: inline-flex; align-items: center; justify-content: center;
+  height: 28px; padding: 0 15px; min-width: 0;
+  border: 1px solid transparent; border-radius: var(--radius-pill);
+  font-family: var(--font-ui); font-size: 11.5px; font-weight: 700;
+  letter-spacing: .11em; text-transform: uppercase;
+  color: var(--text-muted); text-decoration: none; white-space: nowrap;
+  transition: color var(--dur) ease, background-color var(--dur) ease,
+              border-color var(--dur) ease;
+}
+a.pagenav-seg:hover {
+  color: var(--text);
+  background-color: color-mix(in srgb, var(--text) 9%, transparent);
+}
+a.pagenav-seg:focus-visible { outline: 3px solid var(--focus-ring); outline-offset: 2px; }
+/* Current page: full-contrast text on a lifted chip, so the "selected" signal
+   is never carried by color alone. */
+.pagenav-seg[aria-current="page"] {
+  color: var(--text); cursor: default;
+  background-color: color-mix(in srgb, var(--accent-blue) 10%, var(--bg-elevated));
+  border-color: color-mix(in srgb, var(--accent-blue) 50%, var(--border));
+  box-shadow: 0 0 calc(9px * var(--glow-strength))
+              color-mix(in srgb, var(--accent-blue) 30%, transparent);
+}
+
+/* ---------------------------------------------------------------------------
+   Reduce motion — a preference, so it stays small and muted. Keeps the shipped
+   .switch geometry (44x24) rather than shrinking below a comfortable target.
+   --------------------------------------------------------------------------- */
+.motion {
+  font-size: 12px; color: var(--text-muted); gap: 9px;
+  white-space: nowrap; transition: color var(--dur) ease;
+}
+.motion:hover { color: var(--text); }
+
+/* ---------------------------------------------------------------------------
+   Theme console — the hero control.
+
+   A labelled instrument rather than a bare dropdown: a cap that names it, four
+   lamps showing the palette you are currently on, and the real <select> filling
+   the rest. The lamps are plain divs painted with --accent-*, so switching the
+   theme re-colors them for free and they roll in sequence — the smallest
+   possible demonstration of the thing this site is for. No JS involved.
+   --------------------------------------------------------------------------- */
+.theme-console {
+  display: inline-flex; align-items: center; height: 36px; min-width: 0;
+  border-radius: var(--radius); overflow: hidden; cursor: pointer;
+  background: color-mix(in srgb, var(--accent-purple) 7%, var(--bg-elevated));
+  border: 1px solid color-mix(in srgb, var(--accent-purple) 50%, var(--border));
+  box-shadow: 0 0 calc(12px * var(--glow-strength))
+              color-mix(in srgb, var(--accent-purple) 20%, transparent);
+  transition: border-color var(--dur) ease, box-shadow var(--dur) ease;
+}
+.theme-console:hover {
+  border-color: var(--accent-purple);
+  box-shadow: 0 0 calc(18px * var(--glow-strength))
+              color-mix(in srgb, var(--accent-purple) 38%, transparent);
+}
+/* The <select> is the real control, so the ring belongs to the console it fills. */
+.theme-console:has(select:focus-visible) {
+  outline: 3px solid var(--focus-ring); outline-offset: 2px;
+}
+.theme-console:has(select:focus-visible) select { outline: none; }
+
+.tc-cap {
+  display: flex; align-items: center; align-self: stretch; padding: 0 11px;
+  font-family: var(--font-mono); font-size: 10px; font-weight: 700;
+  letter-spacing: .16em; text-transform: uppercase; color: var(--text-muted);
+  background: color-mix(in srgb, var(--text) 6%, transparent);
+  border-right: 1px solid color-mix(in srgb, var(--accent-purple) 35%, var(--border));
+}
+
+.tc-lamps { display: inline-flex; align-items: center; gap: 5px; padding: 0 11px; flex: none; }
+.tc-lamps i {
+  width: 8px; height: 8px; border-radius: 50%;
+  background-color: var(--lamp);
+  box-shadow: 0 0 calc(5px * var(--glow-strength))
+              color-mix(in srgb, var(--lamp) 65%, transparent);
+  /* Staggered so the palette rolls left-to-right on a theme change. Both the
+     duration and the delay are multiplied by --motion, so "Reduce motion" and
+     the OS setting collapse the whole sweep to an instant swap. */
+  transition: background-color calc(var(--motion) * .3s) ease,
+              box-shadow calc(var(--motion) * .3s) ease;
+}
+/* Order matches the type scale's accent order (t-h1..t-h4): pink, green, blue, purple. */
+.tc-lamps i:nth-child(1) { --lamp: var(--accent-pink); }
+.tc-lamps i:nth-child(2) { --lamp: var(--accent-green);  transition-delay: calc(var(--motion) * 50ms); }
+.tc-lamps i:nth-child(3) { --lamp: var(--accent-blue);   transition-delay: calc(var(--motion) * 100ms); }
+.tc-lamps i:nth-child(4) { --lamp: var(--accent-purple); transition-delay: calc(var(--motion) * 150ms); }
+
+.theme-console select {
+  -webkit-appearance: none; appearance: none;
+  /* Sized so every plain family name ("Synthwave Sunset · Dark") fits whole; only
+     the long "(No Background)" variants ellipsis, and the open list shows those
+     in full. Keeping this tight is also what buys the one-row layout its slack. */
+  flex: 1 1 auto; min-width: 0; max-width: 190px;
+  align-self: stretch; border: 0; background: transparent; outline: none;
+  padding: 0 6px 0 0; cursor: pointer;
+  font-family: var(--font-mono); font-size: 12.5px; font-weight: 600;
+  color: var(--text);
+  text-overflow: ellipsis; white-space: nowrap; overflow: hidden;
+}
+.theme-console select option { background: var(--bg-elevated); color: var(--text); }
+/* Same two-triangle caret the .select component draws, in the console's purple. */
+.theme-console::after {
+  content: ""; flex: none; width: 10px; height: 5px; margin-right: 13px;
+  background-image: linear-gradient(45deg, transparent 50%, var(--accent-purple) 50%),
+                    linear-gradient(135deg, var(--accent-purple) 50%, transparent 50%);
+  background-position: 0 0, 5px 0;
+  background-size: 5px 5px, 5px 5px;
+  background-repeat: no-repeat;
+}
+
+/* =============================================================================
+   Responsive. Two rows below 1080px, in a 2-column grid that keeps the four
+   zones in DOM order:  brand | nav  /  motion | theme.
+   ============================================================================= */
+@media (max-width: 1080px) {
+  .hdr-inner {
+    display: grid; grid-template-columns: auto 1fr;
+    column-gap: 14px; row-gap: 8px; align-items: center;
+  }
+  .pagenav      { justify-self: end; margin-right: 0; }
+  .theme-console { justify-self: end; width: 100%; max-width: 340px; }
+  .theme-console select { max-width: none; }
+}
+
+/* Phones: the tagline and the console's cap are the first things to go — the
+   <select> keeps aria-label="Theme", so the control never loses its name. */
+@media (max-width: 620px) {
+  .hdr-inner { padding: 10px 14px; column-gap: 10px; }
+  .brand-tag, .brand-dot { display: none; }
+  .brand { gap: 9px; }
+  .tc-cap { display: none; }
+  .pagenav-seg { padding: 0 12px; letter-spacing: .07em; }
+  .tc-lamps { padding: 0 9px; gap: 4px; }
+}
+
+/* Narrowest phones: mark only. The link keeps its name from aria-label. */
+@media (max-width: 400px) {
+  .brand-name { display: none; }
+}
