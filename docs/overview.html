@@ -195,6 +195,40 @@
       </div>
     </div>
   </section>
+
+  <section class="ov-section" id="wf-apply">
+    <h2>Workflow A — Apply the themes to an app</h2>
+    <p class="ov-lead">You ask; the agent does the wiring and confirms the choices that matter before changing anything.</p>
+    <div class="flow-col" style="max-width:640px">
+      <div class="node-card node-card--accent" style="--node-accent: var(--accent-pink)">
+        <span class="node-label">"Apply the theme-service to this app"</span>
+        <span class="node-sub">you → Claude (skill)</span></div>
+      <div style="align-self:center"><svg class="flow-arrow" style="transform:rotate(90deg)" width="40" height="24" viewBox="0 0 46 24" aria-hidden="true"><path class="connector" d="M2 12 H36"/><path class="connector" d="M30 6 L40 12 L30 18"/></svg></div>
+      <div class="node-card">
+        <span class="node-label">Locate the source</span>
+        <span class="node-sub">reads machine-local config</span></div>
+      <div style="align-self:center"><svg class="flow-arrow" style="transform:rotate(90deg)" width="40" height="24" viewBox="0 0 46 24" aria-hidden="true"><path class="connector" d="M2 12 H36"/><path class="connector" d="M30 6 L40 12 L30 18"/></svg></div>
+      <div class="node-card node-card--accent" style="--node-accent: var(--accent-purple)">
+        <span class="node-label">Confirm the choices that matter</span>
+        <span class="node-sub">restyle depth? fonts? existing selector? placement?</span></div>
+      <div style="align-self:center"><svg class="flow-arrow" style="transform:rotate(90deg)" width="40" height="24" viewBox="0 0 46 24" aria-hidden="true"><path class="connector" d="M2 12 H36"/><path class="connector" d="M30 6 L40 12 L30 18"/></svg></div>
+      <div class="node-card">
+        <span class="node-label">Vendor CSS + map colors to tokens</span>
+        <span class="node-sub">agent → your app repo</span></div>
+      <div style="align-self:center"><svg class="flow-arrow" style="transform:rotate(90deg)" width="40" height="24" viewBox="0 0 46 24" aria-hidden="true"><path class="connector" d="M2 12 H36"/><path class="connector" d="M30 6 L40 12 L30 18"/></svg></div>
+      <div class="node-card">
+        <span class="node-label">Add a theme picker + persistence</span>
+        <span class="node-sub">all themes selectable</span></div>
+      <div style="align-self:center"><svg class="flow-arrow" style="transform:rotate(90deg)" width="40" height="24" viewBox="0 0 46 24" aria-hidden="true"><path class="connector" d="M2 12 H36"/><path class="connector" d="M30 6 L40 12 L30 18"/></svg></div>
+      <div class="node-card">
+        <span class="node-label">Verify WCAG AA + write tracking log</span>
+        <span class="node-sub">THEME-SERVICE.md</span></div>
+      <div style="align-self:center"><svg class="flow-arrow" style="transform:rotate(90deg)" width="40" height="24" viewBox="0 0 46 24" aria-hidden="true"><path class="connector" d="M2 12 H36"/><path class="connector" d="M30 6 L40 12 L30 18"/></svg></div>
+      <div class="node-card node-card--accent" style="--node-accent: var(--accent-green)">
+        <span class="node-label">Done — switch themes live</span>
+        <span class="node-sub">nothing else changed</span></div>
+    </div>
+  </section>
 </main>
 
 <!-- Shipped helper populates &amp; wires the selector/toggle. External = CSP-safe. -->
