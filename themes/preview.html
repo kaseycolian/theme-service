@@ -5,6 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>The A11Y Way — Preview Themes</title>
 
+<!-- Static icon works without JS; favicon-theme.js re-colors it per theme -->
+<link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+<script src="../assets/favicon-theme.js" defer></script>
+
 <!-- This is exactly how a consuming app wires it up (all scripts EXTERNAL — CSP-safe): -->
 <script src="theme-init.js"></script>
 <link rel="stylesheet" href="theme.css">
@@ -15,8 +19,8 @@
   body { margin: 0; background: var(--bg); color: var(--text); font-family: var(--font-ui); transition: background .2s; }
   /* --- Shared header (identical markup + CSS on overview and preview) ---
      Three columns: [brand + nav button] [page title] [animations + theme].
-     The 1fr side columns are equal, so the centre column is centred on the
-     PAGE, not merely between its neighbours. Collapses to centred stacked
+     The 1fr side columns are equal, so the center column is centered on the
+     PAGE, not merely between its neighbours. Collapses to centered stacked
      rows once the three columns no longer fit. */
   .topbar { position: sticky; top: 0; z-index: 50; display: grid; align-items: center;
             grid-template-columns: 1fr auto 1fr; gap: 10px 16px; padding: 20px;
@@ -47,7 +51,7 @@
   .ov-cta:focus-visible { outline: 3px solid var(--accent-blue); outline-offset: 2px; }
 
   @media (max-width: 1080px) {
-    /* One centred column per group: brand + nav button, then the page title,
+    /* One centered column per group: brand + nav button, then the page title,
        then the controls — reading order unchanged from desktop. */
     .topbar { grid-template-columns: 1fr; justify-items: center; padding: 12px 20px;}
     .topbar-page { grid-column: 1; }
