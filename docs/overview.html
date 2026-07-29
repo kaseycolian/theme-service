@@ -229,6 +229,27 @@
         <span class="node-sub">nothing else changed</span></div>
     </div>
   </section>
+
+  <section class="ov-section" id="wf-clone">
+    <h2>Workflow B — Clone / save / update, with your own storage</h2>
+    <p class="ov-lead">Your themes live on your machine and persist with a plain local commit — GitHub is optional. You can still pull upstream updates anytime without losing your themes.</p>
+    <div class="flow-col" style="max-width:720px">
+      <div class="node-card"><span class="node-label">Origin — theme-service</span>
+        <span class="node-sub">clone or fork (once)</span></div>
+      <div style="align-self:center"><svg class="flow-arrow" style="transform:rotate(90deg)" width="40" height="24" viewBox="0 0 46 24" aria-hidden="true"><path class="connector" d="M2 12 H36"/><path class="connector" d="M30 6 L40 12 L30 18"/></svg></div>
+      <div class="node-card node-card--accent" style="--node-accent: var(--accent-purple)">
+        <span class="node-label">Your machine — local clone</span>
+        <span class="node-sub">add your themes → tools/palettes/local.mjs → npm run build-themes → git commit (saved locally ✔, no GitHub required)</span></div>
+      <div style="align-self:center"><svg class="flow-arrow" style="transform:rotate(90deg)" width="40" height="24" viewBox="0 0 46 24" aria-hidden="true"><path class="connector" d="M2 12 H36"/><path class="connector" d="M30 6 L40 12 L30 18"/></svg></div>
+      <div class="node-card"><span class="node-label">npm run update-from-origin</span>
+        <span class="node-sub">fetch + merge, conflict-free — your local.mjs is never touched; nothing auto-deleted</span></div>
+      <div style="align-self:center"><svg class="flow-arrow" style="transform:rotate(90deg)" width="40" height="24" viewBox="0 0 46 24" aria-hidden="true"><path class="connector connector--dashed" d="M2 12 H36"/><path class="connector connector--dashed" d="M30 6 L40 12 L30 18"/></svg></div>
+      <div class="node-card" style="--node-accent: var(--accent-blue); border-style:dashed">
+        <span class="node-label">Optional: git push → your own GitHub</span>
+        <span class="node-sub">backup · sync machines · share</span></div>
+    </div>
+    <p class="node-sub" style="margin-top:12px">Solid = local (works with just local git). Dashed = optional GitHub.</p>
+  </section>
 </main>
 
 <!-- Shipped helper populates &amp; wires the selector/toggle. External = CSP-safe. -->
