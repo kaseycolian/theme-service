@@ -142,6 +142,20 @@ The generators **refuse to write if any pair fails WCAG AA** (your own `local.mj
 too). The standalone checker is in [`tools/contrast-checker/`](tools/contrast-checker/) (library + CLI,
 usable in any project).
 
+## Local dev of this repo's informational site (maintainers only)
+
+`docs/overview.html` and `themes/preview.html` are the pages published to GitHub Pages to explain what
+this repo is. **Nothing below is needed to install or use the theme service** — it only builds/serves
+those two pages locally, exactly as `.github/workflows/pages.yml` deploys them (clean URLs: `/` and
+`/preview/`, which opening the files from disk can't reproduce).
+
+```sh
+npm run dev:overview-site         # build _site/, serve it, rebuild on source change
+npm run dev:overview-site:build   # build _site/ only — a dry run of the Pages deploy
+npm run dev:overview-site:serve   # serve the existing _site/ as-is (no build, no watch)
+npm run dev:overview-site -- --port 5000   # any of the above on a different port
+```
+
 **Versioning:** `VERSION` is the single source of truth (`build-final.mjs` reads it). `npm run release`
 bumps it, prepends a `CHANGELOG.md` entry, commits, and creates the git tag `vX.Y.Z` (push with
 `git push --follow-tags`). Additive theme/token changes → minor; token renames/removals or a
