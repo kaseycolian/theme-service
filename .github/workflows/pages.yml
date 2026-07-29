@@ -26,8 +26,12 @@ jobs:
         run: npm ci || npm install
       - name: Build themes from the latest finalized draft
         run: |
-          N=$(ls -d discovery/draft-*/ | sed -E 's#.*draft-([0-9]+)/#\1#' | sort -n | tail -1)
-          echo "Latest finalized draft: draft-$N"
+          # Detect from the palette source the build actually imports
+          # (tools/build-final.mjs imports ./palettes/draft-<N>.mjs), NOT the
+          # discovery/ playground — the two share the draft-N number by
+          # convention, but this is the tree the build depends on.
+          N=$(ls tools/palettes/draft-*.mjs | sed -E 's#.*draft-([0-9]+)\.mjs#\1#' | sort -n | tail -1)
+          echo "Latest finalized draft: draft-$N (tools/palettes/draft-$N.mjs)"
           node tools/build-final.mjs "$N" --write
       - name: Assemble _site with clean URLs (/ = overview, /preview/ = preview)
         run: node tools/assemble-site.mjs
