@@ -8,7 +8,8 @@ description: Apply, update, or extend the "neon skating rink" theme system in an
 This skill injects a shared, WCAG AA 2.2 neon theme system into any project and keeps it in sync.
 The **source of truth** is the `theme-service` repo's `themes/` folder: `theme.css` (color tokens for
 every theme), `effects.css` (glow/grid/scrollbar recipes), `components.css` (opt-in component classes),
-plus `tokens.json` and `themes.index.json`. All themes are pre-validated to pass AA in every state.
+`dropdown.css` + `dropdown.js` (the optional accessible dropdown/listbox), plus `tokens.json` and
+`themes.index.json`. All themes are pre-validated to pass AA in every state.
 
 ## Step 0 — Locate the theme-service source (do this first)
 

@@ -51,6 +51,8 @@ const preview = rewrite(readFileSync('themes/preview.html', 'utf8'), 'themes/pre
   ['href="theme.css"', 'href="../themes/theme.css"'],
   ['href="effects.css"', 'href="../themes/effects.css"'],
   ['href="components.css"', 'href="../themes/components.css"'],
+  ['href="dropdown.css"', 'href="../themes/dropdown.css"'],
+  ['src="dropdown.js"', 'src="../themes/dropdown.js"'],
   ['src="theme-select.js"', 'src="../themes/theme-select.js"'],
 ]);
 writeFileSync('_site/preview/index.html', preview);
@@ -73,6 +75,7 @@ cpSync('assets', '_site/assets', {
 
 // Sanity: the load-bearing files must exist
 for (const f of ['_site/index.html', '_site/preview/index.html', '_site/themes/theme.css', '_site/themes/theme-init.js',
+                 '_site/themes/dropdown.css', '_site/themes/dropdown.js',
                  '_site/assets/favicon.svg', '_site/assets/favicon-theme.js']) {
   if (!existsSync(f)) {
     console.error(`ASSEMBLE FAIL: missing ${f}`);

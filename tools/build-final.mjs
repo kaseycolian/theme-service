@@ -77,6 +77,13 @@ function checksFor(p) {
   add('text','bg',4.5); add('text','panel',4.5); add('muted','bg',4.5); add('muted','panel',4.5);
   for (const a of accents) { add(a,'bg',4.5); add(a,'panel',4.5); add('on'+cap(a),a,4.5); }
   add('focus','bg',3.0); add('focus','panel',3.0); add('borderStrong','panel',3.0);
+  // --bg-elevated is a real text surface, not just a shade: the dropdown panel
+  // (dropdown.css) and .drop-panel both paint labels, muted secondary text, group
+  // headings and the focus border straight onto it. Left unchecked, a new theme
+  // could pass every other pair and still ship an unreadable open dropdown.
+  add('text','elevated',4.5); add('muted','elevated',4.5);
+  for (const a of accents) add(a,'elevated',4.5);
+  add('focus','elevated',3.0);
   return c;
 }
 let failures = 0;
@@ -184,14 +191,35 @@ if (process.argv.includes('--write')) {
 `;
   writeFileSync(join(REPO, 'themes/theme-init.js'), themeInit);
 
-  const selectList = [{ id: '', label: `Auto (${defFam.label})` }]
-    .concat(Object.values(themes).map(t => ({ id: t.id, label: `${t.label} · ${t.mode[0].toUpperCase()}${t.mode.slice(1)}` })));
+  // Each entry carries enough to render a RICH picker: a family group heading, the
+  // theme's own four accents as a swatch strip, and its id as secondary text (the
+  // value you'd put in data-theme). dropdown.js reads the data-ac-* attributes; a
+  // plain <select> ignores them and just shows the label, so both stay supported.
+  const swatchOf = t => accents.map(a => t.tokens[VARMAP[a]]).join(',');
+  const modeLabel = m => m[0].toUpperCase() + m.slice(1);
+  const selectList = [{
+    id: '', label: `Auto (${defFam.label})`, group: 'Automatic',
+    secondary: 'follows your OS', swatch: swatchOf(themes[defDark]),
+  }].concat(Object.values(themes).map(t => ({
+    id: t.id,
+    // The full family name stays in the option text, not just the mode: it is what
+    // the trigger displays once chosen, and what type-ahead matches on.
+    label: `${t.label} · ${modeLabel(t.mode)}`,
+    group: (families[t.family] && families[t.family].label) || t.family,
+    secondary: t.id,
+    swatch: swatchOf(t),
+  })));
   const themeSelect =
 `/* theme-service v${VERSION} — theme-select.js  (GENERATED; theme list mirrors themes.index.json)
    Populates and wires any <select data-theme-select> and any [data-motion-toggle] checkbox.
    Load via <script src="theme/theme-select.js"></script> (NOT inline — MV3/strict CSP blocks inline).
    Markup you provide:  <select data-theme-select aria-label="Theme"></select>
                         <input type="checkbox" data-motion-toggle> Reduce motion  (optional)
+
+   Options are grouped by family (<optgroup>) and carry data-ac-swatch (the theme's
+   four accents) + data-ac-secondary (its id). A plain <select> ignores those two
+   attributes; add data-ac-dropdown AND load dropdown.js to render them.
+
    For React/Angular, prefer the framework's own provider (see the skill) instead of this file. */
 (function () {
   var THEMES = ${JSON.stringify(selectList)};
@@ -204,13 +232,36 @@ if (process.argv.includes('--write')) {
     var saved = '';
     try { saved = localStorage.getItem('theme') || ''; } catch (e) {}
     document.querySelectorAll('select[data-theme-select]').forEach(function (sel) {
-      if (!sel.options.length) THEMES.forEach(function (t) { sel.add(new Option(t.label, t.id)); });
+      if (!sel.options.length) {
+        var groups = {};
+        THEMES.forEach(function (t) {
+          var opt = new Option(t.label, t.id);
+          if (t.swatch) opt.setAttribute('data-ac-swatch', t.swatch);
+          if (t.secondary) opt.setAttribute('data-ac-secondary', t.secondary);
+          if (!t.group) { sel.appendChild(opt); return; }
+          if (!groups[t.group]) {
+            groups[t.group] = document.createElement('optgroup');
+            groups[t.group].label = t.group;
+            sel.appendChild(groups[t.group]);
+          }
+          groups[t.group].appendChild(opt);
+        });
+      }
       sel.value = root.getAttribute('data-theme') || saved || '';
       sel.addEventListener('change', function () {
         var id = sel.value;
         if (id) { root.setAttribute('data-theme', id); try { localStorage.setItem('theme', id); } catch (e) {} }
         else { root.removeAttribute('data-theme'); try { localStorage.removeItem('theme'); } catch (e) {} }
       });
+      // Opt-in upgrade to the accessible listbox. Order-independent: createDropdown
+      // is idempotent, so if dropdown.js auto-init already ran on the empty <select>
+      // this returns that instance, and rebuild() picks up the options added above.
+      // Without data-ac-dropdown nothing changes — apps on the old markup keep the
+      // native control through an update.
+      if (sel.hasAttribute('data-ac-dropdown') && window.AC && window.AC.createDropdown) {
+        var dd = window.AC.createDropdown(sel);
+        if (dd) dd.rebuild();
+      }
     });
     document.querySelectorAll('[data-motion-toggle]').forEach(function (cb) {
       cb.checked = root.getAttribute('data-motion') === 'off';

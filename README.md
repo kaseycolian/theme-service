@@ -92,7 +92,8 @@ This repo is the **origin**. Fork or clone it and it becomes **your** source of 
 ## What's in the box
 
 ```
-themes/            The distributable themes. effects.css, components.css, preview.html, README.md are
+themes/            The distributable themes. effects.css, components.css, dropdown.css, dropdown.js,
+                   preview.html, README.md are
                    committed; theme.css / tokens.json / themes.index.json / theme-init.js /
                    theme-select.js are BUILD OUTPUT (gitignored) — run `npm run build-themes`.
 tools/             build-final.mjs (build themes/), build-palettes.mjs (discovery drafts),

@@ -46,6 +46,13 @@ function checksFor(p) {
   add('focus ring on bg', 'focus', 'bg', 3.0);
   add('focus ring on panel', 'focus', 'panel', 3.0);
   add('border-strong on panel', 'borderStrong', 'panel', 3.0);
+  // Elevated is a real text surface: the dropdown panel and .drop-panel paint
+  // labels, muted text, group headings and the focus border onto it. Kept in step
+  // with build-final.mjs so validate can never pass a theme the build refuses.
+  add('text on elevated', 'text', 'elevated', 4.5);
+  add('muted on elevated', 'muted', 'elevated', 4.5);
+  for (const a of accents) add(`${a} text on elevated`, a, 'elevated', 4.5);
+  add('focus ring on elevated', 'focus', 'elevated', 3.0);
   return c;
 }
 
