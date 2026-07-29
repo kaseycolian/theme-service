@@ -14,8 +14,8 @@ live across all themes.)*
   Pages home), so no PNG/SVG export is needed.
 - ✅ **Hero polish.** A few `aria` tidy-ups, remove unused CSS, add the positioned dashed
   skill→build connector (currently conveyed by caption text).
-- 🌐 **Live demo:** the [overview page](overview.html) is the repo's GitHub Pages home; its "See
-  Built-In Themes" button opens the live [product preview](../themes/preview.html).
+- 🌐 **Live demo:** the overview is the repo's [GitHub Pages home](https://kaseycolian.github.io/theme-service/);
+  its "See Built-In Themes" button opens the live [product preview](https://kaseycolian.github.io/theme-service/preview/).
 
 ---
 

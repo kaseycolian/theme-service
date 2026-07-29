@@ -36,6 +36,7 @@ mkdirSync('_site/preview', { recursive: true });
 // Overview -> _site/index.html (site root). It lives in docs/, so its assets are
 // referenced as ../themes/…; from the root they become themes/…
 const home = rewrite(readFileSync('docs/overview.html', 'utf8'), 'docs/overview.html', [
+  ['href="overview.html"', 'href="./"'],  // brand self-link -> site root
   ['../themes/preview.html', 'preview/'], // CTA -> clean preview URL (must precede the generic themes/ rewrite)
   ['../themes/', 'themes/'],              // asset links (css/js)
 ]);
