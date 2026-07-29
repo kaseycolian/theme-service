@@ -4,6 +4,58 @@ All notable changes to the theme-service. Apps record the version they vendored 
 (plus `updating-themes.md`) to migrate. Versioning: minor bump for additive themes/tokens, major for
 breaking token renames/removals or a default-theme change.
 
+## 1.0.0 — 2026-07-29
+
+**BREAKING** — the dropdown's class names, data attributes and JS global are renamed. Nothing else
+changed, and no token was touched.
+
+### What broke
+
+`dropdown.css` + `dropdown.js` arrived in 0.4.0 carrying the naming of the library they were ported
+from (**a11y-component-examples**), which made them the only files here using an `ac-` prefix,
+`data-ac-*` hooks and a `window.AC` global while `components.css` uses bare `.btn` / `.input` /
+`.field`. That prefix exists upstream specifically to avoid colliding with those names, so it had no
+reason to travel here.
+
+If you vendored 0.4.0 and use these two files, apply this mapping to your markup and CSS. It is
+mechanical and total — there is no behavior change hiding in it:
+
+| 0.4.0 | 1.0.0 |
+| --- | --- |
+| `.ac-dropdown` | `.dropdown` |
+| `.ac-dropdown__toggle`, `__panel`, `__list`, `__option`, `__value`, `__caret`, `__text`, `__primary`, `__secondary`, `__icon`, `__swatch`, `__check`, `__empty`, `__native`, `__group`, `__group-label` | same part names with a single hyphen: `.dropdown-toggle`, `.dropdown-panel`, … |
+| `.ac-dropdown--disabled` / `.ac-dropdown--up` | `.dropdown-disabled` / `.dropdown-up` |
+| `data-ac-dropdown` | `data-dropdown` |
+| `data-ac-anchor`, `data-ac-icon`, `data-ac-swatch`, `data-ac-secondary`, `data-ac-empty-text` | `data-dropdown-anchor`, `data-dropdown-icon`, … |
+| `window.AC.createDropdown(el)` | `window.ThemeService.createDropdown(el)` |
+| `select._acDropdown` | `select._dropdown` |
+
+`.dropdown` is a **different component** from the long-standing `.drop` in `components.css`, not a
+rename of it. `.drop` is unchanged; nothing styles a bare `.drop*` selector.
+
+If you regenerate `theme-select.js` (`npm run build-themes`) you get the new hooks automatically —
+the generator emits `data-dropdown-swatch` / `data-dropdown-secondary` and re-enhances through
+`window.ThemeService`. A stale hand-copied `theme-select.js` is the failure to watch for: the picker
+still switches themes but silently stops rendering swatches.
+
+### Not a drop-in re-copy from upstream any more
+
+Porting an upstream fix now means translating identifiers rather than copying the file. `dropdown.js`
+carries the full mapping in its header, and both it and `themes/README.md` no longer claim the
+line-for-line parity they used to — that claim was false the moment the names changed.
+
+### Also in this release
+
+- **Fix** — `-webkit-user-select` added to the trigger. Without it, a slow double-click in Safari
+  selected the value text instead of reopening the panel.
+- `forced-color-adjust: none` in the forced-colors block is documented as a deliberate false-positive
+  for linters that flag it as Safari-unsupported: the whole `@media (forced-colors: active)` block
+  never matches in Safari, and removing the property would break the focused-row cue on Windows
+  High Contrast.
+- `npm run release` refuses to run on a dirty tree (it commits only `VERSION` + `CHANGELOG.md`, so it
+  was able to tag a commit that did not contain the work), requires `--note`, and confirms the bump
+  rule and version transition before writing. `--allow-dirty` and `--yes` override.
+
 ## 0.4.0 — 2026-07-29
 
 Themed dropdown component, plus `--glow-strength` finally applying per theme.
