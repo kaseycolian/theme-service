@@ -29,13 +29,8 @@ jobs:
           N=$(ls -d discovery/draft-*/ | sed -E 's#.*draft-([0-9]+)/#\1#' | sort -n | tail -1)
           echo "Latest finalized draft: draft-$N"
           node tools/build-final.mjs "$N" --write
-      - name: Assemble _site (mirror repo layout so ../themes/ resolves)
-        run: |
-          rm -rf _site
-          mkdir -p _site/docs _site/themes
-          cp index.html _site/index.html
-          cp docs/overview.html _site/docs/overview.html
-          cp -r themes/. _site/themes/
+      - name: Assemble _site with clean URLs (/ = overview, /preview/ = preview)
+        run: node tools/assemble-site.mjs
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
