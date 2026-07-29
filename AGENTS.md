@@ -55,6 +55,11 @@ detailed, non-agent-specific procedures live in `skill/references/` and are shar
   own themes go in `tools/palettes/local.mjs`; run `npm run build-themes` (merges built-ins + local) and
   **commit in the source repo** (git-local persists; GitHub optional). Never hand-edit the generated
   `themes/` files.
+- **Publishing to the live site (origin repo only).** The GitHub Pages home (`docs/overview.html`)
+  links a live "Built-In Themes" preview (`themes/preview.html`) that renders the built `theme.css`.
+  `.github/workflows/pages.yml` auto-detects the **highest-numbered `discovery/draft-N`** and builds
+  themes from it — finalizing a new draft as the highest `draft-N` makes it the live preview on the
+  next push to `main`, no extra publish step. Convention: highest `draft-N` = the latest finalized set.
 - **Never auto-delete or overwrite a user's themes.** Their themes live in `local.mjs` (origin never
   touches it); rebuilding only regenerates. Remove a theme only on explicit request. When updating a
   fork from origin, follow `updating-from-origin.md` and **ask before including built-in themes**.
