@@ -173,15 +173,15 @@
       <!-- Live palette readout: painted from --accent-* in CSS, so a theme change
            re-colors them with no JS at all. -->
       <span class="tc-lamps" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
-      <!-- data-ac-dropdown opts this into themes/dropdown.js, which groups the
+      <!-- data-dropdown opts this into themes/dropdown.js, which groups the
            list by family and gives each theme its own accent swatch. Without that
            script it stays a plain <select> and still switches themes.
            aria-labelledby, not aria-label, so the enhanced trigger announces as
            "Theme, <current theme>" the way a native select does.
-           data-ac-anchor sizes the panel to the whole console rather than to the
+           data-dropdown-anchor sizes the panel to the whole console rather than to the
            button inside it — the cap and lamps read as part of the control, so a
            panel starting after them looks detached. -->
-      <select data-theme-select data-ac-dropdown data-ac-anchor=".theme-console"
+      <select data-theme-select data-dropdown data-dropdown-anchor=".theme-console"
               aria-labelledby="tc-cap"></select>
     </div>
 
@@ -330,7 +330,7 @@
         <div class="block-title">Plain</div>
         <div class="field">
           <label class="field-label" for="dd-plain">Export format</label>
-          <select id="dd-plain" data-ac-dropdown>
+          <select id="dd-plain" data-dropdown>
             <option value="md" selected>Markdown</option>
             <option value="html">HTML</option>
             <option value="pdf">PDF</option>
@@ -344,10 +344,10 @@
         <div class="block-title">Icons + secondary text</div>
         <div class="field">
           <label class="field-label" for="dd-env">Environment</label>
-          <select id="dd-env" data-ac-dropdown>
-            <option value="prod" data-ac-icon="ac-icon-rocket" data-ac-secondary="app.example.com" selected>Production</option>
-            <option value="staging" data-ac-icon="ac-icon-flask" data-ac-secondary="staging.example.com">Staging</option>
-            <option value="local" data-ac-icon="ac-icon-laptop" data-ac-secondary="localhost:3000">Local</option>
+          <select id="dd-env" data-dropdown>
+            <option value="prod" data-dropdown-icon="ac-icon-rocket" data-dropdown-secondary="app.example.com" selected>Production</option>
+            <option value="staging" data-dropdown-icon="ac-icon-flask" data-dropdown-secondary="staging.example.com">Staging</option>
+            <option value="local" data-dropdown-icon="ac-icon-laptop" data-dropdown-secondary="localhost:3000">Local</option>
           </select>
         </div>
       </div>
@@ -358,7 +358,7 @@
         <div class="block-title">Grouped + unavailable row</div>
         <div class="field">
           <label class="field-label" for="dd-region">Region</label>
-          <select id="dd-region" data-ac-dropdown>
+          <select id="dd-region" data-dropdown>
             <optgroup label="Americas">
               <option value="us-east">US East</option>
               <option value="us-west">US West</option>
@@ -381,12 +381,12 @@
         <div class="block-title">Color swatches</div>
         <div class="field">
           <label class="field-label" for="dd-palette">Palette</label>
-          <select id="dd-palette" data-ac-dropdown>
-            <option value="rink" data-ac-swatch="#ff2ec4,#5bff3a,#3ceaff,#b57fff" selected>Rink Classic</option>
-            <option value="midnight" data-ac-swatch="#f060c4,#54ffc4,#5cc8ff,#a888f5">Midnight Arcade</option>
-            <option value="hot" data-ac-swatch="#ff3ec8,#6bff45,#22e0ff,#cf7bff">Hot Neon</option>
-            <option value="synthwave" data-ac-swatch="#ff5d8f,#ffb03a,#4ad8ff,#c17bff">Synthwave Sunset</option>
-            <option value="acid" data-ac-swatch="#ff4de0,#c6ff2e,#38f0ff,#b98cff">Acid Arcade</option>
+          <select id="dd-palette" data-dropdown>
+            <option value="rink" data-dropdown-swatch="#ff2ec4,#5bff3a,#3ceaff,#b57fff" selected>Rink Classic</option>
+            <option value="midnight" data-dropdown-swatch="#f060c4,#54ffc4,#5cc8ff,#a888f5">Midnight Arcade</option>
+            <option value="hot" data-dropdown-swatch="#ff3ec8,#6bff45,#22e0ff,#cf7bff">Hot Neon</option>
+            <option value="synthwave" data-dropdown-swatch="#ff5d8f,#ffb03a,#4ad8ff,#c17bff">Synthwave Sunset</option>
+            <option value="acid" data-dropdown-swatch="#ff4de0,#c6ff2e,#38f0ff,#b98cff">Acid Arcade</option>
           </select>
         </div>
       </div>
@@ -396,7 +396,7 @@
         <div class="block-title">Empty state</div>
         <div class="field">
           <label class="field-label" for="dd-empty">Saved filter</label>
-          <select id="dd-empty" data-ac-dropdown data-ac-empty-text="No saved filters yet"></select>
+          <select id="dd-empty" data-dropdown data-dropdown-empty-text="No saved filters yet"></select>
         </div>
       </div>
 
@@ -405,7 +405,7 @@
         <div class="block-title">Disabled</div>
         <div class="field">
           <label class="field-label" for="dd-locked">Plan</label>
-          <select id="dd-locked" data-ac-dropdown disabled>
+          <select id="dd-locked" data-dropdown disabled>
             <option value="team" selected>Team (contact sales to change)</option>
           </select>
         </div>

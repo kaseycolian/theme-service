@@ -237,8 +237,8 @@
 <script src="data/contrast.js"></script>
 <!-- Before the render script below, which is inline and therefore runs while the
      document is still parsing. dropdown.js registers a DOMContentLoaded listener,
-     so it enhances every [data-ac-dropdown] the render loop has stamped out by
-     the time that fires — no manual AC.createDropdown() pass needed. -->
+     so it enhances every [data-dropdown] the render loop has stamped out by
+     the time that fires — no manual ThemeService.createDropdown() pass needed. -->
 <script src="scripts/dropdown.js"></script>
 <script>
 const PALETTES = [
@@ -421,7 +421,7 @@ function galleryHTML(id) {
           <div class="block-title">Plain</div>
           <div class="field">
             <label class="field-label" for="dd-plain-${id}">Export format</label>
-            <select id="dd-plain-${id}" data-ac-dropdown>
+            <select id="dd-plain-${id}" data-dropdown>
               <option value="md" selected>Markdown</option>
               <option value="html">HTML</option>
               <option value="pdf">PDF</option>
@@ -434,10 +434,10 @@ function galleryHTML(id) {
           <div class="block-title">Icons + secondary text</div>
           <div class="field">
             <label class="field-label" for="dd-env-${id}">Environment</label>
-            <select id="dd-env-${id}" data-ac-dropdown>
-              <option value="prod" data-ac-icon="ac-icon-rocket" data-ac-secondary="app.example.com" selected>Production</option>
-              <option value="staging" data-ac-icon="ac-icon-flask" data-ac-secondary="staging.example.com">Staging</option>
-              <option value="local" data-ac-icon="ac-icon-laptop" data-ac-secondary="localhost:3000">Local</option>
+            <select id="dd-env-${id}" data-dropdown>
+              <option value="prod" data-dropdown-icon="ac-icon-rocket" data-dropdown-secondary="app.example.com" selected>Production</option>
+              <option value="staging" data-dropdown-icon="ac-icon-flask" data-dropdown-secondary="staging.example.com">Staging</option>
+              <option value="local" data-dropdown-icon="ac-icon-laptop" data-dropdown-secondary="localhost:3000">Local</option>
             </select>
           </div>
         </div>
@@ -446,7 +446,7 @@ function galleryHTML(id) {
           <div class="block-title">Grouped + unavailable row</div>
           <div class="field">
             <label class="field-label" for="dd-region-${id}">Region</label>
-            <select id="dd-region-${id}" data-ac-dropdown>
+            <select id="dd-region-${id}" data-dropdown>
               <optgroup label="Americas">
                 <option value="us-east">US East</option>
                 <option value="us-west">US West</option>
@@ -464,8 +464,8 @@ function galleryHTML(id) {
           <div class="block-title">Color swatches — this palette's accents</div>
           <div class="field">
             <label class="field-label" for="dd-palette-${id}">Accent order</label>
-            <select id="dd-palette-${id}" data-ac-dropdown>
-              <option value="all" data-ac-swatch="${sw}" selected>Pink · green · blue · purple</option>
+            <select id="dd-palette-${id}" data-dropdown>
+              <option value="all" data-dropdown-swatch="${sw}" selected>Pink · green · blue · purple</option>
             </select>
           </div>
         </div>
@@ -474,7 +474,7 @@ function galleryHTML(id) {
           <div class="block-title">Empty state</div>
           <div class="field">
             <label class="field-label" for="dd-empty-${id}">Saved filter</label>
-            <select id="dd-empty-${id}" data-ac-dropdown data-ac-empty-text="No saved filters yet"></select>
+            <select id="dd-empty-${id}" data-dropdown data-dropdown-empty-text="No saved filters yet"></select>
           </div>
         </div>
 
@@ -482,7 +482,7 @@ function galleryHTML(id) {
           <div class="block-title">Disabled</div>
           <div class="field">
             <label class="field-label" for="dd-locked-${id}">Plan</label>
-            <select id="dd-locked-${id}" data-ac-dropdown disabled>
+            <select id="dd-locked-${id}" data-dropdown disabled>
               <option value="team" selected>Team (contact sales to change)</option>
             </select>
           </div>

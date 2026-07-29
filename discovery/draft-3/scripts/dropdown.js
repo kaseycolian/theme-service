@@ -1,16 +1,28 @@
 /* =============================================================================
    Theme Service — dropdown.js. Accessible dropdown / listbox behavior.
 
-   A port of the `dropdown` component from the a11y-component-examples library,
-   kept DELIBERATELY LINE-FOR-LINE with upstream so fixes there apply here. Only
-   the skin is ours (dropdown.css). If you change behavior, change it upstream
-   first, then port — otherwise the two drift and neither can be trusted.
+   The BEHAVIOR is a port of the `dropdown` component from the
+   a11y-component-examples library. The NAMES are this repo's: `.dropdown-*`
+   classes, `data-dropdown-*` hooks, `window.ThemeService`, matching `.btn` /
+   `.input` / `.field` in components.css rather than upstream's `ac-` prefix —
+   which exists over there precisely to avoid colliding with those names, and so
+   has no reason to travel here.
 
-   ONE KNOWN DIVERGENCE, pending an upstream port: `data-ac-anchor` / the
-   `anchor` option (see "Panel anchor" below). Upstream always anchors the panel
-   to the trigger, which leaves the panel narrower than its shell whenever the
-   trigger sits in a group — as it does in this site's header. It is additive and
-   opt-in: with no attribute the behavior is byte-for-byte the upstream one.
+   That means this is NOT a drop-in re-copy from upstream. Porting a fix means
+   translating the identifiers, so diff the logic and not the text. The mapping
+   is mechanical and total:
+
+       ac-dropdown           ->  dropdown            (and __part -> -part)
+       ac-dropdown--disabled ->  dropdown-disabled   (likewise --up)
+       data-ac-<x>           ->  data-dropdown-<x>
+       window.AC             ->  window.ThemeService
+       select._acDropdown    ->  select._dropdown
+
+   One behavior addition beyond upstream: `data-dropdown-anchor` / the `anchor`
+   option (see "Panel anchor" below). Upstream always anchors the panel to the
+   trigger, which leaves the panel narrower than its shell whenever the trigger
+   sits in a group — as it does in this site's header. Additive and opt-in: with
+   no attribute the behavior is upstream's exactly.
 
    Progressive enhancement of a real <select>. The native element stays in the
    DOM as the value store, so `.value`, `.selectedIndex`, `change` listeners and
@@ -27,9 +39,9 @@
    bottom sheet, which is a different focus and dismissal model.
 
    Usage:  <label class="field-label" for="x">Region</label>
-           <select id="x" data-ac-dropdown>…</select>
-   Anything with [data-ac-dropdown] is enhanced automatically on DOMContentLoaded.
-   Construct manually with AC.createDropdown(el) — it is idempotent.
+           <select id="x" data-dropdown>…</select>
+   Anything with [data-dropdown] is enhanced automatically on DOMContentLoaded.
+   Construct manually with ThemeService.createDropdown(el) — it is idempotent.
 
    No dependencies, no build step, external file (inline scripts are blocked by
    strict CSP / Manifest V3). Load AFTER theme-select.js is fine — that file
@@ -52,51 +64,51 @@
    * @param {{ emptyText?: string }} [options]
    */
   function createDropdown(select, options) {
-    if (!select || select._acDropdown) return select && select._acDropdown;
+    if (!select || select._dropdown) return select && select._dropdown;
 
     // A multi-select is a different pattern with a different keyboard model.
     // Enhancing it would quietly break it, so leave it as the native control.
     if (select.multiple) {
       if (typeof console !== 'undefined' && console.warn) {
-        console.warn('ac-dropdown: <select multiple> is not supported; leaving it native.', select);
+        console.warn('dropdown: <select multiple> is not supported; leaving it native.', select);
       }
       return null;
     }
 
     var settings = options || {};
-    var id = select.id || 'ac-dropdown-' + ++uid;
+    var id = select.id || 'dropdown-' + ++uid;
     var emptyText =
-      settings.emptyText || select.getAttribute('data-ac-empty-text') || 'No options available';
+      settings.emptyText || select.getAttribute('data-dropdown-empty-text') || 'No options available';
 
     // Panel anchor. By default the panel lines up with the trigger, the way a
     // native select does. When the trigger sits inside a group — a label cap, an
     // addon, an icon rail — the thing the user reads as "the control" is the
     // GROUP, and a panel that starts partway across it looks detached. Pass a
-    // selector in data-ac-anchor (or an element as options.anchor) to anchor to
+    // selector in data-dropdown-anchor (or an element as options.anchor) to anchor to
     // the nearest matching ancestor instead. Resolved from the <select>, which is
     // still in its original parent at this point. Opt-in: with no attribute the
     // anchor is the trigger, so no existing instance moves.
-    var anchorSelector = select.getAttribute('data-ac-anchor');
+    var anchorSelector = select.getAttribute('data-dropdown-anchor');
     var anchorEl = settings.anchor || (anchorSelector ? select.closest(anchorSelector) : null);
 
     /* === Build the shell ================================================== */
 
     var wrap = document.createElement('div');
-    wrap.className = 'ac-dropdown';
+    wrap.className = 'dropdown';
 
     var toggle = document.createElement('button');
     toggle.type = 'button';
-    toggle.className = 'ac-dropdown__toggle';
+    toggle.className = 'dropdown-toggle';
     toggle.id = id + '-toggle';
     toggle.setAttribute('aria-haspopup', 'listbox');
     toggle.setAttribute('aria-expanded', 'false');
     toggle.setAttribute('aria-controls', id + '-panel');
 
     var valueEl = document.createElement('span');
-    valueEl.className = 'ac-dropdown__value';
+    valueEl.className = 'dropdown-value';
 
     var caret = document.createElement('span');
-    caret.className = 'ac-dropdown__caret';
+    caret.className = 'dropdown-caret';
     caret.setAttribute('aria-hidden', 'true');
     caret.innerHTML =
       '<svg viewBox="0 0 16 16" focusable="false"><path d="M4 6l4 4 4-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
@@ -105,7 +117,7 @@
     toggle.appendChild(caret);
 
     var panel = document.createElement('div');
-    panel.className = 'ac-dropdown__panel';
+    panel.className = 'dropdown-panel';
     panel.id = id + '-panel';
     panel.setAttribute('role', 'listbox');
     panel.hidden = true;
@@ -116,7 +128,7 @@
     }
 
     var list = document.createElement('div');
-    list.className = 'ac-dropdown__list';
+    list.className = 'dropdown-list';
     panel.appendChild(list);
 
     /* === Accessible name ==================================================
@@ -168,7 +180,7 @@
     wrap.appendChild(panel);
     wrap.appendChild(select);
 
-    select.classList.add('ac-dropdown__native');
+    select.classList.add('dropdown-native');
     select.tabIndex = -1;
     // display:none already removes it from the accessibility tree; this makes the
     // intent explicit for anyone reading the DOM.
@@ -184,12 +196,12 @@
     function decorate(row, option) {
       /* An icon or a color strip. Both render aria-hidden, so no symbol name
          reaches the option's accessible name. */
-      var swatch = option.getAttribute('data-ac-swatch');
-      var icon = option.getAttribute('data-ac-icon');
+      var swatch = option.getAttribute('data-dropdown-swatch');
+      var icon = option.getAttribute('data-dropdown-icon');
 
       if (icon) {
         var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-        svg.setAttribute('class', 'ac-dropdown__icon');
+        svg.setAttribute('class', 'dropdown-icon');
         svg.setAttribute('aria-hidden', 'true');
         svg.setAttribute('focusable', 'false');
         var use = document.createElementNS('http://www.w3.org/2000/svg', 'use');
@@ -199,7 +211,7 @@
       } else if (swatch) {
         var colors = swatch.split(',');
         var strip = document.createElement('span');
-        strip.className = 'ac-dropdown__swatch';
+        strip.className = 'dropdown-swatch';
         strip.setAttribute('aria-hidden', 'true');
         for (var i = 0; i < colors.length; i++) {
           var dot = document.createElement('span');
@@ -213,19 +225,19 @@
 
       /* The option's own text */
       var text = document.createElement('span');
-      text.className = 'ac-dropdown__text';
+      text.className = 'dropdown-text';
 
       var primary = document.createElement('span');
-      primary.className = 'ac-dropdown__primary';
+      primary.className = 'dropdown-primary';
       primary.textContent = option.textContent.trim();
       text.appendChild(primary);
 
       /* A muted second line. NOT aria-hidden: it is real information, so it
          belongs in the accessible name. */
-      var secondary = option.getAttribute('data-ac-secondary');
+      var secondary = option.getAttribute('data-dropdown-secondary');
       if (secondary) {
         var sub = document.createElement('span');
-        sub.className = 'ac-dropdown__secondary';
+        sub.className = 'dropdown-secondary';
         sub.textContent = secondary;
         text.appendChild(sub);
       }
@@ -234,7 +246,7 @@
 
       /* The tick, so selection is never shown by color alone */
       var check = document.createElement('span');
-      check.className = 'ac-dropdown__check';
+      check.className = 'dropdown-check';
       check.setAttribute('aria-hidden', 'true');
       check.textContent = '✓';
       row.appendChild(check);
@@ -242,7 +254,7 @@
 
     function buildRow(option, optionIndex) {
       var row = document.createElement('div');
-      row.className = 'ac-dropdown__option';
+      row.className = 'dropdown-option';
       row.id = id + '-option-' + optionIndex;
       row.setAttribute('role', 'option');
       row.setAttribute('aria-selected', String(optionIndex === select.selectedIndex));
@@ -277,9 +289,9 @@
         if (child.tagName === 'OPTGROUP') {
           var group = document.createElement('div');
           group.setAttribute('role', 'group');
-          group.className = 'ac-dropdown__group';
+          group.className = 'dropdown-group';
           var groupLabel = document.createElement('div');
-          groupLabel.className = 'ac-dropdown__group-label';
+          groupLabel.className = 'dropdown-group-label';
           groupLabel.id = id + '-group-' + i;
           groupLabel.textContent = child.label;
           // aria-hidden on the visible text plus aria-label on the group stops the
@@ -299,7 +311,7 @@
 
       if (!select.options.length) {
         var empty = document.createElement('div');
-        empty.className = 'ac-dropdown__empty';
+        empty.className = 'dropdown-empty';
         empty.textContent = emptyText;
         list.appendChild(empty);
       }
@@ -311,7 +323,7 @@
     function syncValue() {
       var option = select.options[select.selectedIndex];
       valueEl.textContent = option ? option.textContent.trim() : emptyText;
-      valueEl.classList.toggle('ac-dropdown__value--empty', !option);
+      valueEl.classList.toggle('dropdown-value-empty', !option);
 
       var allRows = list.querySelectorAll('[role="option"]');
       for (var i = 0; i < allRows.length; i++) {
@@ -326,7 +338,7 @@
       // aria-disabled, not the disabled attribute: the control stays focusable, so
       // a keyboard user can still reach it and hear why it is unavailable.
       toggle.setAttribute('aria-disabled', String(select.disabled));
-      wrap.classList.toggle('ac-dropdown--disabled', select.disabled);
+      wrap.classList.toggle('dropdown-disabled', select.disabled);
     }
 
     /* === Positioning ======================================================
@@ -360,7 +372,7 @@
       }
 
       // A styling hook for consumers who want to square off the adjoining corners.
-      wrap.classList.toggle('ac-dropdown--up', flipUp);
+      wrap.classList.toggle('dropdown-up', flipUp);
     }
 
     /* === Open and close =================================================== */
@@ -416,7 +428,7 @@
       }
       panel.hidden = true;
       toggle.setAttribute('aria-expanded', 'false');
-      wrap.classList.remove('ac-dropdown--up');
+      wrap.classList.remove('dropdown-up');
       if (openInstance === api) openInstance = null;
 
       document.removeEventListener('pointerdown', onDocumentPointerDown, true);
@@ -620,27 +632,27 @@
         list.removeEventListener('pointermove', onListPointerMove);
         select.removeEventListener('change', onNativeChange);
 
-        select.classList.remove('ac-dropdown__native');
+        select.classList.remove('dropdown-native');
         select.removeAttribute('aria-hidden');
         select.tabIndex = 0;
         wrap.parentNode.insertBefore(select, wrap);
         wrap.remove();
-        delete select._acDropdown;
+        delete select._dropdown;
       },
     };
 
-    select._acDropdown = api;
+    select._dropdown = api;
     rebuild();
     return api;
   }
 
-  global.AC = global.AC || {};
-  global.AC.createDropdown = createDropdown;
+  global.ThemeService = global.ThemeService || {};
+  global.ThemeService.createDropdown = createDropdown;
 
   /* === Auto-init ========================================================== */
 
   function initAll(scope) {
-    (scope || document).querySelectorAll('select[data-ac-dropdown]').forEach(function (el) {
+    (scope || document).querySelectorAll('select[data-dropdown]').forEach(function (el) {
       createDropdown(el);
     });
   }
