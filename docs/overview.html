@@ -17,12 +17,21 @@
          transition: background .2s, color .2s; }
   .topbar { position: sticky; top: 0; z-index: 50; display: flex; gap: 18px; align-items: center;
             flex-wrap: wrap; padding: 12px 20px; background: var(--bg-panel);
-            border-bottom: 1px solid var(--border); max-width: 100%; }
+            border-bottom: 1px solid var(--border); max-width: 100%; justify-content: flex-start; }
   .topbar > * { min-width: 0; max-width: 100%; }
   .topbar strong { font-size: 14px; }
   .topbar label { font-size: 12.5px; color: var(--text-muted); display: inline-flex; gap: 8px;
                   align-items: center; min-width: 0; max-width: 100%; }
   .topbar select[data-theme-select] { font-family: var(--font-mono); max-width: 100%; min-width: 0; width: 100%; }
+  .ov-cta { margin-left: auto; text-decoration: none; font-size: 13px; font-weight: 600;
+            padding: 7px 14px; border-radius: 999px; color: var(--text);
+            border: 1px solid color-mix(in srgb, var(--accent-purple) 55%, var(--border));
+            background: color-mix(in srgb, var(--accent-purple) 14%, transparent);
+            box-shadow: 0 0 12px color-mix(in srgb, var(--accent-purple) 30%, transparent);
+            white-space: nowrap; }
+  .ov-cta:hover { border-color: var(--accent-pink); box-shadow: 0 0 16px color-mix(in srgb, var(--accent-pink) 40%, transparent); }
+  .ov-cta:focus-visible { outline: 3px solid var(--accent-blue); outline-offset: 2px; }
+  @media (max-width: 720px) { .ov-cta { margin-left: 0; } }
   main { max-width: 1040px; margin: 0 auto; padding: 32px 20px 80px; }
   .page-title { font-size: 24px; margin: 0 0 6px; }
   .page-lead { color: var(--text-muted); max-width: 64ch; line-height: 1.55; margin: 0 0 28px; }
@@ -100,6 +109,7 @@
   </label>
   <label class="switch"><input type="checkbox" data-motion-toggle>
     <span class="track"><span class="thumb"></span></span> Disable animations</label>
+  <a class="ov-cta" href="../themes/preview.html">See Built-In Themes →</a>
 </div>
 
 <main>
