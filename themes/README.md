@@ -69,26 +69,32 @@ scripts, which silently leaves the dropdown empty):
 persists the choice. React/Angular use their own provider instead — see the skill's
 `applying-themes.md`.
 
-Options are emitted **grouped by family** (`<optgroup>`), each carrying `data-ac-swatch` (that
-theme's four accents) and `data-ac-secondary` (its id). A plain `<select>` ignores those two
+Options are emitted **grouped by family** (`<optgroup>`), each carrying `data-dropdown-swatch` (that
+theme's four accents) and `data-dropdown-secondary` (its id). A plain `<select>` ignores those two
 attributes and just shows the label — so the snippet above is unchanged. To render them, add
-`data-ac-dropdown` and load `dropdown.js`:
+`data-dropdown` and load `dropdown.js`:
 
 ```html
 <span id="theme-cap">Theme</span>
-<select data-theme-select data-ac-dropdown aria-labelledby="theme-cap"></select>
+<select data-theme-select data-dropdown aria-labelledby="theme-cap"></select>
 <script src="dropdown.js"></script>
 <script src="theme-select.js"></script>
 ```
 
-Either script order works. Without `data-ac-dropdown` nothing changes, so an app that vendored an
+Either script order works. Without `data-dropdown` nothing changes, so an app that vendored an
 earlier version keeps its native control through an update.
 
 ## Accessible dropdown (`dropdown.css` + `dropdown.js`)
 
-A themed port of the `dropdown` component from the **a11y-component-examples** library, kept
-line-for-line with upstream so fixes there port straight across — only the skin is ours. It is the
-control the theme picker in `preview.html`'s header uses.
+A themed port of the `dropdown` component from the **a11y-component-examples** library. The
+behavior is upstream's; the names are this repo's — `.dropdown-*` classes, `data-dropdown-*` hooks
+and `window.ThemeService`, matching `.btn` / `.input` / `.field` rather than upstream's `ac-` prefix
+(which exists over there to avoid colliding with exactly those names). So it is **not** a drop-in
+re-copy from upstream: porting a fix means translating identifiers, and `dropdown.js`'s header
+carries the full mapping. It is the control the theme picker in `preview.html`'s header uses.
+
+`.dropdown` is a separate component from `.drop` in `components.css`, not a rename of it — `.drop`
+is styles-only for a listbox you wire yourself, and nothing here styles a bare `.drop*` selector.
 
 It **progressively enhances a real `<select>`**. The native element stays in the DOM as the value
 store, so `.value`, `.selectedIndex`, `change` listeners and form submission keep working — you can
@@ -97,7 +103,7 @@ drop it onto an existing form and nothing downstream needs to know.
 ```html
 <div class="field">
   <label class="field-label" for="region">Region</label>
-  <select id="region" data-ac-dropdown>
+  <select id="region" data-dropdown>
     <optgroup label="Americas">
       <option value="us-east">US East</option>
       <option value="sa-east" disabled>South America (at capacity)</option>
@@ -106,26 +112,26 @@ drop it onto an existing form and nothing downstream needs to know.
 </div>
 ```
 
-Anything with `[data-ac-dropdown]` is enhanced on `DOMContentLoaded`. Per-option decoration, all
+Anything with `[data-dropdown]` is enhanced on `DOMContentLoaded`. Per-option decoration, all
 optional:
 
 | Attribute | Renders | In the accessible name? |
 | --------- | ------- | ----------------------- |
-| `data-ac-icon="<symbol id>"` | `<use href="#id">` from an SVG sprite | No — `aria-hidden` decoration |
-| `data-ac-swatch="#hex,#hex,…"` | a color strip | No — `aria-hidden` decoration |
-| `data-ac-secondary="text"` | a muted second line | **Yes** — it is content, not filler |
-| `data-ac-empty-text="…"` | the empty-state message | — |
+| `data-dropdown-icon="<symbol id>"` | `<use href="#id">` from an SVG sprite | No — `aria-hidden` decoration |
+| `data-dropdown-swatch="#hex,#hex,…"` | a color strip | No — `aria-hidden` decoration |
+| `data-dropdown-secondary="text"` | a muted second line | **Yes** — it is content, not filler |
+| `data-dropdown-empty-text="…"` | the empty-state message | — |
 
 One attribute goes on the `<select>` rather than an option:
 
 | Attribute | Effect |
 | --------- | ------ |
-| `data-ac-anchor="<css selector>"` | Size and align the open panel to the nearest matching **ancestor** instead of to the trigger |
+| `data-dropdown-anchor="<css selector>"` | Size and align the open panel to the nearest matching **ancestor** instead of to the trigger |
 
 Use it when the trigger sits inside a group — a label cap, an addon, an icon rail — so that what
 the user reads as "the control" is the whole group. Without it the panel starts partway across the
 group and looks detached. The site header does exactly this
-(`data-ac-anchor=".theme-console"`), which is why its list spans the cap and the lamps too. It is
+(`data-dropdown-anchor=".theme-console"`), which is why its list spans the cap and the lamps too. It is
 opt-in: with no attribute the panel matches the trigger, the way a native `<select>` behaves.
 
 Supports plain lists, icons, swatches, secondary text, `<optgroup>` hierarchies, disabled options,
@@ -136,10 +142,16 @@ type-ahead. When open, DOM focus moves onto the option itself rather than using
 The panel is `position: fixed` and promoted to the **top layer** via the Popover API, so an ancestor
 with `overflow: hidden` or a `transform` cannot clip it. It re-anchors on scroll/resize and flips
 above the trigger when there is more room there. It takes its width and left edge from its anchor
-(the trigger, or `data-ac-anchor` — see above), so the anchor's width is what sizes the list.
+(the trigger, or `data-dropdown-anchor` — see above), so the anchor's width is what sizes the list.
+
+The elements it builds are `.dropdown` (wrapper) wrapping `.dropdown-toggle`, `.dropdown-panel` >
+`.dropdown-list` > `.dropdown-option`, and the hidden `.dropdown-native` select. Target those to
+restyle it; `assets/site-header.css` is a worked example.
 
 ```js
-const dd = AC.createDropdown(el, { emptyText: 'Nothing saved yet', anchor: groupEl });
+// window.ThemeService — the only global this file adds. Not to be confused with an
+// Angular ThemeService class, which is app code (see Framework notes below).
+const dd = window.ThemeService.createDropdown(el, { emptyText: 'Nothing saved yet', anchor: groupEl });
 dd.rebuild();  // after you change the options — the rows are not observed
 dd.sync();     // after you set select.value programmatically
 dd.destroy();  // unbinds and restores the native <select>

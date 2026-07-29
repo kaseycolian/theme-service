@@ -193,7 +193,7 @@ if (process.argv.includes('--write')) {
 
   // Each entry carries enough to render a RICH picker: a family group heading, the
   // theme's own four accents as a swatch strip, and its id as secondary text (the
-  // value you'd put in data-theme). dropdown.js reads the data-ac-* attributes; a
+  // value you'd put in data-theme). dropdown.js reads the data-dropdown-* attributes; a
   // plain <select> ignores them and just shows the label, so both stay supported.
   const swatchOf = t => accents.map(a => t.tokens[VARMAP[a]]).join(',');
   const modeLabel = m => m[0].toUpperCase() + m.slice(1);
@@ -216,9 +216,9 @@ if (process.argv.includes('--write')) {
    Markup you provide:  <select data-theme-select aria-label="Theme"></select>
                         <input type="checkbox" data-motion-toggle> Reduce motion  (optional)
 
-   Options are grouped by family (<optgroup>) and carry data-ac-swatch (the theme's
-   four accents) + data-ac-secondary (its id). A plain <select> ignores those two
-   attributes; add data-ac-dropdown AND load dropdown.js to render them.
+   Options are grouped by family (<optgroup>) and carry data-dropdown-swatch (the theme's
+   four accents) + data-dropdown-secondary (its id). A plain <select> ignores those two
+   attributes; add data-dropdown AND load dropdown.js to render them.
 
    For React/Angular, prefer the framework's own provider (see the skill) instead of this file. */
 (function () {
@@ -236,8 +236,8 @@ if (process.argv.includes('--write')) {
         var groups = {};
         THEMES.forEach(function (t) {
           var opt = new Option(t.label, t.id);
-          if (t.swatch) opt.setAttribute('data-ac-swatch', t.swatch);
-          if (t.secondary) opt.setAttribute('data-ac-secondary', t.secondary);
+          if (t.swatch) opt.setAttribute('data-dropdown-swatch', t.swatch);
+          if (t.secondary) opt.setAttribute('data-dropdown-secondary', t.secondary);
           if (!t.group) { sel.appendChild(opt); return; }
           if (!groups[t.group]) {
             groups[t.group] = document.createElement('optgroup');
@@ -256,10 +256,10 @@ if (process.argv.includes('--write')) {
       // Opt-in upgrade to the accessible listbox. Order-independent: createDropdown
       // is idempotent, so if dropdown.js auto-init already ran on the empty <select>
       // this returns that instance, and rebuild() picks up the options added above.
-      // Without data-ac-dropdown nothing changes — apps on the old markup keep the
+      // Without data-dropdown nothing changes — apps on the old markup keep the
       // native control through an update.
-      if (sel.hasAttribute('data-ac-dropdown') && window.AC && window.AC.createDropdown) {
-        var dd = window.AC.createDropdown(sel);
+      if (sel.hasAttribute('data-dropdown') && window.ThemeService && window.ThemeService.createDropdown) {
+        var dd = window.ThemeService.createDropdown(sel);
         if (dd) dd.rebuild();
       }
     });

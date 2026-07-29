@@ -185,7 +185,7 @@ a.pagenav-seg:focus-visible { outline: 3px solid var(--focus-ring); outline-offs
 /* The trigger is the real control, so the ring belongs to the console it fills.
    Both selectors are live: the first once dropdown.js has enhanced it, the
    second on the native fallback. */
-.theme-console:has(.ac-dropdown__toggle:focus-visible),
+.theme-console:has(.dropdown-toggle:focus-visible),
 .theme-console:has(select:focus-visible) {
   outline: 3px solid var(--focus-ring); outline-offset: 2px;
 }
@@ -220,7 +220,7 @@ a.pagenav-seg:focus-visible { outline: 3px solid var(--focus-ring); outline-offs
 /* --- the enhanced control (themes/dropdown.js) ---------------------------- */
 
 /* The open panel matches its ANCHOR's width, and the markup anchors it to the
-   console (data-ac-anchor) rather than to the button — so the panel spans the
+   console (data-dropdown-anchor) rather than to the button — so the panel spans the
    cap and the lamps too, and the list gets the console's full width instead of
    starting partway across it. That means this number no longer has to be
    inflated to buy list width: the panel is this + the cap + the lamps (~139px).
@@ -239,25 +239,25 @@ a.pagenav-seg:focus-visible { outline: 3px solid var(--focus-ring); outline-offs
    max-width is never reached, so both leave it at ~165px. A definite width is
    what actually reserves the space. min-width:0 still lets it shrink in the
    two-row layout below. Includes the trigger's 11px of side padding. */
-.theme-console .ac-dropdown {
+.theme-console .dropdown {
   flex: 0 1 auto; width: 316px; min-width: 0; align-self: stretch;
 }
 /* One palette notation in the header, not two. The component's default swatch is
    a contiguous strip; the trigger beside it shows .tc-lamps, four dots. Reading a
    row and then the trigger meant re-parsing the same four accents in a different
    shape, so the panel adopts the lamps' notation: same order (pink, green, blue,
-   purple — build-final.mjs emits data-ac-swatch in exactly that order), same
+   purple — build-final.mjs emits data-dropdown-swatch in exactly that order), same
    circles, same 5px rhythm, one size down for the row's smaller type. Only the
    header is rescoped; the component keeps its strip, which is what the gallery in
    preview.html demonstrates. To go back to strips everywhere, delete this block. */
-.theme-console .ac-dropdown__swatch {
+.theme-console .dropdown-swatch {
   gap: 5px;
   border: 0; border-radius: 0;
   /* The strip clipped its children to a rounded box. Dots need to glow past
      their own edges, so the clip has to go with the border that motivated it. */
   overflow: visible;
 }
-.theme-console .ac-dropdown__swatch > span {
+.theme-console .dropdown-swatch > span {
   position: relative;
   width: 7px; height: 7px; border-radius: 50%;
 }
@@ -276,7 +276,7 @@ a.pagenav-seg:focus-visible { outline: 3px solid var(--focus-ring); outline-offs
    disc up to 11px BEFORE blurring, and the dots came out as blobs rather than
    dots with halos. The glow must start at the dot's own edge, like a shadow.
    Scaled by --glow-strength for the same reason every other glow here is. */
-.theme-console .ac-dropdown__swatch > span::after {
+.theme-console .dropdown-swatch > span::after {
   content: '';
   position: absolute; inset: 0;
   border-radius: 50%;
@@ -294,21 +294,21 @@ a.pagenav-seg:focus-visible { outline: 3px solid var(--focus-ring); outline-offs
    so the name read as jammed against its own highlight. 11px matches the lamps'
    own trailing padding, which lands the tint's leading edge exactly midway
    between the last lamp dot and the text — a deliberate region, not a clip. */
-.theme-console .ac-dropdown__toggle {
+.theme-console .dropdown-toggle {
   height: 100%; min-height: 0;
   padding: 0 11px; gap: 8px;
   border: 0; border-radius: 0; background: transparent; box-shadow: none;
   font-family: var(--font-mono); font-size: 12.5px; font-weight: 600;
   color: var(--text);
 }
-.theme-console .ac-dropdown__toggle[aria-expanded="true"] {
+.theme-console .dropdown-toggle[aria-expanded="true"] {
   background: color-mix(in srgb, var(--accent-purple) 14%, transparent);
   box-shadow: none;
 }
 /* The ring is drawn by the console (above), so the trigger must not draw its own. */
-.theme-console .ac-dropdown__toggle:focus-visible { outline: none; box-shadow: none; }
+.theme-console .dropdown-toggle:focus-visible { outline: none; box-shadow: none; }
 /* The console's caret is purple, not the component's blue. */
-.theme-console .ac-dropdown__caret { color: var(--accent-purple); }
+.theme-console .dropdown-caret { color: var(--accent-purple); }
 
 /* The panel is position:fixed and in the top layer, so neither the console's
    overflow:hidden nor the header's backdrop-filter can clip or re-anchor it —
@@ -329,7 +329,7 @@ a.pagenav-seg:focus-visible { outline: 3px solid var(--focus-ring); outline-offs
 .theme-console select optgroup { background: var(--bg-elevated); color: var(--text-muted); }
 /* Same two-triangle caret the .select component draws, in the console's purple.
    Only for the fallback — once enhanced, the component draws its own chevron. */
-.theme-console:not(:has(.ac-dropdown))::after {
+.theme-console:not(:has(.dropdown))::after {
   content: ""; flex: none; width: 10px; height: 5px; margin-right: 13px;
   background-image: linear-gradient(45deg, transparent 50%, var(--accent-purple) 50%),
                     linear-gradient(135deg, var(--accent-purple) 50%, transparent 50%);
@@ -352,7 +352,7 @@ a.pagenav-seg:focus-visible { outline: 3px solid var(--focus-ring); outline-offs
   /* Two-row layout: the console is width-constrained, so the control goes back to
      filling whatever the cap and lamps leave rather than reserving a fixed 330px. */
   .theme-console select { max-width: none; }
-  .theme-console .ac-dropdown { width: auto; flex: 1 1 auto; }
+  .theme-console .dropdown { width: auto; flex: 1 1 auto; }
 
   /* Dots one step down, same as .tc-lamps tighten below. Four circles at a 5px
      rhythm are 43px wide where the strip they replaced was 28px, and the panel
@@ -360,8 +360,8 @@ a.pagenav-seg:focus-visible { outline: 3px solid var(--focus-ring); outline-offs
      tips the two longest names onto a second line from 1000px down. 6/4 (36px)
      is the largest rhythm that doesn't, so the notation survives the whole
      range instead of being paid for in wrapped rows. */
-  .theme-console .ac-dropdown__swatch { gap: 4px; }
-  .theme-console .ac-dropdown__swatch > span { width: 6px; height: 6px; }
+  .theme-console .dropdown-swatch { gap: 4px; }
+  .theme-console .dropdown-swatch > span { width: 6px; height: 6px; }
 }
 
 /* Phones: the tagline and the console's cap are the first things to go. */
@@ -376,8 +376,8 @@ a.pagenav-seg:focus-visible { outline: 3px solid var(--focus-ring); outline-offs
      not wrap before the notation changed. Verified against the old bar at 480px
      and 380px — identical wrap counts. Below ~340px every row wraps whatever
      this is, so there is nothing further to buy. */
-  .theme-console .ac-dropdown__swatch { gap: 3px; }
-  .theme-console .ac-dropdown__swatch > span { width: 5px; height: 5px; }
+  .theme-console .dropdown-swatch { gap: 3px; }
+  .theme-console .dropdown-swatch > span { width: 5px; height: 5px; }
 
   /* The cap is HIDDEN, NOT REMOVED. It is the control's accessible name via
      aria-labelledby, and a name that points at a display:none element resolves
@@ -402,12 +402,12 @@ a.pagenav-seg:focus-visible { outline: 3px solid var(--focus-ring); outline-offs
    glow and the gap were tuned around is untouched. */
 @media (forced-colors: active) {
   .tc-lamps i,
-  .theme-console .ac-dropdown__swatch > span {
+  .theme-console .dropdown-swatch > span {
     outline: 1px solid CanvasText;
     outline-offset: -1px;
   }
   /* The halo is a blurred copy of a color that no longer exists here. */
-  .theme-console .ac-dropdown__swatch > span::after { display: none; }
+  .theme-console .dropdown-swatch > span::after { display: none; }
 }
 
 /* Narrowest phones: mark only. The link keeps its name from aria-label. */

@@ -132,15 +132,15 @@
       <!-- Live palette readout: painted from --accent-* in CSS, so a theme change
            re-colors them with no JS at all. -->
       <span class="tc-lamps" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
-      <!-- data-ac-dropdown opts this into themes/dropdown.js, which groups the
+      <!-- data-dropdown opts this into themes/dropdown.js, which groups the
            list by family and gives each theme its own accent swatch. Without that
            script it stays a plain <select> and still switches themes.
            aria-labelledby, not aria-label, so the enhanced trigger announces as
            "Theme, <current theme>" the way a native select does.
-           data-ac-anchor sizes the panel to the whole console rather than to the
+           data-dropdown-anchor sizes the panel to the whole console rather than to the
            button inside it — the cap and lamps read as part of the control, so a
            panel starting after them looks detached. -->
-      <select data-theme-select data-ac-dropdown data-ac-anchor=".theme-console"
+      <select data-theme-select data-dropdown data-dropdown-anchor=".theme-console"
               aria-labelledby="tc-cap"></select>
     </div>
 
