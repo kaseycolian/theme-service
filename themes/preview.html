@@ -54,6 +54,11 @@
   .page-head { display: flex; flex-direction: column; gap: 16px; }
   .page-title { font-size: 26px; margin: 0; }
   .page-lead { color: var(--text-muted); max-width: 68ch; line-height: 1.55; margin: 0; }
+  /* Inline paths in the lead. Size in em so it tracks the paragraph, and --font-mono
+     so it uses the theme's type stack instead of the browser's default monospace,
+     which renders a step too small next to body text. Color is inherited, so this
+     adds no new pair for the contrast check to cover. */
+  .page-lead code { font-family: var(--font-mono); font-size: .92em; }
 
   /* Wraps rather than scrolls, so the index absorbs new categories at any width
      without a breakpoint. */
@@ -193,9 +198,16 @@
 <main id="main">
   <div class="page-head">
     <h1 class="page-title">Every component, in one theme</h1>
-    <p class="page-lead">Change the theme in the header — everything below re-skins through the
-    same tokens your app gets. Every pairing on this page is contrast-checked at build time, in
-    every theme. Nothing here is bespoke.</p>
+    <p class="page-lead">This is the demo page used for the themes. The ones that ship here and any
+    you create will be demo'd for you to view during creation in the same format. It exists so you can
+    see a theme in real use before applying it in an app. Pick a theme in the header to see it applied
+    to the page, using the same color tokens your app gets. Every theme in the list passed its
+    WCAG&nbsp;2.2 AA contrast checks before it was built.</p>
+
+    <p class="page-lead">The Markdown docs in this repo tell an agent how to install these themes into
+    a new or existing project — USAGE.md for the prompts, AGENTS.md or the Claude skill for the
+    procedure. They wire your app to the finalized tokens in <code>themes/</code>, so it gets the same
+    <code>theme.css</code> this page runs on.</p>
 
     <!-- Category index. One entry per section.cat below; add a section, add a line. -->
     <nav class="cat-nav" aria-label="Component categories">
@@ -213,7 +225,8 @@
   <section class="cat" id="cat-typography" aria-labelledby="h-typography">
     <div class="cat-head">
       <h2 class="cat-title" id="h-typography">Typography</h2>
-      <p class="cat-note">Each rank carries its own accent and glow.</p>
+      <p class="cat-note">Heading sizes, body text, links, muted text, and monospace. Each heading
+      level uses its own accent color.</p>
     </div>
     <div class="cat-grid">
       <div class="block">
@@ -240,8 +253,8 @@
   <section class="cat" id="cat-buttons" aria-labelledby="h-buttons">
     <div class="cat-head">
       <h2 class="cat-title" id="h-buttons">Buttons</h2>
-      <p class="cat-note">Fills carry a matching --on-* text color, so no accent is ever
-      paired with unreadable type.</p>
+      <p class="cat-note">Solid buttons in each accent color, plus outline, ghost, icon, and
+      disabled. Each fill has a matching text color that stays readable.</p>
     </div>
     <div class="cat-grid">
       <div class="block">
@@ -273,8 +286,8 @@
   <section class="cat" id="cat-inputs" aria-labelledby="h-inputs">
     <div class="cat-head">
       <h2 class="cat-title" id="h-inputs">Inputs</h2>
-      <p class="cat-note">Focus, hover and disabled states are drawn from tokens, never from
-      a hardcoded color.</p>
+      <p class="cat-note">Text fields, selects, radios, checkboxes, and switches — plus six
+      versions of the enhanced dropdown below.</p>
     </div>
 
     <div class="cat-grid">
@@ -421,8 +434,8 @@
   <section class="cat" id="cat-feedback" aria-labelledby="h-feedback">
     <div class="cat-head">
       <h2 class="cat-title" id="h-feedback">Feedback</h2>
-      <p class="cat-note">Status is never carried by hue alone — each one pairs its color
-      with a glyph or a word.</p>
+      <p class="cat-note">Notices, badges, chips, and status labels. Each one pairs its color with
+      an icon or a word, so color is never the only signal.</p>
     </div>
     <div class="cat-grid">
       <div class="block">
@@ -454,7 +467,8 @@
   <section class="cat" id="cat-surfaces" aria-labelledby="h-surfaces">
     <div class="cat-head">
       <h2 class="cat-title" id="h-surfaces">Surfaces</h2>
-      <p class="cat-note">Panels, the gradient scrollbar, and the result readout.</p>
+      <p class="cat-note">A scrollable panel with the gradient scrollbar, and the readout used for
+      generated output.</p>
     </div>
     <div class="cat-grid wide">
       <div class="block">
