@@ -23,15 +23,18 @@
 <link rel="stylesheet" href="palettes/light-06-acid-arcade.css">
 <link rel="stylesheet" href="palettes/light-06-acid-arcade-no-background.css">
 
-<!-- Effects + components (token-driven, palette-agnostic) -->
-<link rel="stylesheet" href="styles/effects.css">
-<link rel="stylesheet" href="styles/components.css">
-<!-- Verbatim copies of themes/dropdown.{css,js} — a draft folder is self-contained
-     so it still opens over file://. Re-copy both, unedited, to re-sync. Unlike the
-     two files above they need no [data-palette]-scoped variant: neither declares a
-     token, they only consume them, and the panel stays a DOM descendant of its
-     section even while promoted to the top layer — so it keeps that palette. -->
-<link rel="stylesheet" href="styles/dropdown.css">
+<!-- THE SHIPPED component CSS, not a copy of it. These files derive their tokens
+     on `:root, [data-palette]`, so each section below recomputes every glow and
+     gradient from its own palette while an app gets the same rules off :root.
+     This page therefore shows exactly what a consuming app gets — no fork to
+     re-sync, and no rescoping step when a draft is finalized. -->
+<link rel="stylesheet" href="../../themes/effects.css">
+<link rel="stylesheet" href="../../themes/components.css">
+<link rel="stylesheet" href="../../themes/dropdown.css">
+
+<!-- The component gallery, shared verbatim with themes/preview.html: the markup
+     for every card below comes from gallery/gallery.js. See gallery/README.md. -->
+<link rel="stylesheet" href="../../gallery/gallery.css">
 
 <style>
   /* ---- Neutral page chrome (deliberately NOT one of the palettes, so themed
@@ -111,87 +114,46 @@
   .contrast-detail .chip-c { display: inline-block; width: 12px; height: 12px; border-radius: 3px; vertical-align: middle; margin-right: 4px; border: 1px solid color-mix(in srgb, var(--text) 30%, transparent); }
 
   /* ---- Themed gallery body ------------------------------------------------
-     Three nesting levels, the same system themes/preview.html uses:
-
-       .sec-body  >  section.cat  >  .cat-grid  >  .block
-
-     A CATEGORY is a kind of component; a BLOCK is one component card. Keeping
-     the class names and the nesting identical to the preview page is the point:
-     a component designed there drops in here unchanged, and this page then shows
-     it against all 16 palettes at once. Nothing is positional — no nth-child,
-     no per-category rules, no fixed column counts — so a new component needs no
-     rule in either file.
+     Everything from .sec-body down is the palette's, and every card in it is
+     rendered by gallery/gallery.js and laid out by gallery/gallery.css — the
+     SAME template themes/preview.html shows. A component designed on either page
+     appears on the other with no second edit; see gallery/README.md.
 
      The page chrome above (header, nav, contrast tables) stays on the neutral
-     --chrome-* palette. Everything from .sec-body down is the palette's. */
-  .sec-body { padding: 20px; display: flex; flex-direction: column; gap: 28px; }
+     --chrome-* palette. */
+  .sec-body {
+    padding: 20px; display: flex; flex-direction: column; gap: 28px;
 
-  .cat { display: flex; flex-direction: column; gap: 14px; }
-  .cat-head {
-    display: flex; align-items: baseline; flex-wrap: wrap; gap: 5px 14px;
-    border-bottom: 1px solid var(--border); padding-bottom: 7px;
-  }
-  .cat-title {
-    margin: 0; font-size: 13px; font-weight: 800; letter-spacing: .18em;
-    text-transform: uppercase; color: var(--accent-green);
-    text-shadow: var(--tglow-green-sm);
-  }
-  .cat-note { margin: 0; font-size: 12px; color: var(--text-muted); }
-  .sub-head {
-    margin: 4px 0 0; font-family: var(--font-mono); font-size: 11px; font-weight: 700;
-    letter-spacing: .14em; text-transform: uppercase; color: var(--accent-purple);
-    text-shadow: var(--tglow-purple-sm);
+    /* Density knobs from gallery.css. Its defaults suit ONE gallery on a page;
+       this document stacks 16, so cards run a little tighter here. */
+    --gal-cat-gap: 14px;
+    --gal-grid-gap: 14px;
+    --gal-col-min: 250px;
+    --gal-col-min-wide: 430px;
+    --gal-card-pad: 14px;
+    --gal-card-gap: 11px;
+    --gal-title-size: 13px;
   }
 
-  /* auto-fit + minmax picks its own column count, so the gallery reflows from
-     3 across to 1 with no media query. min(…,100%) stops a single wide card
-     from forcing horizontal scroll on a phone. */
-  .cat-grid {
-    display: grid; gap: 14px; align-items: start;
-    grid-template-columns: repeat(auto-fit, minmax(min(250px, 100%), 1fr));
+  /* Discovery-only: when the toggle kills motion, kill it for the page CHROME
+     too, not just the token-driven components. themes/effects.css deliberately
+     ships no blanket !important reset — a consuming app's own animations are
+     none of its business — so this belongs here rather than in the shared file. */
+  [data-motion="off"] *,
+  [data-motion="off"] *::before,
+  [data-motion="off"] *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
   }
-  .cat-grid.wide { grid-template-columns: repeat(auto-fit, minmax(min(430px, 100%), 1fr)); }
-
-  /* Cards sit on --bg-panel over the section's --bg, so the card frame is itself
-     one of the pairings this page exists to check. min-width:0 + max-width on the
-     contents: grid items will not shrink below their content by default, and one
-     long unbreakable string (the result URL) would push the page sideways. */
-  .block {
-    display: flex; flex-direction: column; gap: 11px; min-width: 0;
-    padding: 14px;
-    background: var(--bg-panel);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+    }
   }
-  .block input, .block select, .block textarea, .block .row { max-width: 100%; }
-  .block-title {
-    font-family: var(--font-mono); font-size: 10px; font-weight: 700;
-    letter-spacing: .14em; text-transform: uppercase; color: var(--text-muted);
-  }
-  .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
-  .hint { font-size: 11px; color: var(--text-muted); font-style: italic; margin: 0; }
-
-  /* The icon sprite is a <symbol> library, not a picture. `hidden` alone does not
-     hide it: the UA rule that turns [hidden] into display:none declares an HTML
-     default namespace, so it skips elements in the SVG namespace and the sprite
-     keeps SVG's default 300x150 box. Needs a real rule. */
-  .sprite { display: none; }
-
-  /* Mini app-recreation frames */
-  .app-frame { border: 1px solid var(--border); border-radius: 12px; overflow: hidden; background: var(--bg); }
-  .app-head { padding: 12px 14px; display: flex; align-items: center; justify-content: space-between; }
-  .app-head .title { font-size: 14px; font-weight: 800; font-style: italic; text-transform: uppercase; letter-spacing: 1px; color: var(--accent-pink); text-shadow: var(--tglow-pink); }
-  .app-body { padding: 14px; display: flex; flex-direction: column; gap: 12px; }
-  .app-foot { padding: 12px 14px; display: flex; gap: 10px; justify-content: flex-end; }
-  .preview { height: 150px; overflow: auto; padding: 12px 14px; background: var(--bg-panel); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
-  .preview h1 { font-size: 17px; color: var(--accent-pink); text-shadow: var(--tglow-pink); margin: 0 0 6px; }
-  .preview h2 { font-size: 14px; color: var(--accent-green); text-shadow: var(--tglow-green); margin: 10px 0 4px; }
-  .preview h3 { font-size: 13px; color: var(--accent-blue); text-shadow: var(--tglow-blue); margin: 8px 0 4px; }
-  .preview p { font-size: 13px; color: var(--text); margin: 0 0 6px; line-height: 1.5; }
-  .preview a { color: var(--accent-blue); text-shadow: var(--tglow-blue); }
-  .preview pre { background: color-mix(in srgb, #000 30%, var(--bg)); border: 1px solid var(--accent-green); box-shadow: 0 0 10px color-mix(in srgb, var(--accent-green) calc(20% * var(--glow-strength)), transparent), inset 0 0 10px color-mix(in srgb, var(--accent-green) calc(8% * var(--glow-strength)), transparent); border-radius: 6px; padding: 8px 10px; font-family: var(--font-mono); font-size: 12px; color: var(--text); overflow-x: auto; }
-  .preview blockquote { border-left: 3px solid var(--accent-purple); margin: 6px 0; padding: 2px 10px; color: var(--text-muted); }
-  .preview hr { border: none; border-top: 2px dashed var(--accent-pink); opacity: 0.6; margin: 10px 0; }
 </style>
 </head>
 <body>
@@ -212,34 +174,15 @@
 
 <main id="main"></main>
 
-<!-- One sprite for the whole document, not one per palette: <symbol> is resolved
-     by id, so all 16 galleries point their <use href="#ac-icon-…"> at these. The
-     icons inherit currentColor, so each copy still paints in its own palette. -->
-<svg class="sprite" hidden aria-hidden="true" focusable="false">
-  <symbol id="ac-icon-rocket" viewBox="0 0 16 16">
-    <path d="M8 1.5c2.5 1.4 4 4 4 6.6L10 11H6L4 8.1C4 5.5 5.5 2.9 8 1.5Z" fill="none"
-          stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
-    <circle cx="8" cy="6.5" r="1.4" fill="currentColor"/>
-    <path d="M6 11.5 5 14.5l3-1.5 3 1.5-1-3" fill="none" stroke="currentColor"
-          stroke-width="1.4" stroke-linejoin="round"/>
-  </symbol>
-  <symbol id="ac-icon-flask" viewBox="0 0 16 16">
-    <path d="M6.5 1.5v4L2.8 12A1.5 1.5 0 0 0 4.1 14.5h7.8A1.5 1.5 0 0 0 13.2 12L9.5 5.5v-4"
-          fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
-    <path d="M5.5 1.5h5M4.8 9.5h6.4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
-  </symbol>
-  <symbol id="ac-icon-laptop" viewBox="0 0 16 16">
-    <rect x="2.5" y="3.5" width="11" height="7" rx="1" fill="none" stroke="currentColor" stroke-width="1.4"/>
-    <path d="M1 12.5h14" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
-  </symbol>
-</svg>
-
 <script src="data/contrast.js"></script>
-<!-- Before the render script below, which is inline and therefore runs while the
-     document is still parsing. dropdown.js registers a DOMContentLoaded listener,
-     so it enhances every [data-dropdown] the render loop has stamped out by
-     the time that fires — no manual ThemeService.createDropdown() pass needed. -->
-<script src="scripts/dropdown.js"></script>
+<!-- The shipped dropdown, not a copy of it: the panel stays a DOM descendant of
+     its section even while promoted to the top layer, so it keeps that palette. -->
+<script src="../../themes/dropdown.js"></script>
+<!-- The gallery template, shared with themes/preview.html. Before the inline
+     script below, which calls ThemeGallery.html() per palette while the document
+     is still parsing — so every [data-dropdown] it stamps out exists before
+     dropdown.js's DOMContentLoaded pass runs and enhances them. -->
+<script src="../../gallery/gallery.js"></script>
 <script>
 const PALETTES = [
   { id:'dark-01-rink-classic',                 label:'Rink Classic',                    group:'Faithful · Dark',  mode:'dark' },
@@ -262,9 +205,10 @@ const PALETTES = [
 
 
 /* The four accents THIS palette actually ships, pulled out of the contrast
-   report rather than duplicated here. The swatch dropdown below then shows the
-   palette it is sitting in, which is the whole point of a palette page — a
-   hardcoded set of hexes would look identical in all 16 sections. */
+   report rather than duplicated here. Handed to the gallery as its `swatches`
+   input so the swatch dropdown shows the palette it is sitting in — the whole
+   point of a palette page, since one hardcoded set of hexes would look identical
+   in all 16 sections. */
 function accentsOf(id) {
   const data = window.CONTRAST && window.CONTRAST[id];
   const find = (name) => {
@@ -274,347 +218,6 @@ function accentsOf(id) {
   return ['pink', 'green', 'blue', 'purple'].map(find);
 }
 
-/* The component gallery — identical markup for every palette.
-
-   Organised the way themes/preview.html is: categories of component cards. Every
-   id is suffixed with the palette id, because this markup is stamped out 16
-   times into one document and a duplicate id would break both <label for> and
-   the dropdown's aria-labelledby. */
-function galleryHTML(id) {
-  const sw = accentsOf(id).join(',');
-  return `
-  <div class="sec-body">
-
-    <!-- ================= Typography ================= -->
-    <section class="cat">
-      <div class="cat-head">
-        <h3 class="cat-title">Typography</h3>
-        <p class="cat-note">Each rank carries its own accent and glow.</p>
-      </div>
-      <div class="cat-grid">
-        <div class="block">
-          <div class="block-title">Headings</div>
-          <div class="t-h1">Skating Rink</div>
-          <div class="t-h2">Neon Nights</div>
-          <div class="t-h3">Section heading</div>
-          <div class="t-h4">Sub label</div>
-        </div>
-        <div class="block">
-          <div class="block-title">Body, links, mono</div>
-          <p class="t-body">Body copy at a comfortable reading size. The quick brown fox
-          jumps over the lazy dog.</p>
-          <p><a href="#${id}" class="t-link">An inline link</a> inside a paragraph.</p>
-          <p class="t-muted">Muted secondary text for hints and metadata.</p>
-          <p class="t-mono">https://example.com/mono/path?value=123</p>
-        </div>
-      </div>
-    </section>
-
-    <!-- ================= Buttons ================= -->
-    <section class="cat">
-      <div class="cat-head">
-        <h3 class="cat-title">Buttons</h3>
-        <p class="cat-note">Every fill carries its matching --on-* text color.</p>
-      </div>
-      <div class="cat-grid">
-        <div class="block">
-          <div class="block-title">Solid — one per accent</div>
-          <div class="row">
-            <button class="btn btn-solid a-pink">Pink</button>
-            <button class="btn btn-solid a-green">Green</button>
-            <button class="btn btn-solid a-blue">Blue</button>
-            <button class="btn btn-solid a-purple">Purple</button>
-          </div>
-          <div class="row">
-            <button class="btn btn-solid a-blue"><span class="spinner"></span>Loading</button>
-            <button class="btn btn-solid a-pink" disabled>Disabled</button>
-          </div>
-        </div>
-        <div class="block">
-          <div class="block-title">Outline</div>
-          <div class="row">
-            <button class="btn btn-outline a-pink">Pink</button>
-            <button class="btn btn-outline a-green">Green</button>
-            <button class="btn btn-outline a-blue">Blue</button>
-            <button class="btn btn-outline a-purple">Purple</button>
-          </div>
-        </div>
-        <div class="block">
-          <div class="block-title">Ghost &amp; icon</div>
-          <div class="row">
-            <button class="btn btn-ghost">Ghost</button>
-            <button class="btn btn-ghost" disabled>Disabled</button>
-          </div>
-          <div class="row">
-            <button class="btn-icon" aria-label="Settings">&#9881;</button>
-            <button class="btn-icon" aria-label="Add">+</button>
-            <button class="btn-icon" aria-label="Delete" disabled>&#215;</button>
-          </div>
-          <p class="hint">Hover, press and tab to these for hover / active / focus.</p>
-        </div>
-      </div>
-    </section>
-
-    <!-- ================= Inputs ================= -->
-    <section class="cat">
-      <div class="cat-head">
-        <h3 class="cat-title">Inputs</h3>
-        <p class="cat-note">Focus, hover and disabled states all come from tokens.</p>
-      </div>
-
-      <div class="cat-grid">
-        <div class="block">
-          <div class="block-title">Text</div>
-          <label class="field">
-            <span class="field-label">Base URL</span>
-            <input class="input" type="text" placeholder="https://example.com">
-          </label>
-          <label class="field">
-            <span class="field-label">Notes</span>
-            <textarea class="textarea" placeholder="Longer text…"></textarea>
-          </label>
-        </div>
-
-        <div class="block">
-          <div class="block-title">Input group, native select, disabled</div>
-          <label class="field">
-            <span class="field-label sub">Route name</span>
-            <div class="input-group">
-              <input class="input" type="text" placeholder="my-route">
-              <button class="btn-icon" aria-label="Saved routes" title="Saved routes">&#9662;</button>
-            </div>
-          </label>
-          <label class="field">
-            <span class="field-label">Format</span>
-            <select class="select"><option>Markdown</option><option>HTML</option><option>Plain text</option></select>
-          </label>
-          <label class="field">
-            <span class="field-label">Disabled</span>
-            <input class="input" type="text" value="Read only" disabled>
-          </label>
-        </div>
-
-        <div class="block">
-          <div class="block-title">Radios, checkboxes, switches</div>
-          <div class="row" role="radiogroup" aria-label="Scope">
-            <label class="choice"><input type="radio" name="scope-${id}" checked>Whole page</label>
-            <label class="choice"><input type="radio" name="scope-${id}">Selection</label>
-            <label class="choice"><input type="radio" name="scope-${id}" disabled>Disabled</label>
-          </div>
-          <div class="row">
-            <label class="choice"><input type="checkbox" checked>Include hidden</label>
-            <label class="choice"><input type="checkbox">Strip styles</label>
-            <label class="choice"><input type="checkbox" disabled>Disabled</label>
-          </div>
-          <div class="row">
-            <label class="switch"><input type="checkbox" checked><span class="track"><span class="thumb"></span></span>Enabled</label>
-            <label class="switch"><input type="checkbox"><span class="track"><span class="thumb"></span></span>Off</label>
-            <label class="switch"><input type="checkbox" disabled><span class="track"><span class="thumb"></span></span>Disabled</label>
-          </div>
-        </div>
-      </div>
-
-      <h4 class="sub-head">Select — list organizations</h4>
-
-      <div class="cat-grid">
-        <div class="block">
-          <div class="block-title">Plain</div>
-          <div class="field">
-            <label class="field-label" for="dd-plain-${id}">Export format</label>
-            <select id="dd-plain-${id}" data-dropdown>
-              <option value="md" selected>Markdown</option>
-              <option value="html">HTML</option>
-              <option value="pdf">PDF</option>
-              <option value="txt">Plain text</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="block">
-          <div class="block-title">Icons + secondary text</div>
-          <div class="field">
-            <label class="field-label" for="dd-env-${id}">Environment</label>
-            <select id="dd-env-${id}" data-dropdown>
-              <option value="prod" data-dropdown-icon="ac-icon-rocket" data-dropdown-secondary="app.example.com" selected>Production</option>
-              <option value="staging" data-dropdown-icon="ac-icon-flask" data-dropdown-secondary="staging.example.com">Staging</option>
-              <option value="local" data-dropdown-icon="ac-icon-laptop" data-dropdown-secondary="localhost:3000">Local</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="block">
-          <div class="block-title">Grouped + unavailable row</div>
-          <div class="field">
-            <label class="field-label" for="dd-region-${id}">Region</label>
-            <select id="dd-region-${id}" data-dropdown>
-              <optgroup label="Americas">
-                <option value="us-east">US East</option>
-                <option value="us-west">US West</option>
-                <option value="sa-east" disabled>South America (at capacity)</option>
-              </optgroup>
-              <optgroup label="Europe">
-                <option value="eu-west" selected>EU West</option>
-                <option value="eu-north">EU North</option>
-              </optgroup>
-            </select>
-          </div>
-        </div>
-
-        <div class="block">
-          <div class="block-title">Color swatches — this palette's accents</div>
-          <div class="field">
-            <label class="field-label" for="dd-palette-${id}">Accent order</label>
-            <select id="dd-palette-${id}" data-dropdown>
-              <option value="all" data-dropdown-swatch="${sw}" selected>Pink · green · blue · purple</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="block">
-          <div class="block-title">Empty state</div>
-          <div class="field">
-            <label class="field-label" for="dd-empty-${id}">Saved filter</label>
-            <select id="dd-empty-${id}" data-dropdown data-dropdown-empty-text="No saved filters yet"></select>
-          </div>
-        </div>
-
-        <div class="block">
-          <div class="block-title">Disabled</div>
-          <div class="field">
-            <label class="field-label" for="dd-locked-${id}">Plan</label>
-            <select id="dd-locked-${id}" data-dropdown disabled>
-              <option value="team" selected>Team (contact sales to change)</option>
-            </select>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ================= Feedback ================= -->
-    <section class="cat">
-      <div class="cat-head">
-        <h3 class="cat-title">Feedback</h3>
-        <p class="cat-note">Status never rides on hue alone — each pairs color with a glyph or a word.</p>
-      </div>
-      <div class="cat-grid">
-        <div class="block">
-          <div class="block-title">Notices</div>
-          <div class="notice info"><span class="icon">&#9432;</span><span>Heads up — this is an informational message.</span></div>
-          <div class="notice success"><span class="icon">&#10003;</span><span>Success — your file was saved.</span></div>
-          <div class="notice warn"><span class="icon">&#9888;</span><span>Warning — double-check this value.</span></div>
-          <div class="notice error"><span class="icon">&#10007;</span><span>Error — something went wrong.</span></div>
-        </div>
-        <div class="block">
-          <div class="block-title">Badges, chips, tooltip, status</div>
-          <div class="row">
-            <span class="badge">New</span>
-            <span class="badge solid">Beta</span>
-            <button class="chip-toggle" aria-pressed="true">Filter A</button>
-            <button class="chip-toggle" aria-pressed="false">Filter B</button>
-          </div>
-          <div class="row">
-            <span class="tip" tabindex="0" aria-label="Tooltip demo"><span class="badge">Hover me</span><span class="tip-body" role="tooltip">Tooltip text</span></span>
-          </div>
-          <div class="row">
-            <span class="status ok">&#10003; Ready</span>
-            <span class="status err">&#10007; Failed</span>
-            <span class="status mut">Idle</span>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ================= Surfaces ================= -->
-    <section class="cat">
-      <div class="cat-head">
-        <h3 class="cat-title">Surfaces</h3>
-        <p class="cat-note">Tabs, grouped fields, the result readout and the gradient scrollbar.</p>
-      </div>
-      <div class="cat-grid">
-        <div class="block">
-          <div class="block-title">Tabs</div>
-          <div class="tabs" role="tablist">
-            <button class="tab" role="tab" aria-selected="true">Overview</button>
-            <button class="tab" role="tab" aria-selected="false">Details</button>
-            <button class="tab" role="tab" aria-selected="false">History</button>
-          </div>
-        </div>
-        <div class="block">
-          <div class="block-title">Grouped fields</div>
-          <div class="group">
-            <span class="field-label">Grouped fields</span>
-            <input class="input" type="text" placeholder="Field in a group">
-          </div>
-        </div>
-        <div class="block">
-          <div class="block-title">Result readout</div>
-          <div class="result">
-            <div class="result-label">Result</div>
-            <div class="result-url">https://app.example.com/generated/route?id=42</div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ================= App recreations ================= -->
-    <section class="cat">
-      <div class="cat-head">
-        <h3 class="cat-title">App recreations</h3>
-        <p class="cat-note">The palette doing real work, not posing as a swatch sheet.</p>
-      </div>
-      <div class="cat-grid wide">
-        <div class="block">
-          <div class="block-title">URL Maker — from chrome-extension-url-maker</div>
-          <div class="app-frame fx-grid">
-            <div class="app-head"><span class="title">URL Maker</span><span class="badge">v2</span></div>
-            <div class="app-body">
-              <label class="field"><span class="field-label">Base URL</span><input class="input" type="text" value="https://app.example.com"></label>
-              <label class="field"><span class="field-label sub">Route</span>
-                <div class="input-group"><input class="input" type="text" value="dashboard"><button class="btn-icon" aria-label="History">&#9662;</button></div>
-              </label>
-              <div class="result"><div class="result-label">Generated URL</div><div class="result-url">https://app.example.com/dashboard</div></div>
-            </div>
-            <div class="app-foot">
-              <button class="btn btn-solid a-blue">Create</button>
-              <button class="btn btn-solid a-green">Create &amp; Go</button>
-            </div>
-          </div>
-        </div>
-
-        <div class="block">
-          <div class="block-title">Page to Markdown — from download-webpage-content</div>
-          <div class="app-frame">
-            <div class="app-head fx-bar-top"><span class="title">Page → Markdown</span></div>
-            <div class="app-body">
-              <div class="row" role="radiogroup" aria-label="Extraction scope">
-                <label class="choice"><input type="radio" name="pm-${id}" checked>Whole page</label>
-                <label class="choice"><input type="radio" name="pm-${id}">Main content</label>
-              </div>
-              <label class="choice"><input type="checkbox">Include hidden elements</label>
-            </div>
-            <div class="preview fx-scroll">
-              <h1>Extracted Title</h1>
-              <p>Rendered markdown preview with a <a href="#${id}">link</a> and inline text.</p>
-              <h2>Section</h2>
-              <p>Paragraph under a section heading.</p>
-              <pre>const theme = "neon";
-console.log(theme);</pre>
-              <blockquote>A blockquote, tinted with the purple accent.</blockquote>
-              <hr>
-              <h3>Footnotes</h3>
-              <p>Trailing content below the divider.</p>
-            </div>
-            <div class="app-foot fx-bar-bottom" style="justify-content:flex-end">
-              <button class="btn btn-outline a-pink">Copy</button>
-              <button class="btn btn-outline a-green">Download</button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-  </div>`;
-}
 function contrastTable(id) {
   const data = window.CONTRAST && window.CONTRAST[id];
   if (!data) return '';
@@ -636,6 +239,12 @@ function contrastTable(id) {
 /* Render sections + nav */
 const main = document.getElementById('main');
 const nav = document.getElementById('jumpNav');
+
+/* One symbol library for the whole document, from the shared template: <symbol>
+   resolves by id, so all 16 galleries point their <use> at these three and each
+   copy still paints in its own palette (the icons inherit currentColor). */
+main.insertAdjacentHTML('afterbegin', ThemeGallery.SPRITE);
+
 let navHTML = '';
 let lastGroup = '';
 const groupsSeen = new Set();
@@ -669,7 +278,23 @@ PALETTES.forEach(p => {
       </button>
     </div>
     ${contrastTable(p.id)}
-    ${galleryHTML(p.id)}
+    <div class="sec-body">${ThemeGallery.html({
+      // Every id/name in the gallery is suffixed with the palette id: this markup
+      // is stamped out 16 times into one document, and a duplicate id would break
+      // both <label for> and the dropdown's aria-labelledby.
+      sfx: p.id,
+      // The page is h1, each palette h2 — so a category is h3 here (preview.html,
+      // with one gallery under its page title, passes 2).
+      heading: 3,
+      // Same reason as sfx, for the region's accessible name: without the theme
+      // spelled out, this document offers sixteen regions called "Typography".
+      // Both parts of the .sec-head naming are needed, not just the <h2>: the
+      // labels alone repeat (dark and light are each "Rink Classic"), and it is
+      // the .grp-tag above them that says which. Reads as
+      // "Typography for Rink Classic, Faithful · Dark".
+      name: `${p.label}, ${p.group}`,
+      swatches: accentsOf(p.id).join(','),
+    })}</div>
   `;
   main.appendChild(section);
 
@@ -702,7 +327,7 @@ main.addEventListener('click', e => {
     return;
   }
   // No dropdown handler here any more: the select examples are enhanced by
-  // scripts/dropdown.js, which owns its own open/close, outside-click and key
+  // themes/dropdown.js, which owns its own open/close, outside-click and key
   // handling. The hand-rolled .drop-toggle listener this replaced was the last
   // thing on the page driving the legacy .drop component.
   // Tabs

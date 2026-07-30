@@ -19,6 +19,7 @@ themes/  (COMMITTED, hand-authored): effects.css  components.css  dropdown.css  
 consuming apps                 ← include theme.css+effects.css+components.css, set data-theme
 
 discovery/draft-<n>/  ← optional review playground (owner): node tools/build-palettes.mjs <n> --write
+gallery/              ← the component gallery, rendered by BOTH preview.html and the discovery page
 ```
 
 - **Built-ins vs local:** `build-final.mjs` merges the origin's built-in themes (from `draft-3.mjs`,

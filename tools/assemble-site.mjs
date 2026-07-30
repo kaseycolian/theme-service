@@ -63,6 +63,12 @@ cpSync('themes', '_site/themes', {
   filter: (src) => !src.endsWith('preview.html'),
 });
 
+// The shared component gallery (gallery.js + gallery.css), which the preview page
+// renders after its page head. No rewrite needed: preview.html lives in themes/ and
+// links ../gallery/…, which resolves to the repo root here and to _site/gallery/
+// from /preview/ — the same place either way.
+cpSync('gallery', '_site/gallery', { recursive: true });
+
 // Site assets (favicon + brand mark + the scripts that re-color them per theme).
 // Served from
 // /assets/ for both pages: the home page's ../assets/ was rewritten above, and
@@ -77,6 +83,7 @@ cpSync('assets', '_site/assets', {
 // Sanity: the load-bearing files must exist
 for (const f of ['_site/index.html', '_site/preview/index.html', '_site/themes/theme.css', '_site/themes/theme-init.js',
                  '_site/themes/dropdown.css', '_site/themes/dropdown.js',
+                 '_site/gallery/gallery.js', '_site/gallery/gallery.css',
                  '_site/assets/favicon.svg', '_site/assets/favicon-theme.js',
                  '_site/assets/brand-mark.svg', '_site/assets/brand-mark-theme.js']) {
   if (!existsSync(f)) {

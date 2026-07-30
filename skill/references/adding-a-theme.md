@@ -51,6 +51,8 @@ discovery→finalize flow; it supports either brand-consistent variants or a del
    with `node tools/build-palettes.mjs <n> --write` → `discovery/draft-<n>/index.html`.
 4. **Verify** in `themes/preview.html` (the new theme appears in the switcher and renders correctly),
    then walk `wcag-checklist.md`. **Never delete existing themes** to make room — only add.
+   Both that page and the draft page render the same gallery (`gallery/`), so either one exercises
+   every component; use the draft page when you want all palettes side by side.
 5. **Commit** in the source repo (git-local persists; push optional). **Origin owner cutting a
    release:** `npm run release <patch|minor|major> -- --note "…"` bumps `VERSION`, updates `CHANGELOG`,
    commits, and tags `vX.Y.Z`.

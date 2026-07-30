@@ -19,7 +19,7 @@ the palette files (`tools/palettes/draft-*.mjs` built-in + `local.mjs` yours).
 | `themes.index.json` | Registry: families, modes, and the default — drives theme pickers and the add-theme flow. |
 | `theme-init.js` | **External** (CSP-safe) script: applies the saved/`?theme=` theme before first paint. Load in `<head>`. |
 | `theme-select.js` | **External** (CSP-safe, generated) script: populates & wires any `<select data-theme-select>` + `[data-motion-toggle]`. |
-| `preview.html` | Live theme switcher + usage example. Open it in a browser. |
+| `preview.html` | Live theme switcher + usage example. Open it in a browser. Its component gallery is rendered from `gallery/` — the same template the palette discovery page uses, so the two can't drift. Add a card there, not here. |
 
 ## Use it in an app
 

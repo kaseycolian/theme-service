@@ -21,8 +21,9 @@ history log so a later session can revisit it.
      re-colored. Lowest risk, smallest diff. Change as little of the components' own styling as
      possible while pulling the palette through.
    - **Full restyle to match the theme-service look:** components adopt the same **look, feel, and
-     interaction** as the gallery in `discovery/draft-2/index.html` (and `themes/preview.html`) by
-     using the `components.css` classes — while **preserving all existing functionality**. Bigger
+     interaction** as the reference gallery in `gallery/gallery.js` — the one both `themes/preview.html`
+     and the discovery page render, so it is the canonical example of every component in its intended
+     markup — by using the `components.css` classes, while **preserving all existing functionality**. Bigger
      visual change and more work; only do it if the user opts in. Do **not** rewrite the whole UI
      without this explicit go-ahead.
    - If they're unsure, offer a **visual before/after** (a small scratch page or screenshots of a few
@@ -114,8 +115,9 @@ Use the component classes directly; the app inherits the full look for free.
    `.btn-icon`, `.input`, `.textarea`, `.select`, `.field`/`.field-label`, `.drop`/`.drop-toggle`/
    `.drop-panel`, `.choice`, `.switch`, `.notice.{info,success,warn,error}`, `.badge`, `.chip-toggle`,
    `.tabs`/`.tab`, `.result`, `.t-h1..t-h4`/`.t-body`/`.t-muted`/`.t-link`, and effect classes
-   `.fx-grid`, `.fx-scroll`, `.fx-bar-top`/`.fx-bar-bottom`. (See the source `themes/preview.html`
-   and `discovery/draft-2/index.html` for a full gallery of every class + state.)
+   `.fx-grid`, `.fx-scroll`, `.fx-bar-top`/`.fx-bar-bottom`. (See `gallery/gallery.js` for a full
+   gallery of every class + state in its intended markup — it is what both `themes/preview.html` and
+   `discovery/draft-N/index.html` render, so it is the one authoritative copy.)
 3. Add the **theme selector** (below) and the **motion toggle** (optional).
 4. Verify against `wcag-checklist.md`.
 
