@@ -18,6 +18,18 @@
 (function () {
   'use strict';
 
+  /* The only caller-supplied string that reaches the markup is the theme name,
+     and it lands inside a double-quoted attribute. It comes from a palette
+     source in this repo rather than from a user, but it is still data being
+     concatenated into HTML, so it gets escaped rather than trusted. */
+  function esc(s) {
+    return String(s)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
   /* One symbol library for the whole document, injected by mount() or by the
      discovery render loop. <symbol> resolves by id, so 16 galleries can all
      point their <use href="#ac-icon-…"> at these three; the icons inherit
@@ -72,6 +84,9 @@
        heading  rank for .cat-title. 2 where the page <h1> is the page title
                 (preview), 3 where an <h2> already names the palette (discovery).
                 The Inputs sub-head follows at heading + 1.
+       name     the theme/palette this copy renders, e.g. 'Rink Classic'. Given,
+                each section is labelled "<Category> for <name>"; omitted, the
+                section points at its own visible heading. See cat() below.
        swatches "#hex,#hex,#hex,#hex" for the accent-swatch card, or null for the
                 built-in theme list above.
      ------------------------------------------------------------------------- */
@@ -81,17 +96,35 @@
     var q = sfx ? '-' + sfx : '';              // id suffix
     var h = Number(o.heading) || 2;            // .cat-title rank
     var hs = h + 1;                            // .sub-head rank
+    var name = o.name ? String(o.name) : '';   // theme this copy renders
     var here = sfx ? '#' + sfx : '#';          // "link to this page" target
     var swatchOptions = o.swatches
       ? '<option value="all" data-dropdown-swatch="' + o.swatches + '" selected>Pink · green · blue · purple</option>'
       : BUILTIN_SWATCH_OPTIONS;
 
-    /* Every category is built through this, so the id / aria-labelledby /
+    /* Every category is built through this, so the id / accessible-name /
        heading-rank contract holds by construction rather than by 6 careful
-       copies. Slugs are the anchors preview.html's .cat-nav links. */
+       copies. Slugs are the anchors preview.html's .cat-nav links.
+
+       Naming the region depends on how many galleries share the document:
+
+         name given (discovery, 16 copies)  aria-label="Typography for Rink Classic"
+         no name  (preview, one copy)       aria-labelledby -> its own heading
+
+       Pointing at the heading is the better of the two — the accessible name is
+       then guaranteed to match the visible text — but it only works while the
+       heading says something unique. Stamped out per palette, sixteen regions
+       all announce "Typography" and the landmark/region list a screen-reader
+       user navigates by becomes six labels repeated sixteen times, with nothing
+       to tell them apart. The visible heading can stay short there because the
+       palette's <h2> is right above it on screen; the accessible name cannot
+       borrow that context, so it spells the theme out. */
     function cat(slug, title, note, body) {
+      var label = name
+        ? `aria-label="${esc(title + ' for ' + name)}"`
+        : `aria-labelledby="h-${slug}${q}"`;
       return `
-    <section class="cat" id="cat-${slug}${q}" aria-labelledby="h-${slug}${q}">
+    <section class="cat" id="cat-${slug}${q}" ${label}>
       <div class="cat-head">
         <h${h} class="cat-title" id="h-${slug}${q}">${title}</h${h}>
         <p class="cat-note">${note}</p>
@@ -432,7 +465,8 @@ console.log(theme);</pre>
        <div id="gallery" data-gallery data-gallery-heading="2"></div>
 
      and loads this file AFTER it (or with defer). Optional attributes:
-     data-gallery-suffix, data-gallery-swatches, data-gallery-heading.
+     data-gallery-suffix, data-gallery-swatches, data-gallery-heading,
+     data-gallery-name.
 
      Load this BEFORE themes/dropdown.js: whether we mount synchronously (host
      already parsed) or on DOMContentLoaded (script in <head>), the gallery's six
@@ -444,6 +478,7 @@ console.log(theme);</pre>
     host.innerHTML = SPRITE + html({
       sfx: host.getAttribute('data-gallery-suffix') || '',
       heading: host.getAttribute('data-gallery-heading') || 2,
+      name: host.getAttribute('data-gallery-name') || '',
       swatches: host.getAttribute('data-gallery-swatches') || null,
     });
     host.setAttribute('data-gallery-mounted', '');

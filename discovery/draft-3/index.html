@@ -286,6 +286,13 @@ PALETTES.forEach(p => {
       // The page is h1, each palette h2 — so a category is h3 here (preview.html,
       // with one gallery under its page title, passes 2).
       heading: 3,
+      // Same reason as sfx, for the region's accessible name: without the theme
+      // spelled out, this document offers sixteen regions called "Typography".
+      // Both parts of the .sec-head naming are needed, not just the <h2>: the
+      // labels alone repeat (dark and light are each "Rink Classic"), and it is
+      // the .grp-tag above them that says which. Reads as
+      // "Typography for Rink Classic, Faithful · Dark".
+      name: `${p.label}, ${p.group}`,
       swatches: accentsOf(p.id).join(','),
     })}</div>
   `;

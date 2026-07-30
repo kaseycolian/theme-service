@@ -22,22 +22,23 @@ A **category** is a kind of component (Typography, Inputs, …). A **block** is 
 - **Add a component:** add a `.block` inside the right `.cat-grid` in `gallery.js`. No CSS, no layout
   work — `.cat-grid` is `auto-fit` + `minmax`, so it picks its own column count.
 - **Add a category:** add one `cat('<slug>', 'Title', 'Note', \`…\`)` entry in `gallery.js`, then one
-  `<a href="#cat-<slug>">` line in `themes/preview.html`'s `.cat-nav`. The section id,
-  `aria-labelledby` and heading rank come from the `cat()` helper, so they can't drift.
+  `<a href="#cat-<slug>">` line in `themes/preview.html`'s `.cat-nav`. The section id, accessible name
+  and heading rank come from the `cat()` helper, so they can't drift.
 - Both pages pick the change up on reload. There is no build step.
 
 ## The API
 
 ```js
-ThemeGallery.html({ sfx, heading, swatches })  // -> the six <section class="cat"> blocks
-ThemeGallery.SPRITE                            // the <svg class="sprite"> symbol library
-ThemeGallery.mount(hostEl)                     // hostEl.innerHTML = SPRITE + html(...)
+ThemeGallery.html({ sfx, heading, name, swatches })  // -> the six <section class="cat"> blocks
+ThemeGallery.SPRITE                                  // the <svg class="sprite"> symbol library
+ThemeGallery.mount(hostEl)                           // hostEl.innerHTML = SPRITE + html(...)
 ```
 
 | Option | Why it exists |
 |--------|---------------|
 | `sfx` | Suffix for every `id` / `for` / radio `name` and the in-page anchors. `''` on a page with one gallery; the palette id on the discovery page, where 16 copies share one document and duplicate ids would break both `<label for>` and the dropdown's `aria-labelledby`. |
 | `heading` | Rank for `.cat-title`; `.sub-head` follows at `heading + 1`. `2` where the page `<h1>` is the page title (preview), `3` where an `<h2>` already names the palette (discovery). |
+| `name` | The theme this copy renders. Given, each region is labelled **"`<Category>` for `<name>`"** (`aria-label="Typography for Rink Classic"`); omitted, the region points at its own visible heading (`aria-labelledby`). Discovery passes the palette label for the same reason it passes `sfx`: sixteen regions all called "Typography" give a screen-reader user nothing to navigate by, and the visible heading can't spell the theme out because the palette's `<h2>` already does that on screen. A single-gallery page should omit it — matching the visible heading is the stronger option whenever it's unambiguous. |
 | `swatches` | `"#hex,#hex,#hex,#hex"` for the accent-swatch card. The only content that legitimately differs per page: discovery passes the palette it is sitting in (a fixed set of hexes would look identical in all 16 sections and prove nothing), preview falls back to the built-in theme families. |
 
 ## The two call sites
@@ -52,7 +53,7 @@ ThemeGallery.mount(hostEl)                     // hostEl.innerHTML = SPRITE + ht
 ```
 
 `gallery.js` mounts every `[data-gallery]` (reading `data-gallery-heading`, `data-gallery-suffix`,
-`data-gallery-swatches`) as soon as it runs, and again on `DOMContentLoaded` if the host wasn't parsed
+`data-gallery-name`, `data-gallery-swatches`) as soon as it runs, and again on `DOMContentLoaded` if the host wasn't parsed
 yet — `mount()` is idempotent. **Load it before `themes/dropdown.js`** either way: that script
 enhances `[data-dropdown]` on its own `DOMContentLoaded` pass, and this ordering guarantees the
 gallery's six selects are in the DOM by then.
@@ -63,7 +64,7 @@ gallery's six selects are in the DOM by then.
 main.insertAdjacentHTML('afterbegin', ThemeGallery.SPRITE);   // one sprite for the document
 …
 `<div class="sec-body">${ThemeGallery.html({
-   sfx: p.id, heading: 3, swatches: accentsOf(p.id).join(','),
+   sfx: p.id, heading: 3, name: p.label, swatches: accentsOf(p.id).join(','),
  })}</div>`
 ```
 

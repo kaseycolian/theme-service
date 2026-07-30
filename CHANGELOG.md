@@ -27,6 +27,13 @@ once appears on both. No token changed and nothing an app vendors changed behavi
   they are declared, so this is what lets one file serve both the app path (`:root` + `theme.css`) and
   the discovery page (a different palette per section, nothing on `:root`). **Inert for consuming
   apps** — no app has a `[data-palette]` attribute.
+- **A11y — the discovery page's 96 component regions had 6 names between them.** Every
+  `section.cat` was named by its own `<h3>`, so a screen-reader user moving by region heard
+  "Typography", "Buttons", … sixteen times over with nothing to say which palette they were in. The
+  gallery takes an optional `name` and labels each region **"`<Category>` for `<theme>`"**; discovery
+  passes the palette's visible label *and* group (`"Typography for Rink Classic, Faithful · Dark"`)
+  because the labels alone repeat — dark and light are each "Rink Classic". `themes/preview.html`
+  renders one gallery, so it omits `name` and keeps pointing at its own visible headings.
 - Renamed while moving into the shared stylesheet: `.preview` → `.app-preview`,
   `.app-head .title` → `.app-title` (both were too generic for a shared file). They only ever existed
   on the discovery page.
