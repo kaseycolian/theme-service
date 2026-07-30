@@ -1,12 +1,14 @@
 # Theme Service
 
-A lightweight, framework-agnostic theme system for consistent branding — a "90s skating rink"
-neon aesthetic — across many apps (vanilla JS/CSS, Angular, React). The source of truth is plain
-**CSS custom properties** (with a JSON mirror), so it drops into any stack with **no build step**.
-Every theme passes **WCAG AA 2.2** in all states.
+Create **WCAG 2.2 compliant** themes, then install them into a new or existing app. Use the themes
+that ship here, or use the skill (`AGENTS.md` for other agents) to create your own — a guided process
+for choosing colors that checks contrast as it goes. **A theme that fails WCAG 2.2 AA is never
+written.** Accessibility is handled at the palette stage, before any app consumes the theme.
 
-Ships with **16 themes** (5 families × dark/light, plus "No Background" variants). Default is
-**Rink Classic** (dark, auto-light by OS). See them in `themes/preview.html`.
+Lightweight and framework-agnostic: the source of truth is plain **CSS custom properties** (with a
+JSON mirror), so it drops into vanilla JS/CSS, Angular, or React with **no build step** for the app
+consuming it. Default theme is **Rink Classic** (dark, auto-light by OS).
+`themes/preview.html` shows every theme in real components.
 
 **New here?** Start with the **[Visual Overview](docs/OVERVIEW.md)** — diagrams of what it is, how you
 use it, and the clone / save / update workflow (local + optional GitHub).
@@ -16,7 +18,8 @@ use it, and the clone / save / update workflow (local + optional GitHub).
 ## Two ways to use it
 
 You can use everything **as-is** without touching the theme-creation process — or opt into the full
-guided workflow to add and change themes. Pick your path:
+guided workflow to add and change themes. Both paths are contrast-checked the same way. Pick your
+path:
 
 ### Path 1 — Use the themes as-is
 
@@ -36,9 +39,9 @@ Install once, then apply the existing themes to any repo on your machine. No pal
 3. **Apply to any repo.** Open that repo in Claude Code (or another agent) and say:
    > Use the theme-service skill to add multi-theme support + a theme selector to this app, mapping
    > the existing components onto the theme tokens; build it and confirm every theme renders and
-   > passes WCAG AA.
+   > passes WCAG 2.2 AA.
 
-   The agent vendors the theme CSS, wires a theme picker (all 16 themes), and maps the app's existing
+   The agent vendors the theme CSS, wires a theme picker (all themes), and maps the app's existing
    components onto the tokens — existing markup untouched. Full prompts & per-case variants:
    **[USAGE.md](USAGE.md)**.
 
@@ -115,7 +118,7 @@ CHANGELOG.md  VERSION   (VERSION is the single source of truth; `npm run release
 
 ## The themes
 
-16 themes across 5 families, each in dark + light, several with a grid-off "(No Background)" variant:
+Five families, each in dark + light, several with a grid-off "(No Background)" variant:
 `rink-classic`, `midnight-arcade`, `hot-neon`, `synthwave-sunset`, `acid-arcade`. Default is
 **Rink Classic**. Theme ids are `<family>-<mode>` (e.g. `synthwave-sunset-dark`) and
 `<family>-<mode>-no-background` for the grid-off variants.
@@ -126,7 +129,8 @@ are in [`themes/README.md`](themes/README.md).
 
 ## Explore the themes
 
-- **`themes/preview.html`** — the finalized themes with a live switcher (open in a browser).
+- **`themes/preview.html`** — the template page: every finished theme shown in real components, with a
+  live switcher (open in a browser).
 - **`discovery/index.html`** — the draft playground: every candidate palette rendered with the full
   component gallery, side by side, with computed AA ratios. Reference for the creation process.
 
@@ -145,7 +149,7 @@ would point at a commit missing the work it claims to ship. Commit your feature 
 upgrade affects them. It prints the bump rule and `X.Y.Z -> X.Y.Z` and asks to confirm before writing;
 pass `--yes` to skip that.
 
-The generators **refuse to write if any pair fails WCAG AA** (your own `local.mjs` themes are validated
+The generators **refuse to write if any pair fails WCAG 2.2 AA** (your own `local.mjs` themes are validated
 too). The standalone checker is in [`tools/contrast-checker/`](tools/contrast-checker/) (library + CLI,
 usable in any project).
 

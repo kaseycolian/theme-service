@@ -34,7 +34,6 @@
   .page-lead { color: var(--text-muted); max-width: 64ch; line-height: 1.55; margin: 0 0 28px; }
 
   /* --- Diagram component system (token-driven; reused by all overview diagrams) --- */
-  .diagram { position: relative; }
   .node-card {
     --node-accent: var(--border-strong);
     background: color-mix(in srgb, var(--bg-panel) 88%, transparent);
@@ -63,11 +62,19 @@
   .ov-section > .ov-lead { color: var(--text-muted); margin: 0 0 20px; max-width: 64ch; line-height: 1.55; }
   .flow-row { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
   .flow-col { display: flex; flex-direction: column; gap: 12px; }
-  .flow-row .node-card { flex: 1 1 160px; min-width: 150px; }
+  /* Direct child only: a 160px basis is a width in a .flow-row, but it would become
+     a 160px *height* on cards inside a nested .flow-col, padding them out with dead
+     space. Those cards should size to their content. */
+  .flow-row > .node-card { flex: 1 1 160px; min-width: 150px; }
+  /* A column of alternatives branching off a row. The basis is a preferred WIDTH, so
+     it has to be dropped once .flow-row stacks — otherwise it reads as a 300px
+     min-height and leaves dead space under the last card. */
+  .flow-row > .flow-branch { flex: 1 1 300px; }
   .flow-arrow { flex: 0 0 40px; align-self: center; }
   @media (max-width: 720px) {
     .flow-row { flex-direction: column; align-items: stretch; }
-    .flow-row .node-card { flex: 1 1 auto; }
+    .flow-row > .node-card { flex: 1 1 auto; }
+    .flow-row > .flow-branch { flex: 0 0 auto; }
     .flow-arrow { transform: rotate(90deg); align-self: center; }
   }
 
@@ -150,10 +157,11 @@
 </header>
 
 <main id="main">
-  <h1 class="page-title">What it is, in one picture</h1>
-  <p class="page-lead">One consistent "90s skating rink" neon look — 16 themes, dark + light, all
-  WCAG&nbsp;AA — that any agent can drop into any app. Switch the theme above: this page re-skins
-  through the same tokens every app gets.</p>
+  <h1 class="page-title">Create WCAG 2.2 compliant themes</h1>
+  <p class="page-lead">Use the themes that ship here, or use the skill (AGENTS.md for other agents)
+  to create your own — a guided process for choosing colors that checks contrast as it goes. A theme
+  that fails WCAG&nbsp;2.2 AA is never written. The same skill then installs your themes into a new
+  or existing app.</p>
 
   <section id="hero-export">
     <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -172,84 +180,88 @@
 
     <div class="hero-row">
       <div class="node-card">
-        <span class="node-label">Source</span>
-        <span class="node-sub">built-in + your palettes<br>tools/palettes/*.mjs</span></div>
+        <span class="node-label">Palette</span>
+        <span class="node-sub">built-in set or your own colors<br>tools/palettes/*.mjs</span></div>
       <svg class="hero-arrow" width="46" height="24" viewBox="0 0 46 24" aria-hidden="true">
         <path class="connector" d="M2 12 H36"/>
         <path class="connector" d="M30 6 L40 12 L30 18"/>
       </svg>
       <div class="node-card node-card--accent" style="--node-accent: var(--accent-purple)">
-        <span class="node-label">Build</span>
-        <span class="node-sub">npm run build-themes<br>validates WCAG AA</span></div>
+        <span class="node-label">Build + contrast check</span>
+        <span class="node-sub">npm run build-themes<br>fails WCAG 2.2 AA → not written</span></div>
       <svg class="hero-arrow" width="46" height="24" viewBox="0 0 46 24" aria-hidden="true">
         <path class="connector" d="M2 12 H36"/>
         <path class="connector" d="M30 6 L40 12 L30 18"/>
       </svg>
       <div class="node-card node-card--accent" style="--node-accent: var(--accent-blue)">
-        <span class="node-label">themes/ output</span>
+        <span class="node-label">Validated themes</span>
         <span class="node-sub">theme.css · tokens.json · helpers</span></div>
       <svg class="hero-arrow" width="46" height="24" viewBox="0 0 46 24" aria-hidden="true">
         <path class="connector" d="M2 12 H36"/>
         <path class="connector" d="M30 6 L40 12 L30 18"/>
       </svg>
       <div class="node-card">
-        <span class="node-label">Your apps</span>
-        <span class="node-sub">vendor the CSS + a theme picker</span></div>
+        <span class="node-label">Your app</span>
+        <span class="node-sub">new or legacy — vendor the CSS + a theme picker</span></div>
     </div>
 
     <div class="hero-skill">
       <div class="node-card" style="--node-accent: var(--accent-green)">
         <span class="node-label">Claude skill / AGENTS.md</span>
-        <span class="node-sub">apply · update · create</span>
-        <p class="flow-caption">drives the build &amp; wires your apps</p></div>
+        <span class="node-sub">create · validate · install</span>
+        <p class="flow-caption">guides theme creation and wires your app</p></div>
     </div>
 
     <svg class="hero-skill-connector" viewBox="0 0 960 256" preserveAspectRatio="none" aria-hidden="true">
       <path class="connector connector--dashed" d="M480,141 Q410,100 357,122"/>
     </svg>
+
+    <p class="node-sub" style="margin-top:12px">Switch the theme in the header — this page uses the
+    same tokens your app gets.</p>
   </section>
 
   <section class="ov-section" id="two-ways">
-    <h2>Who uses it, and the two ways in</h2>
-    <p class="ov-lead">You never have to touch theme creation to get value — Path 1 stands alone.</p>
+    <h2>Two ways in</h2>
+    <p class="ov-lead">You never have to create a theme to get value — Path 1 stands alone. Both paths
+    are contrast-checked the same way.</p>
     <div class="flow-row">
       <div class="node-card node-card--accent" style="--node-accent: var(--accent-purple)">
         <span class="node-label">You</span>
         <span class="node-sub">what do you want?</span></div>
       <svg class="flow-arrow" width="40" height="24" viewBox="0 0 46 24" aria-hidden="true">
         <path class="connector" d="M2 12 H36"/><path class="connector" d="M30 6 L40 12 L30 18"/></svg>
-      <div class="flow-col" style="flex:1 1 320px">
+      <div class="flow-col flow-branch">
         <div class="flow-row">
           <div class="node-card" style="--node-accent: var(--accent-pink)">
-            <span class="node-label">Path 1 — Use the themes as-is</span>
-            <span class="node-sub">install the skill → apply 16 themes to any app<br>npm run install-all</span></div>
+            <span class="node-label">Path 1 — Use the themes that ship here</span>
+            <span class="node-sub">install the skill → apply them to any app<br>npm run install-all</span></div>
           <svg class="flow-arrow" width="40" height="24" viewBox="0 0 46 24" aria-hidden="true">
             <path class="connector" d="M2 12 H36"/><path class="connector" d="M30 6 L40 12 L30 18"/></svg>
           <div class="node-card">
-            <span class="node-label">Apps get a theme picker</span>
-            <span class="node-sub">every theme AA-validated</span></div>
+            <span class="node-label">Your app gets a theme picker</span>
+            <span class="node-sub">every theme already passes WCAG 2.2 AA</span></div>
         </div>
         <div class="flow-row">
           <div class="node-card" style="--node-accent: var(--accent-blue)">
-            <span class="node-label">Path 2 — Make your own themes</span>
-            <span class="node-sub">add a palette, be guided, or design a new style<br>npm run build-themes</span></div>
+            <span class="node-label">Path 2 — Create your own themes</span>
+            <span class="node-sub">guided process for choosing colors<br>npm run build-themes</span></div>
           <svg class="flow-arrow" width="40" height="24" viewBox="0 0 46 24" aria-hidden="true">
             <path class="connector" d="M2 12 H36"/><path class="connector" d="M30 6 L40 12 L30 18"/></svg>
           <div class="node-card">
             <span class="node-label">Your themes join the set</span>
-            <span class="node-sub">reusable across all your apps</span></div>
+            <span class="node-sub">checked the same way, reusable across apps</span></div>
         </div>
       </div>
     </div>
   </section>
 
   <section class="ov-section" id="wf-apply">
-    <h2>Workflow A — Apply the themes to an app</h2>
+    <h2>Workflow A — Install themes into a new or existing app</h2>
     <p class="ov-lead">You ask; the agent does the wiring and confirms the choices that matter before changing anything.</p>
     <div class="flow-col" style="max-width:640px">
       <div class="node-card node-card--accent" style="--node-accent: var(--accent-pink)">
         <span class="node-label">"Apply the theme-service to this app"</span>
-        <span class="node-sub">you → Claude (skill)</span></div>
+        <span class="node-sub">you → Claude (skill) or any agent via AGENTS.md</span></div>
       <div style="align-self:center"><svg class="flow-arrow" style="transform:rotate(90deg)" width="40" height="24" viewBox="0 0 46 24" aria-hidden="true"><path class="connector" d="M2 12 H36"/><path class="connector" d="M30 6 L40 12 L30 18"/></svg></div>
       <div class="node-card">
         <span class="node-label">Locate the source</span>
@@ -261,14 +273,14 @@
       <div style="align-self:center"><svg class="flow-arrow" style="transform:rotate(90deg)" width="40" height="24" viewBox="0 0 46 24" aria-hidden="true"><path class="connector" d="M2 12 H36"/><path class="connector" d="M30 6 L40 12 L30 18"/></svg></div>
       <div class="node-card">
         <span class="node-label">Vendor CSS + map colors to tokens</span>
-        <span class="node-sub">agent → your app repo</span></div>
+        <span class="node-sub">legacy colors map onto tokens — markup untouched</span></div>
       <div style="align-self:center"><svg class="flow-arrow" style="transform:rotate(90deg)" width="40" height="24" viewBox="0 0 46 24" aria-hidden="true"><path class="connector" d="M2 12 H36"/><path class="connector" d="M30 6 L40 12 L30 18"/></svg></div>
       <div class="node-card">
         <span class="node-label">Add a theme picker + persistence</span>
         <span class="node-sub">all themes selectable</span></div>
       <div style="align-self:center"><svg class="flow-arrow" style="transform:rotate(90deg)" width="40" height="24" viewBox="0 0 46 24" aria-hidden="true"><path class="connector" d="M2 12 H36"/><path class="connector" d="M30 6 L40 12 L30 18"/></svg></div>
       <div class="node-card">
-        <span class="node-label">Verify WCAG AA + write tracking log</span>
+        <span class="node-label">Verify WCAG 2.2 AA + write tracking log</span>
         <span class="node-sub">THEME-SERVICE.md</span></div>
       <div style="align-self:center"><svg class="flow-arrow" style="transform:rotate(90deg)" width="40" height="24" viewBox="0 0 46 24" aria-hidden="true"><path class="connector" d="M2 12 H36"/><path class="connector" d="M30 6 L40 12 L30 18"/></svg></div>
       <div class="node-card node-card--accent" style="--node-accent: var(--accent-green)">
@@ -300,29 +312,44 @@
 
   <section class="ov-section" id="wf-create">
     <h2>Workflow C — Create or edit a theme</h2>
-    <p class="ov-lead">Three on-ramps, one destination: a validated palette that becomes a reusable theme.</p>
-    <div class="flow-row">
-      <div class="node-card node-card--accent" style="--node-accent: var(--accent-purple)">
-        <span class="node-label">Add / edit a theme</span><span class="node-sub">how?</span></div>
-      <svg class="flow-arrow" width="40" height="24" viewBox="0 0 46 24" aria-hidden="true">
-        <path class="connector" d="M2 12 H36"/><path class="connector" d="M30 6 L40 12 L30 18"/></svg>
-      <div class="flow-col" style="flex:1 1 300px">
-        <div class="node-card" style="--node-accent: var(--accent-pink)"><span class="node-label">I have a palette</span>
-          <span class="node-sub">give colors → agent fills gaps + validates AA</span></div>
-        <div class="node-card" style="--node-accent: var(--accent-blue)"><span class="node-label">Guide me</span>
-          <span class="node-sub">describe a vibe → agent proposes + iterates</span></div>
-        <div class="node-card" style="--node-accent: var(--accent-green)"><span class="node-label">A whole new style</span>
-          <span class="node-sub">design candidates in a discovery draft, compare side-by-side</span></div>
+    <p class="ov-lead">Three ways to start. All of them end at the same contrast check, and a palette
+    only becomes a theme if it passes.</p>
+    <!-- Two rows joined by a rotated arrow, the same nesting as #two-ways: the three
+         on-ramps converge on the check, then the check's two outcomes sit side by side. -->
+    <div class="flow-col">
+      <div class="flow-row">
+        <div class="node-card node-card--accent" style="--node-accent: var(--accent-purple)">
+          <span class="node-label">Add / edit a theme</span><span class="node-sub">how?</span></div>
+        <svg class="flow-arrow" width="40" height="24" viewBox="0 0 46 24" aria-hidden="true">
+          <path class="connector" d="M2 12 H36"/><path class="connector" d="M30 6 L40 12 L30 18"/></svg>
+        <div class="flow-col flow-branch">
+          <div class="node-card" style="--node-accent: var(--accent-pink)"><span class="node-label">I have a palette</span>
+            <span class="node-sub">give colors → agent fills gaps + checks contrast</span></div>
+          <div class="node-card" style="--node-accent: var(--accent-blue)"><span class="node-label">Guide me</span>
+            <span class="node-sub">describe a vibe → agent proposes + iterates</span></div>
+          <div class="node-card" style="--node-accent: var(--accent-green)"><span class="node-label">A whole new style</span>
+            <span class="node-sub">design candidates in a discovery draft, compare side-by-side</span></div>
+        </div>
+        <svg class="flow-arrow" width="40" height="24" viewBox="0 0 46 24" aria-hidden="true">
+          <path class="connector" d="M2 12 H36"/><path class="connector" d="M30 6 L40 12 L30 18"/></svg>
+        <div class="node-card node-card--accent" style="--node-accent: var(--accent-purple)">
+          <span class="node-label">Contrast check</span>
+          <span class="node-sub">npm run build-themes — every color pair</span></div>
       </div>
-      <svg class="flow-arrow" width="40" height="24" viewBox="0 0 46 24" aria-hidden="true">
-        <path class="connector" d="M2 12 H36"/><path class="connector" d="M30 6 L40 12 L30 18"/></svg>
-      <div class="flow-col" style="flex:1 1 180px">
-        <div class="node-card"><span class="node-label">local.mjs (yours)</span>
-          <span class="node-sub">npm run build-themes — AA-validated</span></div>
-        <div class="node-card"><span class="node-label">git commit</span>
-          <span class="node-sub">saved locally</span></div>
+      <div style="align-self:center"><svg class="flow-arrow" style="transform:rotate(90deg)" width="40" height="24" viewBox="0 0 46 24" aria-hidden="true"><path class="connector" d="M2 12 H36"/><path class="connector" d="M30 6 L40 12 L30 18"/></svg></div>
+      <div class="flow-row">
+        <div class="node-card node-card--accent" style="--node-accent: var(--accent-green)">
+          <span class="node-label">Passes — written to themes/</span>
+          <span class="node-sub">and shown on the
+            <a href="../themes/preview.html">template page</a>, in real components</span></div>
+        <!-- No connector between these two: they are the check's two outcomes, not a
+             sequence. The dashed border marks the refused one. -->
+        <div class="node-card" style="--node-accent: var(--accent-pink); border-style:dashed">
+          <span class="node-label">Fails — nothing written</span>
+          <span class="node-sub">adjust the palette and re-run</span></div>
       </div>
     </div>
+    <p class="node-sub" style="margin-top:12px">Dashed = the refused outcome. Nothing is written to themes/ until it passes.</p>
   </section>
 
   <section class="ov-section" id="wf-release">

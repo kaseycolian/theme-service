@@ -76,7 +76,7 @@ Themed dropdown component, plus `--glow-strength` finally applying per theme.
 - `tools/build-palettes.mjs` now emits `--glow-strength` per palette, so the discovery pages gate
   glow the same way the built themes do.
 - `themes/preview.html` reorganized into component categories (`section.cat` > `.cat-grid` >
-  `.block`), and `discovery/draft-3` rebuilt on the same system so a specimen designed on one page
+  `.block`), and `discovery/draft-3` rebuilt on the same system so a component designed on one page
   drops into the other unchanged.
 - `discovery/draft-3` contrast report regenerated: it was stale at **19** pairs per palette against
   the checker's **26** (the `--bg-elevated` pairs added for the dropdown panel were missing from the

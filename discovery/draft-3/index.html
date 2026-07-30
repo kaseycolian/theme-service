@@ -115,11 +115,11 @@
 
        .sec-body  >  section.cat  >  .cat-grid  >  .block
 
-     A CATEGORY is a kind of component; a BLOCK is one specimen card. Keeping
+     A CATEGORY is a kind of component; a BLOCK is one component card. Keeping
      the class names and the nesting identical to the preview page is the point:
-     a specimen designed there drops in here unchanged, and this page then shows
+     a component designed there drops in here unchanged, and this page then shows
      it against all 16 palettes at once. Nothing is positional — no nth-child,
-     no per-category rules, no fixed column counts — so a new specimen needs no
+     no per-category rules, no fixed column counts — so a new component needs no
      rule in either file.
 
      The page chrome above (header, nav, contrast tables) stays on the neutral
@@ -276,7 +276,7 @@ function accentsOf(id) {
 
 /* The component gallery — identical markup for every palette.
 
-   Organised the way themes/preview.html is: categories of specimen cards. Every
+   Organised the way themes/preview.html is: categories of component cards. Every
    id is suffixed with the palette id, because this markup is stamped out 16
    times into one document and a duplicate id would break both <label for> and
    the dropdown's aria-labelledby. */
@@ -701,7 +701,7 @@ main.addEventListener('click', e => {
     badge.closest('section').querySelector('.contrast-detail').scrollIntoView({ block: 'nearest' });
     return;
   }
-  // No dropdown handler here any more: the select specimens are enhanced by
+  // No dropdown handler here any more: the select examples are enhanced by
   // scripts/dropdown.js, which owns its own open/close, outside-click and key
   // handling. The hand-rolled .drop-toggle listener this replaced was the last
   // thing on the page driving the legacy .drop component.

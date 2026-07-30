@@ -1,15 +1,18 @@
 ---
 name: theme-service
-description: Apply, update, or extend the "neon skating rink" theme system in any repo. Use when the user wants to add consistent dark/light theming to a project (new or existing), give an app a theme selector with all the brand themes, wire up theme.css, re-sync a repo to the latest theme-service version, or add a new theme. Triggers on "apply the theme service", "add the themes", "add a theme selector", "theme this app", "update themes to latest", "add a new theme".
+description: Create WCAG 2.2 AA compliant themes and install them into any repo, new or legacy. Use when the user wants accessible dark/light theming for a project (new or existing), give an app a theme selector with all the brand themes, wire up theme.css, re-sync a repo to the latest theme-service version, or create a new theme through a guided color process (a theme that fails contrast is never written). Triggers on "apply the theme service", "add the themes", "add a theme selector", "theme this app", "update themes to latest", "add a new theme", "make an accessible theme", "WCAG compliant theme".
 ---
 
-# Theme Service — apply & maintain consistent themes across repos
+# Theme Service — create WCAG 2.2 AA themes and install them into any repo
 
-This skill injects a shared, WCAG AA 2.2 neon theme system into any project and keeps it in sync.
+This skill installs a WCAG 2.2 AA theme system into any project, new or legacy, and keeps it in sync.
+It also creates themes: a guided process for choosing colors where the build checks every color pair
+and **refuses to write a theme that fails**.
+
 The **source of truth** is the `theme-service` repo's `themes/` folder: `theme.css` (color tokens for
 every theme), `effects.css` (glow/grid/scrollbar recipes), `components.css` (opt-in component classes),
 `dropdown.css` + `dropdown.js` (the optional accessible dropdown/listbox), plus `tokens.json` and
-`themes.index.json`. All themes are pre-validated to pass AA in every state.
+`themes.index.json`. All themes are pre-validated to pass WCAG 2.2 AA in every state.
 
 ## Step 0 — Locate the theme-service source (do this first)
 

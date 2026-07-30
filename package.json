@@ -1,7 +1,7 @@
 {
   "name": "theme-service",
   "private": true,
-  "description": "Shared neon dark/light theme system (WCAG AA 2.2) + Claude Code skill for applying, updating, and creating themes across repos. Version is tracked in the VERSION file.",
+  "description": "Create WCAG 2.2 AA compliant dark/light themes and install them into any repo, new or legacy. A theme that fails contrast is never written. Includes the Claude Code skill (and AGENTS.md) for creating, applying, and updating themes. Version is tracked in the VERSION file.",
   "license": "MIT",
   "scripts": {
     "install-all": "node install/install.mjs --builtins true && npm run build-themes",

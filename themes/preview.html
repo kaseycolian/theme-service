@@ -26,17 +26,17 @@
 
 <style>
   /* ===========================================================================
-     Page chrome for the specimen gallery. Three nesting levels, and only three:
+     Page chrome for the component gallery. Three nesting levels, and only three:
 
        main  >  section.cat  >  .cat-grid  >  .block
 
      A CATEGORY is a kind of component (Typography, Inputs, …). A BLOCK is one
-     specimen card inside it. Adding a component means adding a .block; adding a
+     component card inside it. Adding a component means adding a .block; adding a
      kind means adding a section.cat plus one line in .cat-nav. Nothing here is
      positional — no nth-child, no per-category rules, no fixed column counts —
      so neither addition touches this stylesheet.
 
-     None of this ships. It is the gallery's own furniture; the specimens inside
+     None of this ships. It is the gallery's own furniture; the components inside
      the cards are the part a consuming app vendors.
      =========================================================================== */
 
@@ -102,7 +102,7 @@
 
   /* auto-fit + minmax is the whole reason a new .block needs no layout work: the
      grid picks its own column count, and min(…, 100%) keeps a single card from
-     forcing overflow on a phone. .wide is for specimens that need room to read
+     forcing overflow on a phone. .wide is for cards that need room to read
      (scroll areas, long strings) rather than a per-category override. */
   .cat-grid {
     display: grid; gap: 16px; align-items: start;
@@ -110,7 +110,7 @@
   }
   .cat-grid.wide { grid-template-columns: repeat(auto-fit, minmax(min(420px, 100%), 1fr)); }
 
-  /* A specimen card. min-width:0 on the card AND max-width on its contents:
+  /* A component card. min-width:0 on the card AND max-width on its contents:
      grid items refuse to shrink below their content by default, so one long
      unbreakable string (the result URL, a wide option label) would otherwise
      push the whole page into horizontal scroll at narrow widths. */
@@ -194,8 +194,8 @@
   <div class="page-head">
     <h1 class="page-title">Every component, in one theme</h1>
     <p class="page-lead">Change the theme in the header — everything below re-skins through the
-    same tokens your app gets. Every pairing on this page is contrast-checked at build time,
-    on all 16 themes. Nothing here is bespoke.</p>
+    same tokens your app gets. Every pairing on this page is contrast-checked at build time, in
+    every theme. Nothing here is bespoke.</p>
 
     <!-- Category index. One entry per section.cat below; add a section, add a line. -->
     <nav class="cat-nav" aria-label="Component categories">
@@ -267,7 +267,7 @@
   </section>
 
   <!-- ======================================================================
-       Inputs. The one category with enough specimens to want an internal
+       Inputs. The one category with enough cards to want an internal
        divider — the select variants sit under their own sub-head.
        ====================================================================== -->
   <section class="cat" id="cat-inputs" aria-labelledby="h-inputs">
@@ -306,7 +306,7 @@
 
     <h3 class="sub-head">Select — list organizations</h3>
 
-    <!-- Icon sprite for the "icons" specimen below. Renders nothing itself. -->
+    <!-- Icon sprite for the "icons" card below. Renders nothing itself. -->
     <svg class="sprite" hidden aria-hidden="true" focusable="false">
       <symbol id="ac-icon-rocket" viewBox="0 0 16 16">
         <path d="M8 1.5c2.5 1.4 4 4 4 6.6L10 11H6L4 8.1C4 5.5 5.5 2.9 8 1.5Z" fill="none"

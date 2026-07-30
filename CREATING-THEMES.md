@@ -1,9 +1,10 @@
 # Creating & editing themes (Path 2)
 
-Add new themes or restyle existing ones with the same guided process this repo was built with. You
-don't need to know the internals — an agent (Claude Code, via the installed **theme-service skill**,
-or any agent following [`AGENTS.md`](AGENTS.md)) drives it. Everything stays **WCAG AA 2.2**: the
-generators refuse to write if any color pair fails.
+Add new themes or restyle existing ones with the same guided process this repo was built with — a
+walkthrough for choosing colors that checks contrast as it goes. **A theme that fails WCAG 2.2 AA is
+never written:** the generators refuse to write if any color pair fails, so you cannot end up with a
+non-compliant theme. You don't need to know the internals — an agent (Claude Code, via the installed
+**theme-service skill**, or any agent following [`AGENTS.md`](AGENTS.md)) drives it.
 
 > Prerequisite: you've cloned the repo (and, for Claude, run the installer — see the README Path 1).
 > Theme work happens **inside this repo**, then you commit the result.
@@ -96,8 +97,9 @@ manual workflow, if you want to drive it yourself:
    and tags `vX.Y.Z`. Commit first for real: it commits only those two files, so it **refuses on a
    dirty tree** rather than tag a commit without your themes in it. New themes are additive → `minor`.
 
-**Publishing to the live site (origin repo).** The GitHub Pages home (`docs/overview.html`) links a
-live "Built-In Themes" preview (`themes/preview.html`), which renders the built `theme.css`. The Pages
+**Publishing to the live site (origin repo).** The GitHub Pages home (`docs/overview.html`) links the
+live template page (`themes/preview.html`) from its "Preview Themes" nav segment, which renders the
+built `theme.css`. The Pages
 workflow (`.github/workflows/pages.yml`) auto-detects the **highest-numbered `discovery/draft-N`** and
 builds themes from it, so finalizing a new draft as the highest `draft-N` automatically becomes the
 live preview on the next push to `main` — no extra publish step. Convention: highest `draft-N` = the
