@@ -9,6 +9,10 @@
 <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
 <script src="../assets/favicon-theme.js" defer></script>
 
+<!-- Same deal for the header's brand mark: the <img> paints brand colors on its
+     own, this makes it follow the active theme -->
+<script src="../assets/brand-mark-theme.js" defer></script>
+
 <!-- Real theme assets, exactly as a consuming app wires them (external = CSP-safe) -->
 <script src="../themes/theme-init.js"></script>
 <link rel="stylesheet" href="../themes/theme.css">
@@ -103,11 +107,9 @@
   <div class="hdr-inner">
 
     <a class="brand" href="overview.html" aria-label="The A11Y Way · Theme Service">
-      <svg class="brand-mark" viewBox="0 0 200 200" aria-hidden="true" focusable="false">
-        <path class="bm-outer" d="M 25 170 C 50 170, 75 35, 100 25 C 125 35, 150 170, 175 170"/>
-        <path class="bm-inner" d="M 50 170 C 70 170, 85 55, 100 45 C 115 55, 130 170, 150 170"/>
-        <path class="bm-bar"   d="M 35 115 Q 100 135 165 115"/>
-      </svg>
+      <!-- Shared asset: ../assets/brand-mark.svg. alt="" because the link's
+           aria-label already names the lockup. -->
+      <img class="brand-mark" src="../assets/brand-mark.svg" alt="">
       <span class="brand-name">
         <span class="brand-title">The A11Y Way</span>
         <span class="brand-dot" aria-hidden="true">·</span>
