@@ -81,12 +81,13 @@
 }
 .brand:focus-visible { outline: 3px solid var(--focus-ring); outline-offset: 4px; }
 
-.brand-mark { width: 26px; height: 26px; flex: none; overflow: visible; }
-.brand-mark path { fill: none; stroke-linecap: round; }
-.bm-outer { stroke: var(--accent-pink);  stroke-width: 12; }
-.bm-inner { stroke: var(--accent-green); stroke-width: 6; }
-.bm-bar   { stroke: var(--accent-pink);  stroke-width: 9; }
+/* The mark itself is a shared asset — assets/brand-mark.svg. Its strokes and
+   their colors live in that file (var(--accent-*) with brand fallbacks), because
+   the <img> that loads it is an isolated document this stylesheet can't reach;
+   assets/brand-mark-theme.js carries the resolved tokens across. The glow below
+   is a filter on the element, so it re-themes from here with no JS. */
 .brand-mark {
+  width: 26px; height: 26px; flex: none;
   filter: drop-shadow(0 0 calc(3px * var(--glow-strength))
                       color-mix(in srgb, var(--accent-pink) 55%, transparent));
   transition: transform var(--dur) ease;

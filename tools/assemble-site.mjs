@@ -63,7 +63,8 @@ cpSync('themes', '_site/themes', {
   filter: (src) => !src.endsWith('preview.html'),
 });
 
-// Site assets (favicon + the script that re-colors it per theme). Served from
+// Site assets (favicon + brand mark + the scripts that re-color them per theme).
+// Served from
 // /assets/ for both pages: the home page's ../assets/ was rewritten above, and
 // /preview/ resolves ../assets/ to the same place.
 // (skip full-resolution image sources — they're gitignored, so they don't exist
@@ -76,7 +77,8 @@ cpSync('assets', '_site/assets', {
 // Sanity: the load-bearing files must exist
 for (const f of ['_site/index.html', '_site/preview/index.html', '_site/themes/theme.css', '_site/themes/theme-init.js',
                  '_site/themes/dropdown.css', '_site/themes/dropdown.js',
-                 '_site/assets/favicon.svg', '_site/assets/favicon-theme.js']) {
+                 '_site/assets/favicon.svg', '_site/assets/favicon-theme.js',
+                 '_site/assets/brand-mark.svg', '_site/assets/brand-mark-theme.js']) {
   if (!existsSync(f)) {
     console.error(`ASSEMBLE FAIL: missing ${f}`);
     process.exit(1);
