@@ -1,29 +1,21 @@
 # Theme Service — Visual Overview
 
-A human-friendly tour of what this service is, how you work with it, and the workflows you'll hit.
-The diagrams below render as graphics on GitHub. *(Content-first diagrams. A polished, themed
-visual version is in progress — see [overview.html](overview.html) for the hero, which re-skins
-live across all themes.)*
+A tour of what this service is, how you work with it, and the workflows you'll hit. The diagrams
+below render as graphics on GitHub; the same diagrams, live and themed, are on
+[overview.html](overview.html).
 
-## Polished-graphic status
-
-- ✅ **Pass 1 — Hero.** [overview.html](overview.html): the "What it is" pipeline, fully themed,
-  re-skins live across all 16 themes. Establishes the reusable node/connector component system.
-- ✅ **Pass 2 — Remaining diagrams.** Workflows A–D + "two ways in", styled with the same system.
-- ⛔ **Image export — dropped.** The graphics live on the page (it's the human quick-view / GitHub
-  Pages home), so no PNG/SVG export is needed.
-- ✅ **Hero polish.** A few `aria` tidy-ups, remove unused CSS, add the positioned dashed
-  skill→build connector (currently conveyed by caption text).
-- 🌐 **Live demo:** the overview is the repo's [GitHub Pages home](https://kaseycolian.github.io/theme-service/);
-  its "See Built-In Themes" button opens the live [product preview](https://kaseycolian.github.io/theme-service/preview/).
+🌐 **Live:** the overview is the repo's [GitHub Pages home](https://kaseycolian.github.io/theme-service/);
+the **Preview Themes** nav segment opens the
+[template page](https://kaseycolian.github.io/theme-service/preview/), which shows every theme in real
+components.
 
 ---
 
-## What it is (in one picture)
+## What it is
 
-One consistent "90s skating rink" neon look — **16 themes, dark + light, all WCAG AA 2.2** — that any
-agent can drop into any app, and that **you** can extend with your own themes. Plain CSS custom
-properties: no framework lock-in, no build step for the apps that consume it.
+Create WCAG 2.2 compliant themes, then install them into a new or existing app. Use the themes that
+ship here, or use the skill (`AGENTS.md` for other agents) to create your own — a guided process for
+choosing colors that checks contrast as it goes. **A theme that fails WCAG 2.2 AA is never written.**
 
 ```mermaid
 flowchart LR
@@ -31,41 +23,44 @@ flowchart LR
     A["Built-in palettes<br/>tools/palettes/draft-*.mjs"]
     B["Your palettes<br/>tools/palettes/local.mjs"]
   end
-  A --> BUILD["npm run build-themes<br/>validates WCAG AA"]
+  A --> BUILD["npm run build-themes<br/>contrast check — every color pair"]
   B --> BUILD
-  BUILD --> OUT["themes/ — build output<br/>theme.css · tokens.json · helpers"]
-  OUT --> APPS["Your apps<br/>vendor the CSS + a theme picker"]
-  SKILL["Claude skill / AGENTS.md"] -. "apply · update · create" .-> APPS
-  SKILL -. drives .-> BUILD
+  BUILD -->|"passes"| OUT["themes/ — build output<br/>theme.css · tokens.json · helpers"]
+  BUILD -. "fails WCAG 2.2 AA" .-> STOP["Not written<br/>fix the palette and re-run"]
+  OUT --> APPS["Your app — new or legacy<br/>vendor the CSS + a theme picker"]
+  SKILL["Claude skill / AGENTS.md"] -. "create · validate · install" .-> APPS
+  SKILL -. guides .-> BUILD
 ```
 
-**Why it's powerful:** consistent branding across *all* your apps, accessibility guaranteed, driven
-by plain-English requests to an agent, works fully offline, and it's **yours** — fork it, add themes,
-and keep pulling upstream improvements without losing your work.
+**What you get:** accessibility handled up front — every color pair is checked before a theme exists.
+On top of that: consistent branding across *all* your apps, driven by plain-English requests to an
+agent, works fully offline, and it's **yours** — fork it, add themes, and keep pulling upstream
+improvements without losing your work.
 
 ---
 
-## Who uses it, and the two ways in
+## Two ways in
 
-You never have to touch theme creation to get value — Path 1 stands alone.
+You never have to create a theme to get value — Path 1 stands alone. Both paths are contrast-checked
+the same way.
 
 ```mermaid
 flowchart TD
   U(("You")) --> Q{"What do you want?"}
-  Q -->|"1"| P1["Path 1 — Use the themes as-is<br/>Install the skill → apply 16 themes to any app<br/>▶ npm run install-all"]
-  Q -->|"2"| P2["Path 2 — Make your own themes<br/>Add a palette, be guided, or design a new style<br/>▶ npm run build-themes"]
-  P1 --> D1["Apps get a theme picker,<br/>every theme AA-validated"]
-  P2 --> D2["Your themes join the set —<br/>reusable across all your apps"]
+  Q -->|"1"| P1["Path 1 — Use the themes that ship here<br/>Install the skill → apply them to any app<br/>▶ npm run install-all"]
+  Q -->|"2"| P2["Path 2 — Create your own themes<br/>Guided process for choosing colors<br/>▶ npm run build-themes"]
+  P1 --> D1["Your app gets a theme picker,<br/>every theme already passes WCAG 2.2 AA"]
+  P2 --> D2["Your themes join the set —<br/>checked the same way, reusable across apps"]
 ```
 
 | Path | Who it's for | Start here |
 |------|--------------|-----------|
-| **1 — Use as-is** | Anyone who wants consistent theming fast | `npm run install-all`, then ask an agent to apply it |
+| **1 — Use as-is** | Anyone who wants accessible theming fast | `npm run install-all`, then ask an agent to apply it |
 | **2 — Create / edit** | You want your own brand themes | [CREATING-THEMES.md](../CREATING-THEMES.md) |
 
 ---
 
-## Workflow A — Apply the themes to an app
+## Workflow A — Install themes into a new or existing app
 
 You ask; the agent does the wiring and confirms the choices that matter before changing anything.
 
@@ -80,7 +75,7 @@ sequenceDiagram
   You-->>Agent: Your choices
   Agent->>App: Vendor theme CSS + map the app's colors to tokens
   Agent->>App: Add a theme picker (all themes) + persistence
-  Agent->>App: Verify WCAG AA, write THEME-SERVICE.md tracking log
+  Agent->>App: Verify WCAG 2.2 AA, write THEME-SERVICE.md tracking log
   Agent-->>You: Done — switch themes live, nothing else changed
 ```
 
@@ -132,19 +127,23 @@ Storage at a glance:
 
 ## Workflow C — Create or edit a theme
 
-Three on-ramps, one destination: a validated palette that becomes a reusable theme.
+Three ways to start. All of them end at the same contrast check, and a palette only becomes a theme if
+it passes.
 
 ```mermaid
 flowchart LR
   START(("Add / edit<br/>a theme")) --> WAY{"How?"}
-  WAY -->|"I have a palette"| W1["Give the colors →<br/>agent fills gaps + validates AA"]
+  WAY -->|"I have a palette"| W1["Give the colors →<br/>agent fills gaps + checks contrast"]
   WAY -->|"Guide me"| W2["Describe a vibe →<br/>agent proposes + iterates"]
   WAY -->|"A whole new style"| W3["Design candidates in a<br/>discovery draft, compare side-by-side"]
   W1 --> INTO["local.mjs (yours)"]
   W2 --> INTO
   W3 --> INTO
-  INTO --> BUILD2["npm run build-themes<br/>AA-validated"]
-  BUILD2 --> COMMIT["git commit<br/>(saved locally)"]
+  INTO --> CHECK{"npm run build-themes<br/>contrast check — every color pair"}
+  CHECK -->|"passes"| WRITTEN["Written to themes/<br/>and shown on the template page"]
+  CHECK -. "fails" .-> REFUSED["Nothing written —<br/>adjust the palette and re-run"]
+  REFUSED -. "iterate" .-> INTO
+  WRITTEN --> COMMIT["git commit<br/>(saved locally)"]
 ```
 
 Full walkthrough + copy-paste prompts: [CREATING-THEMES.md](../CREATING-THEMES.md).

@@ -1,6 +1,7 @@
 # Finalized Themes
 
-Apps consume these files. They're validated to WCAG AA 2.2 in every state. The token/registry/helper
+Apps consume these files. Every theme here is validated to WCAG 2.2 AA in every state — a theme that
+fails contrast is never written, so nothing in this folder can ship a failing pair. The token/registry/helper
 files are **build output** — run `npm run build-themes` from the repo root to (re)generate them
 (they're gitignored, not committed, so forks can pull origin updates conflict-free). The
 hand-authored `effects.css`, `components.css`, and `preview.html` are committed. Source of truth =
@@ -184,4 +185,4 @@ source and rebuild:
 node tools/build-final.mjs --write       # from the current selected draft (draft-2)
 ```
 
-The finalizer re-validates every color pair against WCAG AA and refuses to write on any failure.
+The finalizer re-validates every color pair against WCAG 2.2 AA and refuses to write on any failure.

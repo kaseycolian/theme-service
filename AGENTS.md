@@ -1,9 +1,13 @@
 # AGENTS.md — Theme Service (for any AI agent)
 
-This repo is a shared, framework-agnostic **theme system** ("90s skating rink" neon) used to keep
-consistent dark/light branding across many apps. It's model-agnostic: Claude Code loads it as a skill
-(`skill/SKILL.md`), and any other agent (Copilot, GPT, Gemini, …) can follow **this file**. The
-detailed, non-agent-specific procedures live in `skill/references/` and are shared by both.
+This repo creates **WCAG 2.2 AA compliant themes** and installs them into other apps, new or legacy.
+Themes are created through a guided process for choosing colors; the build checks every color pair and
+**refuses to write a theme that fails**. It's a framework-agnostic system of plain CSS custom
+properties, so a consuming app needs no build step.
+
+It's also model-agnostic: Claude Code loads it as a skill (`skill/SKILL.md`), and any other agent
+(Copilot, GPT, Gemini, …) can follow **this file**. The detailed, non-agent-specific procedures live in
+`skill/references/` and are shared by both.
 
 ## What's here
 
@@ -56,7 +60,8 @@ detailed, non-agent-specific procedures live in `skill/references/` and are shar
   **commit in the source repo** (git-local persists; GitHub optional). Never hand-edit the generated
   `themes/` files.
 - **Publishing to the live site (origin repo only).** The GitHub Pages home (`docs/overview.html`)
-  links a live "Built-In Themes" preview (`themes/preview.html`) that renders the built `theme.css`.
+  links the live template page (`themes/preview.html`) from its "Preview Themes" nav segment; that page
+  renders the built `theme.css` and shows every theme in real components.
   Both pages share one header: markup is duplicated (differing only in which `.pagenav-seg` carries
   `aria-current`), styles live once in `assets/site-header.css` — edit there, not in either page's
   `<style>`. That file is site chrome only; it is NOT part of what a consuming app vendors.
