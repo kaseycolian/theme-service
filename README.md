@@ -103,6 +103,9 @@ tools/             build-final.mjs (build themes/), build-palettes.mjs (discover
                    release.mjs (version + tag), update-from-origin.mjs (pull origin updates),
                    palettes/ (draft-*.mjs = built-in source; local.mjs = YOUR themes),
                    contrast-checker/ (standalone WCAG library + CLI)
+gallery/           The component gallery, ONE copy: gallery.js (markup) + gallery.css (layout).
+                   Rendered by BOTH themes/preview.html and the discovery page, so a card added
+                   once shows up in both. See gallery/README.md
 skill/             The Claude Code skill (SKILL.md + references/) — how agents apply/update/add themes
 AGENTS.md          Agent-agnostic mirror of the skill (for non-Claude agents)
 discovery/         Palette-selection playground (draft-1/2/3) — reference for how themes were chosen
@@ -133,6 +136,9 @@ are in [`themes/README.md`](themes/README.md).
   live switcher (open in a browser).
 - **`discovery/index.html`** — the draft playground: every candidate palette rendered with the full
   component gallery, side by side, with computed AA ratios. Reference for the creation process.
+
+Both render the **same** gallery, from `gallery/` — one copy of the markup, one copy of its layout. A
+component added there appears on both pages; neither can drift from the other.
 
 ## Build / validate / release (tooling)
 

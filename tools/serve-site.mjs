@@ -121,10 +121,10 @@ if (!flag('--no-watch')) {
     }, 150);
   };
 
-  for (const dir of ['docs', 'assets', 'themes', join('tools', 'palettes')]) {
+  for (const dir of ['docs', 'assets', 'themes', 'gallery', join('tools', 'palettes')]) {
     const full = join(REPO, dir);
     if (existsSync(full)) watch(full, { recursive: true }, onChange);
   }
   watch(join(REPO, 'tools', 'assemble-site.mjs'), onChange);
-  console.log(`  watching docs/, assets/, themes/, tools/palettes/ — Ctrl+C to stop\n`);
+  console.log(`  watching docs/, assets/, themes/, gallery/, tools/palettes/ — Ctrl+C to stop\n`);
 }

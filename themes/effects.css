@@ -3,6 +3,15 @@
    expressed purely as tokens so they work identically across every theme.
    Pair with theme.css (colors) + components.css (component styles).
    Scoped to :root so it applies app-wide once included.
+
+   The token blocks below also list [data-palette]. Custom properties compute
+   WHERE THEY ARE DECLARED, so a glow derived at :root would bake in :root's
+   accents and inherit that one result everywhere. The palette discovery page
+   (discovery/draft-N/index.html) puts a different set of --accent-* on each
+   [data-palette] section and no colors on :root at all, so it needs the
+   derivation to happen again on those elements. Nothing else changes: a consuming
+   app has no [data-palette] anywhere, and this is what lets the discovery page
+   run THIS file instead of a fork of it.
    ============================================================================= */
 
 /* --glow-strength is theme.css's to set — 1 on dark themes, 0.35 on light. The
@@ -14,13 +23,15 @@
    order, because every page loads effects.css after theme.css. That pinned the
    whole site to full glow and made the light themes' 0.35 dead code for as long
    as it stood. :where() drops this to (0,0,0), so any theme now overrides it and
-   the fallback still applies when no theme.css is present. */
-:where(:root) { --glow-strength: 1; }
+   the fallback still applies when no theme.css is present. The discovery page's
+   generated palette files declare their own per section, and must win the same
+   way. */
+:where(:root, [data-palette]) { --glow-strength: 1; }
 
-:root {
+:root, [data-palette] {
   /* Motion gate: 1 = animations on, 0 = off (flipped by reduced-motion + toggle
-     below). Stays at :root specificity: no theme sets it, and the reduced-motion
-     rules that flip it are in this file. */
+     below). No theme sets it, and the reduced-motion rules that flip it are in
+     this file. */
   --motion: 1;
 
   /* Retro crossing-gradient grid backdrop colors (subdued). */
@@ -68,9 +79,15 @@
    Motion off — two ways, both resolve to --motion: 0. Our components gate motion
    through this token (see --dur / --press in components.css), so no blanket
    !important reset is needed — a host app's own animations are left untouched.
+
+   The [data-palette] halves are for the discovery page only: because that page's
+   sections re-declare --motion above, an ancestor's 0 would not reach them.
    ----------------------------------------------------------------------------- */
-[data-motion="off"] { --motion: 0; }
-@media (prefers-reduced-motion: reduce) { :root { --motion: 0; } }
+[data-motion="off"],
+[data-motion="off"] [data-palette] { --motion: 0; }
+@media (prefers-reduced-motion: reduce) {
+  :root, [data-palette] { --motion: 0; }
+}
 
 /* -----------------------------------------------------------------------------
    Reusable effect classes

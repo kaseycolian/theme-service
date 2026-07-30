@@ -1,0 +1,148 @@
+/* =============================================================================
+   gallery.css — layout for the component gallery that gallery.js renders.
+   Loaded by themes/preview.html and discovery/draft-N/index.html; see README.md.
+
+   Three nesting levels, and only three:
+
+     <host>  >  section.cat  >  .cat-grid  >  .block
+
+   A CATEGORY is a kind of component (Typography, Inputs, …). A BLOCK is one
+   component card inside it. Adding a component means adding a .block; adding a
+   kind means adding a section.cat (plus one line in preview.html's .cat-nav).
+   Nothing here is positional — no nth-child, no per-category rules, no fixed
+   column counts — so neither addition touches this file.
+
+   This is the gallery's own furniture: it is NOT part of what a consuming app
+   vendors. The components inside the cards are, and they live in
+   themes/components.css + themes/effects.css. Everything below is written
+   against theme tokens only, so it works under :root (preview.html, colors from
+   theme.css) and under [data-palette] (discovery, colors from palettes/*.css).
+   ============================================================================= */
+
+/* Density knobs. Defaults are the single-gallery page's (preview.html); the
+   discovery page renders 16 galleries in one document and dials them down on
+   .sec-body, which every card inherits from. */
+:root {
+  --gal-cat-gap: 16px;        /* section.cat internal gap */
+  --gal-grid-gap: 16px;       /* between cards */
+  --gal-col-min: 260px;       /* card column floor -> the grid picks its own count */
+  --gal-col-min-wide: 420px;  /* same, for .cat-grid.wide */
+  --gal-card-pad: 16px;
+  --gal-card-gap: 12px;       /* between rows inside a card */
+  --gal-title-size: 15px;     /* .cat-title */
+  --gal-scroll-margin: 104px; /* anchor offset under a sticky header */
+}
+
+/* The mount host is a plumbing element, not a layout one: display:contents lets
+   its sections become direct children of whatever the page laid out (a flex
+   column with its own gap, in preview.html's case). */
+[data-gallery] { display: contents; }
+
+/* ---- a category ---------------------------------------------------------- */
+
+.cat {
+  display: flex; flex-direction: column; gap: var(--gal-cat-gap);
+  scroll-margin-top: var(--gal-scroll-margin);
+}
+.cat-head {
+  display: flex; align-items: baseline; flex-wrap: wrap; gap: 6px 14px;
+  border-bottom: 1px solid var(--border); padding-bottom: 8px;
+}
+.cat-title {
+  margin: 0; font-size: var(--gal-title-size); font-weight: 800; letter-spacing: .18em;
+  text-transform: uppercase; color: var(--accent-green);
+  text-shadow: var(--tglow-green-sm);
+}
+.cat-note { margin: 0; font-size: 12px; color: var(--text-muted); }
+
+/* Optional divider for a category big enough to want internal grouping.
+   Inputs is the only one that needs it today. */
+.sub-head {
+  margin: 6px 0 0; font-family: var(--font-mono); font-size: 11px; font-weight: 700;
+  letter-spacing: .14em; text-transform: uppercase; color: var(--accent-purple);
+  text-shadow: var(--tglow-purple-sm);
+}
+
+/* ---- the card grid ------------------------------------------------------- */
+
+/* auto-fit + minmax is the whole reason a new .block needs no layout work: the
+   grid picks its own column count, and min(…, 100%) keeps a single card from
+   forcing overflow on a phone. .wide is for cards that need room to read
+   (scroll areas, app frames, long strings) rather than a per-category override. */
+.cat-grid {
+  display: grid; gap: var(--gal-grid-gap); align-items: start;
+  grid-template-columns: repeat(auto-fit, minmax(min(var(--gal-col-min), 100%), 1fr));
+}
+.cat-grid.wide {
+  grid-template-columns: repeat(auto-fit, minmax(min(var(--gal-col-min-wide), 100%), 1fr));
+}
+
+/* A component card. Cards sit on --bg-panel over the page's --bg, so the card
+   frame is itself one of the pairings this gallery exists to check.
+   min-width:0 on the card AND max-width on its contents: grid items refuse to
+   shrink below their content by default, so one long unbreakable string (the
+   result URL, a wide option label) would otherwise push the whole page into
+   horizontal scroll at narrow widths. */
+.block {
+  display: flex; flex-direction: column; gap: var(--gal-card-gap); min-width: 0;
+  padding: var(--gal-card-pad);
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+.block input, .block select, .block textarea, .block .row { max-width: 100%; }
+.block-title {
+  font-family: var(--font-mono); font-size: 10px; font-weight: 700;
+  letter-spacing: .14em; text-transform: uppercase; color: var(--text-muted);
+}
+
+.row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.hint { font-size: 11px; color: var(--text-muted); font-style: italic; margin: 0; }
+.scrollbox { height: 130px; overflow-y: scroll; }
+
+/* The icon sprite is a <symbol> library, not a picture, and the `hidden`
+   attribute alone does NOT hide it. The UA stylesheet that turns [hidden] into
+   display:none declares an HTML default namespace, so its bare selectors skip
+   elements in the SVG namespace — the sprite would keep SVG's default 300x150
+   intrinsic box and push a blank gap into the page. Needs a real rule. */
+.sprite { display: none; }
+
+/* ---- mini app-recreation frames ------------------------------------------ */
+
+/* Deliberately namespaced .app-*: these sit on pages that also carry site
+   chrome, and `.preview` / `.title` are far too generic to put in a shared
+   stylesheet. */
+.app-frame {
+  border: 1px solid var(--border); border-radius: 12px; overflow: hidden;
+  background: var(--bg);
+}
+.app-head { padding: 12px 14px; display: flex; align-items: center; justify-content: space-between; }
+.app-title {
+  font-size: 14px; font-weight: 800; font-style: italic; text-transform: uppercase;
+  letter-spacing: 1px; color: var(--accent-pink); text-shadow: var(--tglow-pink);
+}
+.app-body { padding: 14px; display: flex; flex-direction: column; gap: 12px; }
+.app-foot { padding: 12px 14px; display: flex; gap: 10px; justify-content: flex-end; }
+
+/* The rendered-markdown pane. Its own type scale, because it is standing in for
+   another app's content area rather than for this gallery's copy. */
+.app-preview {
+  height: 150px; overflow: auto; padding: 12px 14px;
+  background: var(--bg-panel);
+  border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+}
+.app-preview h1 { font-size: 17px; color: var(--accent-pink); text-shadow: var(--tglow-pink); margin: 0 0 6px; }
+.app-preview h2 { font-size: 14px; color: var(--accent-green); text-shadow: var(--tglow-green); margin: 10px 0 4px; }
+.app-preview h3 { font-size: 13px; color: var(--accent-blue); text-shadow: var(--tglow-blue); margin: 8px 0 4px; }
+.app-preview p { font-size: 13px; color: var(--text); margin: 0 0 6px; line-height: 1.5; }
+.app-preview a { color: var(--accent-blue); text-shadow: var(--tglow-blue); }
+.app-preview pre {
+  background: color-mix(in srgb, #000 30%, var(--bg));
+  border: 1px solid var(--accent-green);
+  box-shadow: 0 0 10px color-mix(in srgb, var(--accent-green) calc(20% * var(--glow-strength)), transparent),
+        inset 0 0 10px color-mix(in srgb, var(--accent-green) calc(8% * var(--glow-strength)), transparent);
+  border-radius: 6px; padding: 8px 10px;
+  font-family: var(--font-mono); font-size: 12px; color: var(--text); overflow-x: auto;
+}
+.app-preview blockquote { border-left: 3px solid var(--accent-purple); margin: 6px 0; padding: 2px 10px; color: var(--text-muted); }
+.app-preview hr { border: none; border-top: 2px dashed var(--accent-pink); opacity: 0.6; margin: 10px 0; }

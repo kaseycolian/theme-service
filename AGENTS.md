@@ -15,6 +15,9 @@ It's also model-agnostic: Claude Code loads it as a skill (`skill/SKILL.md`), an
   `preview.html`, `README.md` are committed; `theme.css`, `tokens.json`, `themes.index.json`,
   `theme-init.js`, `theme-select.js` are **build output** (gitignored) — produced by
   `npm run build-themes`. Default = **Rink Classic**, auto dark/light.
+- `gallery/` — the component gallery, one copy: `gallery.js` (markup) + `gallery.css` (layout).
+  `themes/preview.html` and `discovery/draft-N/index.html` both render it, so a component added there
+  appears on both and neither page can drift. Not vendored by an app; see `gallery/README.md`.
 - `VERSION` — the theme-service version (single source of truth; `npm run release` bumps + tags it).
 - `tools/` — `build-final.mjs` (build `themes/`), `build-palettes.mjs` (discovery drafts),
   `release.mjs` (version + tag), `update-from-origin.mjs` (pull origin updates), `palettes/`

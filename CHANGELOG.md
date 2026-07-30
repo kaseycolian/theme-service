@@ -4,6 +4,36 @@ All notable changes to the theme-service. Apps record the version they vendored 
 (plus `updating-themes.md`) to migrate. Versioning: minor bump for additive themes/tokens, major for
 breaking token renames/removals or a default-theme change.
 
+## Unreleased
+
+**One component gallery, rendered by both pages.** `themes/preview.html` and
+`discovery/draft-N/index.html` each carried their own hand-maintained copy of the component sheet, in
+two dialects, and had drifted: the preview page never got the App-recreation frames or the richer
+button/input/tabs cards. Both now render `gallery/gallery.js` + `gallery/gallery.css`, so a card added
+once appears on both. No token changed and nothing an app vendors changed behaviour.
+
+- **New `gallery/`** — `gallery.js` (the markup, a classic script exposing `window.ThemeGallery`;
+  works from `file://` and under a strict CSP), `gallery.css` (its layout), `README.md` (how to add a
+  card or a category). Not vendored by consuming apps.
+- `themes/preview.html` now mounts the gallery into `<div id="gallery" data-gallery>` after its page
+  head; its own `<style>` keeps only page chrome. It gained the **App recreations** category (plus a
+  `.cat-nav` entry) and richer Buttons/Inputs/Surfaces cards. Header and page head are unchanged.
+- `discovery/draft-3/` **lost its CSS/JS forks**: it now links `themes/effects.css`,
+  `themes/components.css` and `themes/dropdown.{css,js}` directly instead of stale copies under
+  `styles/` + `scripts/` (both folders deleted). The discovery page therefore shows exactly what an
+  app gets, and finalizing a draft no longer needs a rescoping step.
+- `themes/effects.css` derives its glow/grid tokens on `:root, [data-palette]` rather than `:root`
+  alone, and its motion-off rules reach `[data-palette]` descendants. Custom properties compute where
+  they are declared, so this is what lets one file serve both the app path (`:root` + `theme.css`) and
+  the discovery page (a different palette per section, nothing on `:root`). **Inert for consuming
+  apps** — no app has a `[data-palette]` attribute.
+- Renamed while moving into the shared stylesheet: `.preview` → `.app-preview`,
+  `.app-head .title` → `.app-title` (both were too generic for a shared file). They only ever existed
+  on the discovery page.
+- `tools/assemble-site.mjs` copies `gallery/` into `_site/gallery/` (no link rewrite needed —
+  `../gallery/…` resolves the same from `themes/preview.html` and `/preview/`);
+  `tools/serve-site.mjs` watches it.
+
 ## 1.0.0 — 2026-07-29
 
 **BREAKING** — the dropdown's class names, data attributes and JS global are renamed. Nothing else
