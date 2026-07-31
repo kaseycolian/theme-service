@@ -4,7 +4,7 @@ All notable changes to the theme-service. Apps record the version they vendored 
 (plus `updating-themes.md`) to migrate. Versioning: minor bump for additive themes/tokens, major for
 breaking token renames/removals or a default-theme change.
 
-## Unreleased
+## 1.1.0 — 2026-07-31
 
 **The header rail has room to breathe, and it scales.** `.hdr-inner`'s vertical padding was a flat
 11px at every width; it is now `clamp(13px, 2.2vw, 22px)` — double the old value once there is a
