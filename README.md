@@ -26,13 +26,17 @@ path:
 Install once, then apply the existing themes to any repo on your machine. No palette/creation work.
 
 1. **Clone** this repo anywhere.
-2. **Install** — two modes. Both link the skill into `~/.claude/skills` and write a machine-local
-   pointer to this repo (nothing is written *inside* the repo):
+2. **Install** — two modes. Both link **both skills** into `~/.claude/skills` and write a
+   machine-local pointer to this repo (nothing is written *inside* the repo):
    ```sh
-   npm run install-all         # install the skill AND build the themes (recommended)
-   npm run install-no-themes    # install the skill only — don't generate any themes
-   # (the platform scripts install/install.ps1 · install/install.sh still link the skill)
+   npm run install-all         # install the skills AND build the themes (recommended)
+   npm run install-no-themes    # install the skills only — don't generate any themes
+   # (the platform scripts install/install.ps1 · install/install.sh still link the skills)
    ```
+   Two skills ship here, deliberately separate so neither can disturb the other's work:
+   **`theme-service`** creates and applies themes, and **`a11y-way-pages`** stands up the site
+   header, footer and favicon on a page (see below). The pages skill consumes theme tokens
+   read-only — it never creates or edits a theme.
    The theme files (`themes/theme.css`, `tokens.json`, …) are **build output**, not committed —
    `install-all` produces them; run `npm run build-themes` any time to (re)generate. Re-run install
    to refresh the link.
@@ -61,6 +65,22 @@ AA-validated and consistent, so new themes are reusable across all your apps.
 Full walkthrough & prompts: **[CREATING-THEMES.md](CREATING-THEMES.md)**. In short, tell your agent:
 > Use the theme-service skill to add a new theme — &lt;paste a palette&gt; / guide me to one / design a new
 > theme family called "&lt;name&gt;". Validate AA, regenerate, and bump the version.
+
+### Path 3 — Put the site header and footer on a page
+
+The `a11y-way-pages` skill stands up this site's furniture — the sticky header (brand lockup, page
+nav, motion toggle, theme console), the footer (cross-linked product family + source link), and the
+themed favicon — on a new page here or in a completely different repo. It **asks about your brand
+first** (name, mark, cross-links, class naming), detects the target's templating layer so a
+framework repo gets one component rather than duplicated markup, and defaults to restyling an
+existing header/footer in place rather than replacing working ARIA and wiring.
+
+The furniture is built entirely from theme tokens, so the target repo has to be themed first
+(Path 1). Tell your agent:
+> Add the site header and footer to this repo, matched to its brand.
+
+Procedure: [`skill-a11y-way-pages/`](skill-a11y-way-pages/) — `SKILL.md` plus `references/` for the
+brand interview, the header/footer anatomy, the update flow, and the accessibility checklist.
 
 You don't have to choose Path 2 to use the service — Path 1 is complete on its own.
 
@@ -106,10 +126,15 @@ tools/             build-final.mjs (build themes/), build-palettes.mjs (discover
 gallery/           The component gallery, ONE copy: gallery.js (markup) + gallery.css (layout).
                    Rendered by BOTH themes/preview.html and the discovery page, so a card added
                    once shows up in both. See gallery/README.md
-skill/             The Claude Code skill (SKILL.md + references/) — how agents apply/update/add themes
-AGENTS.md          Agent-agnostic mirror of the skill (for non-Claude agents)
+skill/             The theme-service skill (SKILL.md + references/) — how agents apply/update/add themes
+skill-a11y-way-pages/  The a11y-way-pages skill — how agents stand up the site header, footer and
+                   favicon on a page, in this repo or any other. Consumes theme tokens read-only;
+                   never edits themes
+assets/            SITE FURNITURE (not vendored by consuming apps): site-header.css, site-footer.css,
+                   brand-mark.svg + brand-mark-theme.js, favicon.svg + favicon-theme.js
+AGENTS.md          Agent-agnostic mirror of both skills (for non-Claude agents)
 discovery/         Palette-selection playground (draft-1/2/3) — reference for how themes were chosen
-install/           install.mjs (cross-platform) / install.ps1 / install.sh — link the skill + write
+install/           install.mjs (cross-platform) / install.ps1 / install.sh — link both skills + write
                    the machine-local pointer (~/.claude/theme-service.local.json)
 package.json       scripts: install-all, install-no-themes, build-themes, build-themes:mine,
                    update-from-origin, release, validate (no dependencies)
