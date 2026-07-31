@@ -56,13 +56,67 @@ except which `.pagenav-seg` carries `aria-current="page"`. Styles: `assets/site-
 | Skip link | `.skip-link` | **First element in `<body>`.** Off-screen via `transform`, not `display:none` — it must be focusable. Targets `#main`. |
 | Rail | `.site-header` | `position: sticky; top: 0`. Glass surface. The lit tube is a `::after` on the **bottom** edge. |
 | Inner | `.hdr-inner` | `max-width: 1600px`, `padding: 11px clamp(16px, 3vw, 32px)`, flex row. |
-| Brand | `.brand` > `.brand-mark` + `.brand-name` | An `<a>` with an `aria-label` naming the lockup; the `<img>` inside is `alt=""` so the mark isn't announced twice. |
+| Brand | `.brand` > `.brand-mark` + `.brand-name` (`.brand-title` + `.brand-dot` + `.brand-tag`) | An `<a>` with **no `aria-label`** — the wordmark and tag are on screen at every width, so the link names itself from its own text and the accessible name can never drift from the rendered one. The `<img>` is `alt=""` so the mark isn't announced twice. Only add an `aria-label` if you hide the words at some width, which this header deliberately does not. |
 | Page nav | `.pagenav` > `.pagenav-seg` | `<nav aria-label="Pages">`. The current page is a `<span>` with `aria-current="page"`, **not** a link. Current state is a lifted chip + full-contrast text, never color alone. |
 | Motion | `.motion` (uses shipped `.switch`) | A real `<label>` wrapping a real checkbox with `[data-motion-toggle]`. Keeps the 44×24 switch geometry. |
 | Theme console | `.theme-console` > `.tc-cap` + `.tc-lamps` + `<select data-theme-select>` | A `<div>`, **not** a `<label>` — once `dropdown.js` enhances it the real control is a `<button>`, which a wrapping label would neither name nor focus. `.tc-cap` is the accessible name via `aria-labelledby`, so below 620px it is **clipped, not `display:none`** — a name pointing at a hidden element resolves to nothing. |
 
-Breakpoints: **1080px** two-row grid (`brand | nav` / `motion | theme`), **620px** drop the tagline and
-clip the cap, **400px** mark only.
+Breakpoints: **1080px** two-row grid (`brand | nav` / `motion | theme`), **620px** the rail switches
+to a wrapping flex row, the brand lockup stacks (wordmark over tag) and both the console's cap and
+the nav's `.seg-tail` are clipped, **400px** one step down in type and gutters.
+
+**The nav drops under the brand on its own, with no breakpoint.** Under 620px `.hdr-inner` is
+`display: flex; flex-wrap: wrap`, and `.pagenav` is `flex: none` so it keeps its content width and
+the LINE breaks instead of the pill being crushed. This is not a stylistic preference. In the grid
+the nav is pinned to the right of a `1fr` track, so once its content outgrows the track it overflows
+**leftward, underneath the brand** — the two silently overlap and no scrollbar ever appears to report
+it. The width where that starts is a function of the rendered font, not the viewport: `--font-ui`
+falls back `"Trebuchet MS"` → `"Segoe UI"` → `Verdana`, and measured, the collision moves from 324px
+on Trebuchet to 364px on Verdana. Any px breakpoint picked on a Windows machine is therefore wrong on
+the phones that need it most. Wrapping asks the real question — *does this fit?* — so it is correct
+on fonts and widths nobody tested. Same reasoning as the footer index's auto-fit grid.
+
+Three things hold that layout together, and all three are load-bearing:
+
+- **A generated line break.** `.hdr-inner::before` with `flex: 0 0 100%` and `order: 3` forces the
+  break between the two groups (`brand | nav`, then `motion | theme`). Without it the wrap is greedy
+  and "Reduce motion" rides up beside the nav from ~520px, which is a different header rather than a
+  narrower one. `order` is used **only** to slot this break in: 1, 2, 4, 5 is DOM order untouched, so
+  tab order still matches reading order. A `::before` with no `content` generates nothing, so it must
+  stay inside this query or it becomes a phantom cell in the grid above.
+- **`margin-top: -8px` on the motion switch and the console.** That break is a real flex line, and
+  `row-gap` is charged on *both* sides of it — 16px between the groups, and a rail 8px taller than it
+  has always been. A negative margin on the break itself cannot fix this: Chrome floors a flex line's
+  cross size at 0, so the line simply refuses to shrink. On the two items it works, because their
+  line stays positive. Give both the **same** value: for margin-top `m` in a line of cross size `L`,
+  an item's content centre lands at `(L + m) / 2` — no height term, so equal margins keep items with
+  different heights on one centre line. Verified reproducing the grid's geometry to the pixel.
+- **`flex: 1 1 0` on the console**, not `auto`, plus `width: auto` to cancel the 1080px block's
+  `width: 100%`. Lines break on the flex *basis*, before any shrinking, so a content-sized console
+  asks for ~316px, fails to fit beside the switch under ~420px, and takes a fourth row on exactly the
+  phones with the least height to spare. From 0 it always fits, then grows into what the switch
+  leaves — which is what the `1fr` track did.
+
+**Nothing in the brand zone is ever hidden for space.** Sibling A11Y Way sites share a mark and a
+wordmark, so the tag beside the name is the only thing that says which site you are on — it has to
+survive the width where a visitor has the least other context. Stacking is what pays for it: the
+lockup then takes the width of its longer line instead of the sum of both, and it costs no height
+because the nav pills already make that row 36px tall. Below 620px the page nav also sheds its
+redundant word (`Preview Themes` → `Preview`) via `.seg-tail`, which is **clipped, not removed**, so
+the link's accessible name stays `Preview Themes` at every width.
+
+Two traps if you re-cut this. `.brand-name` aligns on the **baseline** as a row; restate
+`align-items: flex-start` when it becomes a column or the two lines centre on each other.
+
+And `.pagenav-seg` is an `inline-flex`, which is why the label is wrapped in a `.seg-label` that
+looks redundant and is not. Put the text and `.seg-tail` directly in the segment and they are **two
+flex items**, which breaks the word twice: flex strips each item's leading and trailing whitespace,
+so the words render welded (`PreviewThemes`), and the accessible-name algorithm then inserts its own
+separator between the two blockified items — so patching the first problem with a `gap` or an
+`&nbsp;` buys a **double space in the announced name**. One flex item, tail inline inside it, is
+ordinary text flow: the space is just a space, in the DOM, on screen, and in the accessible name.
+Verify by reading the a11y tree, not `innerText` — `innerText` shows clipped text as present and
+hides this class of bug entirely.
 
 **Adapting the header.** The page nav assumes a small number of top-level pages. A repo with many
 pages, or one that already has real navigation, should keep its own and take only the brand, motion
@@ -89,9 +143,9 @@ genuinely wants cards, that's a deliberate deviation to record in `A11Y-WAY-PAGE
 |---|---|---|
 | Slab | `.site-footer` | Direct child of `<body>` = the page's **one** `contentinfo`. Not sticky. Lit tube is a `::before` on the **top** edge. |
 | Inner | `.ftr-inner` | Same `max-width` and `clamp()` padding as `.hdr-inner`, so footer content lines up with header content at every width. One column; two at **1080px** (`minmax(240px, 330px)` lede + `1fr` index) — the same width the header drops to two rows, and the width below which the index no longer has room to run two products beside a 330px lede. |
-| Lede | `.ftr-lede` > `.ftr-brand` + `.ftr-mission` + `.ftr-src` | The lockup restated, **not as a link** — the header's already goes home, so a second one only adds a tab stop to the same destination. |
+| Lede | `.ftr-lede` > `.ftr-brand` + `.ftr-mission` + `.ftr-src` | The lockup restated, **not as a link** — the header's already goes home, so a second one only adds a tab stop to the same destination. A column at the two extremes and a full-width **band** between 621px and 1080px, where the column shape would waste the rail — see the band note below. |
 | Lockup | `.ftr-brand` > `img.brand-mark.ftr-mark` + `.ftr-wordmark` | Keep the `brand-mark` class: `brand-mark-theme.js` re-colors every `img.brand-mark` on the page. `.ftr-mark` sizes and lights it locally so this file stands alone. Wordmark repeats `.brand-title`'s size, weight and tracking verbatim. |
-| Mission | `.ftr-mission` | The only prose here set in `--text`, and a step larger than the descriptions. It is the reason the site exists, so it outranks the index rather than being filed into a meta bar. |
+| Mission | `.ftr-mission` | Outside the band, the only prose here set in `--text` and a step larger than the descriptions — it is the reason the site exists, so it outranks the index rather than being filed into a meta bar. **Inside the band it is demoted to a mono, muted descriptor**, because there its role is different; see the band note below. |
 | Source | `.ftr-src` | Tertiary, so no button and no pill — a labelled mark with `min-height: 32px` to clear SC 2.5.8. The glyph picks up a `drop-shadow` glow on hover, the one place the footer borrows the header's glow rather than its rules. |
 | Index | `.ftr-family` | A `<nav>` with an `aria-label` and **no visible caption**: the lede beside it is the visible name, so a third label over two items is furniture. Never a heading — the furniture must not add entries to the host page's heading outline. |
 | Rows | `.ftr-links` > `li` > `a.ftr-link` | CSS grid, `repeat(auto-fit, minmax(min(280px, 100%), 1fr))`. The `min(…, 100%)` is what stops a 320px viewport overflowing — keep it. |
@@ -99,9 +153,43 @@ genuinely wants cards, that's a deliberate deviation to record in `A11Y-WAY-PAGE
 | Current product | `a.ftr-link[aria-current="true"]` + `.ftr-here` | `aria-current="true"`, not `"page"`: this marks the current item **in a set** (the product you're inside), which stays true across every page of that site. Its rule sits half-lit at rest, and "You are here" is real text beside a lit dot — never color alone. |
 | External marker | `.ftr-ext` | An `aria-hidden="true"` glyph beside the name. The link text already names the destination. |
 
-Breakpoints: both grids collapse on their own; **880px** splits lede from index, **620px** tightens
-the rail, **400px** steps the name size down. No breakpoint does the column collapse — that's
+Breakpoints: both grids collapse on their own; **1080px** splits lede from index (same width the
+header goes two-row), **621–1080px** lays the lede down as a band, **620px** tightens the rail,
+**400px** steps the name size down. No breakpoint does the *index's* column collapse — that's
 deliberate, so the footer survives container widths nobody anticipated.
+
+**The lede band (621–1080px).** Below 1080px the footer is one column, and a lede left in its column
+shape is three stacked rows down the left edge with most of the rail empty beside them — its narrow
+measure is inherited from the two-column layout above 1080px, where it earns its keep, and is dead
+weight here. In this range `.ftr-lede` goes `flex-direction: row`, `.ftr-mission` drops its
+`max-width` and takes the slack, and `.ftr-src` loses its 3px optical nudge (that offset centres it
+under the text above; in a row it just knocks the link off the centre line). Worth ~93–105px of
+height on the exact viewports laptops and tablets use. Reading order is unchanged — the three parts
+run left to right in DOM order. Only the lede lies down; the index keeps its auto-fit grid, so this
+is a change of proportion, not of structure.
+
+**Treatment follows role, not element.** The mission is also *re-typed* inside the band, and this is
+the reasoning worth copying rather than the values. Above 1080px it is the lede's hero statement in a
+narrow column, so `--text` at 14.5px is right. In the band it is a descriptor on a rail beside a 13px
+wordmark and a 12.5px link, and that same treatment makes it the loudest thing in the footer, floating
+mid-rail with nothing holding it. So in the band only it becomes `--font-mono` 12.5px `--text-muted`
+— **the voice this system already uses for descriptors** (`.tc-cap`, `.brand-tag`), which is what
+buys the separation without touching the wordmark. It is anchored by a 1px `border-left` on the
+mission with `align-self: stretch` so the rule spans the band's full height rather than one line of
+text; an inner `display: flex; align-items: center` re-centres the words in that taller box. Use a
+real border, not a painted pseudo-element — HCM replaces backgrounds but keeps borders, so this rule
+needs no `forced-colors` patch the way the footer's other rules do. Verified: it resolves to
+`CanvasText` under HCM automatically.
+
+Two constraints on any retune. **No new color pair** — `--text-muted` on this surface is already
+AA-validated by the theme build (`.ftr-desc` runs it at this exact size); introducing an accent as
+small text is contrast-bound on the light themes. And mono is wider than the UI face, so the mission
+holds one line only from ~840px up; dropping to 12px moves that to ~805px if the two-line range
+bothers you.
+
+That block **must sit after `.ftr-mission`'s base rule** — it overrides the measure cap at equal
+specificity, so source order is the only thing deciding it. Put it in the Responsive section at the
+foot of the file, not beside the other `.ftr-lede` rules, or it silently does nothing.
 
 ---
 

@@ -64,6 +64,17 @@ for.
 ## Sizes and engines
 
 - [ ] **No horizontal scroll** at 320, 360, 400, 620, 768, 900, 1080, 1440, 2560px.
+- [ ] **The brand name and its tag are both legible at 320px.** The tag is what tells a visitor which
+      A11Y Way site they are on, so a phone header that has shed it has lost the thing it was for.
+      Check the nav pills too: right-aligned in a `1fr` track they overflow *leftward*, under the
+      brand, so a collision reads as overlapping text rather than as a scrollbar — **a clean
+      `scrollWidth` proves nothing here.** The source header wraps the nav onto its own line instead;
+      if you kept a grid, test the narrow end by eye.
+- [ ] **Re-test the narrow end with the fallback font.** `--font-ui` ends in Verdana, which is far
+      wider than Trebuchet, so a header that fits at 320px on Windows can overlap at 360px on a
+      phone. Force the fallback (`--font-ui: Verdana`) and walk the ladder again.
+- [ ] Any label shortened at a breakpoint is **clipped, not `display:none`**, and its accessible name
+      is unchanged — read the real name out of the a11y tree at a narrow *and* a wide width.
 - [ ] Content reflows at **200% and 400%** zoom with nothing lost or overlapping (SC 1.4.10).
 - [ ] Renders correctly in **Chromium, Gecko and WebKit** — including a mobile WebKit viewport.
 - [ ] Every progressive enhancement has a fallback that was actually exercised:

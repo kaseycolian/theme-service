@@ -35,6 +35,14 @@ Propose what you found. Confirm the exact casing — "The A11Y Way" and "The A11
 strings and both appear in the wild. The header shows a short tag beside the name (the source uses
 "Themes"); ask what this site's is if it isn't obvious.
 
+**The tag is not decoration — it is the differentiator, and it is never dropped for space.** Sibling
+A11Y Way sites share a mark and a wordmark, so the tag is the only thing in the header that answers
+"which of these am I on". That makes it worth *more* than the wordmark on a phone, not less. The
+source header used to hide the tag at 620px and the whole wordmark at 400px, which left every sibling
+site showing an identical mark on a phone; it now stacks the lockup instead and keeps both lines to
+320px. **Give this site a tag that is distinct from its siblings' at a glance** — prefer a different
+word, not a longer version of the same one.
+
 **If the repo has a constants module, use it** rather than hardcoding the name into the markup — that
 module exists precisely so the visible brand and the tab title can't drift.
 
@@ -45,7 +53,8 @@ module exists precisely so the visible brand and the tab title can't drift.
 - **Reuse The A11Y Way mark** (recommended when the repo is part of that family) — vendor
   `brand-mark.svg` + `favicon.svg` and their themer scripts.
 - **Use the repo's own logo** — keep their asset, apply the source's *treatment* (size, glow filter,
-  hover lift, `alt=""` on the img with the link carrying the `aria-label`).
+  hover lift, `alt=""` on the img — the wordmark beside it names the link, so the mark would only
+  announce it twice).
 - **Wordmark only** — no mark, just the styled name.
 
 If the repo is **always served over http** (no `file://` use case), offer inlining the SVG instead of

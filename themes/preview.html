@@ -103,20 +103,33 @@
 <header class="site-header">
   <div class="hdr-inner">
 
-    <a class="brand" href="../docs/overview.html" aria-label="The A11Y Way · Themes">
-      <!-- Shared asset: ../assets/brand-mark.svg. alt="" because the link's
-           aria-label already names the lockup. -->
+    <!-- No aria-label: both words are on screen at every width now (the lockup
+         stacks below 620px rather than shedding the descriptor), so the link
+         names itself from its own text — "The A11Y Way Themes", the separator
+         being aria-hidden. Nothing left to drift out of sync with what is
+         drawn, and the accessible name matches the visible one at every
+         breakpoint, which is what voice control needs it to. -->
+    <a class="brand" href="../docs/overview.html">
+      <!-- Shared asset: ../assets/brand-mark.svg. alt="" because the wordmark
+           beside it already names the lockup. -->
       <img class="brand-mark" src="../assets/brand-mark.svg" alt="">
       <span class="brand-name">
         <span class="brand-title">The A11Y Way</span>
         <span class="brand-dot" aria-hidden="true">·</span>
+        <!-- Which A11Y Way site this is. Never hidden — see site-header.css. -->
         <span class="brand-tag">Themes</span>
       </span>
     </a>
 
     <nav class="pagenav" aria-label="Pages">
       <a class="pagenav-seg" href="../docs/overview.html">Overview</a>
-      <span class="pagenav-seg" aria-current="page">Preview Themes</span>
+      <!-- .seg-tail is CLIPPED below 620px, not removed: the phone label reads
+           "Preview" (the brand descriptor beside it already said "Themes"),
+           while the accessible name stays "Preview Themes" at every width.
+           .seg-label is load-bearing, not a wrapper for its own sake: it keeps
+           the whole label as ONE flex item, so the space survives. See
+           site-header.css. -->
+      <span class="pagenav-seg" aria-current="page"><span class="seg-label">Preview<span class="seg-tail"> Themes</span></span></span>
     </nav>
 
     <label class="switch motion">
