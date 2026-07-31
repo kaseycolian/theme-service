@@ -108,6 +108,11 @@ any color pair you introduced.
   that already has furniture is **restyle in place**, keeping its markup, ARIA and handlers.
 - **Match the repo, not this repo.** Its class-naming convention, its templating language, its file
   layout, its brand. "Mimic the source" means *the same result*, not the same characters.
+- **Structure with rules and space, not boxes.** The header is a rail of type and one lit edge; the
+  footer is drawn to the same brief, so the two bracket the page as one frame. No panel backgrounds,
+  border boxes or chips in the footer — a tray of rounded cards is the generic default this system
+  exists to avoid. Carry the hierarchy in type size, and let one decorative idea repeat at two scales
+  rather than adding a second. See `references/header-footer-anatomy.md` → "Footer — two zones".
 - **Keep the tracking log.** Every repo gets an `A11Y-WAY-PAGES.md` recording the version, the brand
   decisions on record, and a dated **append-only History**. Check for it first; always write it
   (first apply) or append to it (later work).

@@ -122,12 +122,15 @@
      The page chrome above (header, nav, contrast tables) stays on the neutral
      --chrome-* palette. */
   .sec-body {
-    padding: 20px; display: flex; flex-direction: column; gap: 28px;
+    padding: 24px 22px; display: flex; flex-direction: column;
+    gap: var(--gal-section-gap);
 
     /* Density knobs from gallery.css. Its defaults suit ONE gallery on a page;
-       this document stacks 16, so cards run a little tighter here. */
-    --gal-cat-gap: 14px;
-    --gal-grid-gap: 14px;
+       this document stacks 16, so cards run a little tighter here — a step down
+       from the defaults, not the cramped setting they used to be. */
+    --gal-section-gap: 38px;
+    --gal-cat-gap: 17px;
+    --gal-grid-gap: 16px;
     --gal-col-min: 250px;
     --gal-col-min-wide: 430px;
     --gal-card-pad: 14px;

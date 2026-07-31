@@ -53,9 +53,12 @@ for.
 
 ## Forced colors (Windows High Contrast)
 
-- [ ] Every boundary drawn with a `background` (the lit tube, chips, swatches) has a `CanvasText`
-      outline or border restoring it under `@media (forced-colors: active)`.
+- [ ] Every boundary drawn with a `background` (the lit tube, the footer's row rules, chips, dots) has
+      a `CanvasText` outline or border restoring it under `@media (forced-colors: active)`.
 - [ ] Decorative backgrounds that can't survive are explicitly hidden rather than left as gaps.
+- [ ] Walked the footer's structure specifically: it is built from painted 1px rules rather than
+      boxes, so **every** boundary it has is one HCM replaces. Without the swap the index loses its
+      structure entirely and the products run together.
 - [ ] Text and controls remain readable and distinguishable in both HCM themes.
 
 ## Sizes and engines
@@ -82,6 +85,20 @@ for.
 - [ ] No `target="_blank"` unless the user explicitly asked (SC 3.2.5 — unrequested new windows).
 - [ ] External links are marked visually, and the marker adds nothing to announce.
 - [ ] Every link's accessible name makes sense read out of context.
+
+## Design fidelity
+
+Not accessibility, but the reason this furniture is worth copying rather than reinventing.
+
+- [ ] **No boxes in the footer.** Structure is rules and space — no panel backgrounds, border boxes
+      or chips. A tray of rounded cards is the exact generic look this system exists to avoid.
+- [ ] Header and footer read as **one frame**: the same lockup, the same lit edge mirrored, the same
+      focus ring, the same glow scaling.
+- [ ] Type carries the hierarchy. There are three tiers in the footer (lockup, mission, index) and
+      they are visibly different sizes, not one size with different colors.
+- [ ] Hover changes the border, the rule, the glow or an underline — never the text color.
+- [ ] One decorative idea repeated at two scales beats several competing ones. Adding a flourish?
+      Take one away.
 
 ## Bookkeeping
 

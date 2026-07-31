@@ -73,25 +73,35 @@ and theme zones — ask, don't assume (question 4 of the brand interview).
 ## Footer — two zones
 
 ```
-family ...... the products, cross-linked   (a nav)
-meta ........ the one-line why, and source (a divided row)
+lede ........ who this is, why it exists, where the code is  (a masthead)
+index ....... the products, cross-linked                     (a nav)
 ```
 
 Reference markup: same two pages, byte-identical. Styles: `assets/site-footer.css`.
 
+**No boxes.** This is the rule that keeps the footer from reading as a generic card tray. The header
+is a rail of type and one lit edge; the footer is drawn to the same brief so the two bracket the page
+as one frame. Structure comes from **rules and space** — the 2px tube along the top, and a 1px rule
+above each product. Nothing here has a panel background, a border box or a chip. If a target's brand
+genuinely wants cards, that's a deliberate deviation to record in `A11Y-WAY-PAGES.md`, not a default.
+
 | Part | Class | What it must keep |
 |---|---|---|
 | Slab | `.site-footer` | Direct child of `<body>` = the page's **one** `contentinfo`. Not sticky. Lit tube is a `::before` on the **top** edge. |
-| Inner | `.ftr-inner` | Same `max-width` and `clamp()` padding as `.hdr-inner`, so footer content lines up with header content at every width. |
-| Family | `.ftr-family` | A `<nav>` with an `aria-label`. Its visible caption `.ftr-cap` is a **`<p>`, not a heading** — the furniture must not add entries to the host page's heading outline. |
-| Cards | `.ftr-links` > `li` > `a.ftr-card` | CSS grid, `repeat(auto-fit, minmax(min(280px, 100%), 1fr))`. The `min(…, 100%)` is what stops a 320px viewport overflowing — keep it. |
-| Current product | `a.ftr-card[aria-current="true"]` + `.ftr-here` | `aria-current="true"`, not `"page"`: this marks the current item **in a set** (the product you're inside), which stays true across every page of that site. The "You are here" badge is real text. |
-| External marker | `.ftr-ext` | An `aria-hidden="true"` glyph. The link text already names the destination. |
-| Meta | `.ftr-meta` > `.ftr-mission` + `.ftr-src` | Flex row that wraps on its own. `.ftr-src` has `min-height: 32px` to clear SC 2.5.8. |
+| Inner | `.ftr-inner` | Same `max-width` and `clamp()` padding as `.hdr-inner`, so footer content lines up with header content at every width. One column; two at **1080px** (`minmax(240px, 330px)` lede + `1fr` index) — the same width the header drops to two rows, and the width below which the index no longer has room to run two products beside a 330px lede. |
+| Lede | `.ftr-lede` > `.ftr-brand` + `.ftr-mission` + `.ftr-src` | The lockup restated, **not as a link** — the header's already goes home, so a second one only adds a tab stop to the same destination. |
+| Lockup | `.ftr-brand` > `img.brand-mark.ftr-mark` + `.ftr-wordmark` | Keep the `brand-mark` class: `brand-mark-theme.js` re-colors every `img.brand-mark` on the page. `.ftr-mark` sizes and lights it locally so this file stands alone. Wordmark repeats `.brand-title`'s size, weight and tracking verbatim. |
+| Mission | `.ftr-mission` | The only prose here set in `--text`, and a step larger than the descriptions. It is the reason the site exists, so it outranks the index rather than being filed into a meta bar. |
+| Source | `.ftr-src` | Tertiary, so no button and no pill — a labelled mark with `min-height: 32px` to clear SC 2.5.8. The glyph picks up a `drop-shadow` glow on hover, the one place the footer borrows the header's glow rather than its rules. |
+| Index | `.ftr-family` | A `<nav>` with an `aria-label` and **no visible caption**: the lede beside it is the visible name, so a third label over two items is furniture. Never a heading — the furniture must not add entries to the host page's heading outline. |
+| Rows | `.ftr-links` > `li` > `a.ftr-link` | CSS grid, `repeat(auto-fit, minmax(min(280px, 100%), 1fr))`. The `min(…, 100%)` is what stops a 320px viewport overflowing — keep it. |
+| The row rule | `.ftr-link::before` | 1px, `top: 0`, fading out over the last third. **This is the hover affordance** — see idiom 2 below. |
+| Current product | `a.ftr-link[aria-current="true"]` + `.ftr-here` | `aria-current="true"`, not `"page"`: this marks the current item **in a set** (the product you're inside), which stays true across every page of that site. Its rule sits half-lit at rest, and "You are here" is real text beside a lit dot — never color alone. |
+| External marker | `.ftr-ext` | An `aria-hidden="true"` glyph beside the name. The link text already names the destination. |
 
-Breakpoints: the grid collapses on its own; **620px** tightens the rail, **400px** makes the source
-link full width. There is no breakpoint doing the column collapse — that's deliberate, so the footer
-survives container widths nobody anticipated.
+Breakpoints: both grids collapse on their own; **880px** splits lede from index, **620px** tightens
+the rail, **400px** steps the name size down. No breakpoint does the column collapse — that's
+deliberate, so the footer survives container widths nobody anticipated.
 
 ---
 
@@ -107,10 +117,38 @@ background: color-mix(in srgb, var(--bg-panel) 88%, transparent);
 backdrop-filter: blur(10px) saturate(1.15);
 ```
 
-**2. The lit tube** — a 2px pink→purple→blue ramp with a glow that scales with the theme. The header
-draws it on its bottom edge at `90deg`; the footer mirrors it to its top edge at `270deg`, so the two
-bracket the page. Same mirroring `effects.css` uses for `.fx-bar-top`/`.fx-bar-bottom` (135°/315°).
-It re-colors with the theme, which makes it a readout as well as a rule.
+**2. The lit tube, at two sizes** — a 2px pink→purple→blue ramp with a glow that scales with the
+theme. The header draws it on its bottom edge at `90deg`; the footer mirrors it to its top edge at
+`270deg`, so the two bracket the page. Same mirroring `effects.css` uses for
+`.fx-bar-top`/`.fx-bar-bottom` (135°/315°). It re-colors with the theme, which makes it a readout as
+well as a rule.
+
+The footer then repeats the idea one size down, as the thing each product reacts to — this is the
+whole hover affordance, and the reason the rows need no card:
+
+```css
+.ftr-link::before {
+  content: ""; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+  background: var(--border);                                  /* flat fallback */
+  background: linear-gradient(90deg,
+    color-mix(in srgb, var(--border-strong) 45%, var(--border)) 62%, transparent);
+  transition: background var(--dur) ease, box-shadow var(--dur) ease;
+}
+.ftr-link[aria-current]::before {   /* half-lit at rest — MUST precede :hover */
+  background: linear-gradient(90deg,
+    color-mix(in srgb, var(--accent-blue) 45%, var(--border)) 62%, transparent);
+}
+.ftr-link:hover::before, .ftr-link:focus-visible::before {
+  background: linear-gradient(90deg, var(--accent-blue) 62%, transparent);
+  box-shadow: 0 0 calc(9px * var(--glow-strength))
+              color-mix(in srgb, var(--accent-blue) 60%, transparent);
+}
+```
+
+Two details that are easy to lose. The rule **fades out** rather than stopping square: the track is
+wider than the text over it, so a full-bleed rule advertises the empty half, and the fade gives the
+lit state somewhere to go. And the `[aria-current]` rule must come **before** the hover rules —
+they're the same specificity, so source order is what lets hover win on the current item.
 
 **3. Focus ring** — `outline: 3px solid var(--focus-ring); outline-offset: 2px` on `:focus-visible`.
 Never removed, never replaced with a box-shadow that a forced-colors mode would drop.
@@ -127,11 +165,15 @@ border putting it back:
 @media (forced-colors: active) {
   .site-footer { border-top: 1px solid CanvasText; }
   .site-footer::before { display: none; }   /* the tube is a background; it's gone anyway */
-  .ftr-card, .ftr-here { outline: 1px solid CanvasText; outline-offset: -1px; }
+  .ftr-link::before { display: none; }      /* and so is every row rule */
+  .ftr-link { border-top: 1px solid CanvasText; }
+  .ftr-here::before { outline: 1px solid CanvasText; outline-offset: -1px; }
 }
 ```
-Outlines rather than borders: they sit outside the box, so the geometry the glow and gaps were tuned
-around is untouched.
+This one bites harder in a footer built from rules than in one built from cards: **every** boundary
+the index has is a painted 1px background, so without the swap the whole structure vanishes and the
+two products run together. Outlines rather than borders where the box geometry matters — they sit
+outside the box, so the spacing the glow and gaps were tuned around is untouched.
 
 ---
 
