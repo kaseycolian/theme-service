@@ -72,6 +72,12 @@ main.insertAdjacentHTML('afterbegin', ThemeGallery.SPRITE);   // one sprite for 
 …, see the top of `gallery.css`) — 16 galleries in one document want tighter cards than a single
 gallery does.
 
+**Both hosts spend `--gal-section-gap` themselves.** `[data-gallery]` is `display: contents`, so the
+gap between one `section.cat` and the next belongs to whatever laid the sections out — the host's own
+flex/grid `gap`. The *value* still lives with the rest of the scale at the top of `gallery.css`, so a
+host writes `gap: var(--gal-section-gap)` rather than a number of its own; that is what keeps the two
+pages' vertical rhythm from drifting apart the way their card spacing can't.
+
 ## Site build
 
 `tools/assemble-site.mjs` copies this folder to `_site/gallery/`. `../gallery/…` resolves correctly
