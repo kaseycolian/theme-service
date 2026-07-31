@@ -85,7 +85,8 @@ for (const f of ['_site/index.html', '_site/preview/index.html', '_site/themes/t
                  '_site/themes/dropdown.css', '_site/themes/dropdown.js',
                  '_site/gallery/gallery.js', '_site/gallery/gallery.css',
                  '_site/assets/favicon.svg', '_site/assets/favicon-theme.js',
-                 '_site/assets/brand-mark.svg', '_site/assets/brand-mark-theme.js']) {
+                 '_site/assets/brand-mark.svg', '_site/assets/brand-mark-theme.js',
+                 '_site/assets/site-header.css', '_site/assets/site-footer.css']) {
   if (!existsSync(f)) {
     console.error(`ASSEMBLE FAIL: missing ${f}`);
     process.exit(1);

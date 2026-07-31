@@ -9,6 +9,11 @@ It's also model-agnostic: Claude Code loads it as a skill (`skill/SKILL.md`), an
 (Copilot, GPT, Gemini, …) can follow **this file**. The detailed, non-agent-specific procedures live in
 `skill/references/` and are shared by both.
 
+A **second, separate skill** ships here too: `skill-a11y-way-pages/` stands up the site header, footer
+and favicon on a page (see "Page header and footer" below). The two are deliberately independent — the
+pages skill consumes theme tokens read-only and never creates or edits a theme, so neither can disturb
+the other's work.
+
 ## What's here
 
 - `themes/` — the distributable themes (all AA-validated). `effects.css`, `components.css`,
@@ -23,7 +28,11 @@ It's also model-agnostic: Claude Code loads it as a skill (`skill/SKILL.md`), an
   `release.mjs` (version + tag), `update-from-origin.mjs` (pull origin updates), `palettes/`
   (`draft-*.mjs` = built-in source; `local.mjs` = a fork's own themes), `contrast-checker/`.
 - `discovery/` — palette-selection playground (drafts). Not consumed by apps.
-- `skill/` — the Claude skill; `skill/references/*.md` are the shared how-to docs.
+- `skill/` — the theme-service skill; `skill/references/*.md` are the shared how-to docs.
+- `skill-a11y-way-pages/` — the page header/footer/favicon skill; `references/*.md` likewise.
+- `assets/` — the site's own furniture: `site-header.css`, `site-footer.css`, `brand-mark.svg` +
+  `brand-mark-theme.js`, `favicon.svg` + `favicon-theme.js`. **Not** vendored by a consuming app as
+  part of theming — it's what the `a11y-way-pages` skill distributes.
 - `ARCHITECTURE.md` — how it all fits, the token contract, and framework wiring.
 
 ## How to use it in another repo
@@ -41,6 +50,28 @@ It's also model-agnostic: Claude Code loads it as a skill (`skill/SKILL.md`), an
    - **Update this theme-service fork/clone from its origin** (keep the user's themes) →
      `skill/references/updating-from-origin.md`.
 3. **Verify** with `skill/references/wcag-checklist.md` and the checker in `tools/contrast-checker/`.
+
+## Page header and footer (a separate skill)
+
+Putting this site's **furniture** — the sticky header, the footer, the themed favicon — on a page is a
+different job with a different skill: `skill-a11y-way-pages/SKILL.md`, mirrored by the same
+`references/` docs so any agent can follow them.
+
+1. **Confirm the target is themed** (a `THEME-SERVICE.md` exists). The furniture is built entirely
+   from theme tokens; without them it renders as unstyled boxes. If it isn't themed, do the theme work
+   above **first**.
+2. **Pick the task and follow the matching reference:**
+   - New page in a repo that already has the furniture, a repo with none, or a repo with **its own**
+     header/footer → `skill-a11y-way-pages/references/applying-header-footer.md`.
+   - What the pieces are made of, for rebuilding in another stack →
+     `skill-a11y-way-pages/references/header-footer-anatomy.md`.
+   - Re-sync a repo to the latest → `skill-a11y-way-pages/references/updating-header-footer.md`.
+3. **Ask the brand questions first** — name, mark, which parts, nav segments, cross-links, replace vs
+   restyle, class naming. Detect from the repo, propose, confirm. Never rebrand a repo silently.
+4. **Verify** with `skill-a11y-way-pages/references/page-a11y-checklist.md`.
+
+**That skill never touches themes.** No palettes, no `build-themes`, no `themes/`. If page work needs
+a color role that has no token, stop and flag it — that's this file's job, not that skill's.
 
 ## Non-negotiables
 
@@ -65,9 +96,12 @@ It's also model-agnostic: Claude Code loads it as a skill (`skill/SKILL.md`), an
 - **Publishing to the live site (origin repo only).** The GitHub Pages home (`docs/overview.html`)
   links the live template page (`themes/preview.html`) from its "Preview Themes" nav segment; that page
   renders the built `theme.css` and shows every theme in real components.
-  Both pages share one header: markup is duplicated (differing only in which `.pagenav-seg` carries
-  `aria-current`), styles live once in `assets/site-header.css` — edit there, not in either page's
-  `<style>`. That file is site chrome only; it is NOT part of what a consuming app vendors.
+  Both pages share one header **and one footer**: markup is duplicated (the header differs only in
+  which `.pagenav-seg` carries `aria-current`; the footer blocks are byte-identical), styles live
+  once in `assets/site-header.css` and `assets/site-footer.css` — edit there, not in either page's
+  `<style>`. Those two files are the site's own header/footer; they are NOT part of what a consuming
+  app vendors. To stand up the same header/footer on a new page here or in another repo, use the
+  **`a11y-way-pages` skill** (`skill-a11y-way-pages/`, mirrored below).
   `.github/workflows/pages.yml` auto-detects the **highest-numbered `discovery/draft-N`** and builds
   themes from it — finalizing a new draft as the highest `draft-N` makes it the live preview on the
   next push to `main`, no extra publish step. Convention: highest `draft-N` = the latest finalized set.

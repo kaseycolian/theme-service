@@ -1,8 +1,14 @@
 #!/usr/bin/env node
 /* install.mjs — cross-platform skill installer.
-   Links a theme-service repo's skill/ into ~/.claude/skills/theme-service (directory
-   junction on Windows, symlink elsewhere; copy fallback) and writes the machine-local
-   config ~/.claude/theme-service.local.json (OUTSIDE the repo, never committed):
+   Links this repo's two skills into ~/.claude/skills/ (directory junction on Windows,
+   symlink elsewhere; copy fallback):
+     skill/                 -> ~/.claude/skills/theme-service    (create + apply themes)
+     skill-a11y-way-pages/  -> ~/.claude/skills/a11y-way-pages    (site header/footer/favicon)
+   They are deliberately separate: the pages skill consumes theme tokens read-only and
+   never edits themes, so neither can disturb the other's work.
+
+   Also writes the machine-local config ~/.claude/theme-service.local.json (OUTSIDE the
+   repo, never committed) — both skills read `repo` from it to find their source:
      { repo, version, includeBuiltinThemes, history: [{date, version, action, note}] }
 
    Usage (usually via npm scripts):
@@ -26,38 +32,53 @@ if (argv.includes('--help') || argv.includes('-h')) {
   --source <path>        use a different theme-service clone as your source (default: this repo)
   --builtins <true|false> remember whether to include the origin's built-in themes when building
   --help                 show this
-Links skill/ into ~/.claude/skills/theme-service and writes ~/.claude/theme-service.local.json.`);
+Links skill/ -> ~/.claude/skills/theme-service and skill-a11y-way-pages/ -> ~/.claude/skills/a11y-way-pages,
+and writes ~/.claude/theme-service.local.json.`);
   process.exit(0);
 }
 
 const scriptRepo = join(dirname(fileURLToPath(import.meta.url)), '..');
 const repo = flag('--source') ? resolve(flag('--source')) : scriptRepo;
-const source = join(repo, 'skill');
 const claude = join(homedir(), '.claude');
 const skills = join(claude, 'skills');
-const target = join(skills, 'theme-service');
 const configPath = join(claude, 'theme-service.local.json');
 
-if (!existsSync(join(source, 'SKILL.md'))) {
-  console.error(`skill/SKILL.md not found under ${source} — is ${repo} a theme-service clone?`);
-  process.exit(1);
+// Every skill this repo ships: [source dir in the repo, name under ~/.claude/skills/].
+const SKILLS = [
+  ['skill', 'theme-service'],
+  ['skill-a11y-way-pages', 'a11y-way-pages'],
+];
+
+for (const [dir] of SKILLS) {
+  if (!existsSync(join(repo, dir, 'SKILL.md'))) {
+    console.error(`${dir}/SKILL.md not found under ${repo} — is it a theme-service clone?`);
+    process.exit(1);
+  }
 }
 mkdirSync(skills, { recursive: true });
 
-// Refresh an existing link; refuse to clobber a real directory.
-if (existsSync(target)) {
-  if (lstatSync(target).isSymbolicLink()) rmSync(target, { recursive: true, force: true });
-  else { console.error(`${target} exists and is a real directory (not a link). Remove it manually, then re-run.`); process.exit(1); }
+/** Junction/symlink `source` at `target`, refreshing an existing link. Returns false if
+ *  it had to fall back to a copy (which then needs a re-run to pick up repo changes). */
+function link(source, target) {
+  // Refresh an existing link; refuse to clobber a real directory.
+  if (existsSync(target)) {
+    if (lstatSync(target).isSymbolicLink()) rmSync(target, { recursive: true, force: true });
+    else { console.error(`${target} exists and is a real directory (not a link). Remove it manually, then re-run.`); process.exit(1); }
+  }
+  try {
+    symlinkSync(source, target, process.platform === 'win32' ? 'junction' : 'dir');
+    console.log(`Linked skill: ${target} -> ${source}`);
+    return true;
+  } catch {
+    cpSync(source, target, { recursive: true });
+    console.log(`Copied skill into: ${target} (link unavailable; re-run install to update)`);
+    return false;
+  }
 }
 
 let linked = true;
-try {
-  symlinkSync(source, target, process.platform === 'win32' ? 'junction' : 'dir');
-  console.log(`Linked skill: ${target} -> ${source}`);
-} catch {
-  cpSync(source, target, { recursive: true });
-  linked = false;
-  console.log(`Copied skill into: ${target} (link unavailable; re-run install to update)`);
+for (const [dir, name] of SKILLS) {
+  if (!link(join(repo, dir), join(skills, name))) linked = false;
 }
 
 // Merge into the existing machine-local config (preserve history + prior prefs).
@@ -81,5 +102,5 @@ cfg.history.push({
 
 writeFileSync(configPath, JSON.stringify(cfg, null, 2) + '\n');
 console.log(`Wrote ${configPath}  (repo=${repo}, includeBuiltinThemes=${cfg.includeBuiltinThemes})`);
-console.log("\nDone. Claude Code will discover the 'theme-service' skill on next session.");
+console.log(`\nDone. Claude Code will discover these skills on next session: ${SKILLS.map(s => s[1]).join(', ')}.`);
 if (!linked) console.log('Note: installed as a copy — re-run this script after updating the repo.');
