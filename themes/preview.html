@@ -90,8 +90,23 @@
   .cat-nav a:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2px; }
 
   /* The header is sticky, so an anchor jump has to clear it or the heading lands
-     underneath. Generous enough for the two-row header below 1080px. */
-  :root { --gal-scroll-margin: 104px; }
+     underneath it. Derived from the rail rather than guessed, so it follows the
+     header's fluid vertical gutter instead of drifting out of date the next time
+     that changes: two 36px rows + the 8px between them + both gutters + air. */
+  :root { --gal-scroll-margin: calc(80px + 2 * clamp(13px, 2.2vw, 22px) + 10px); }
+
+  /* Above 1080px the four zones collapse to a single rail — one row, not two. */
+  @media (min-width: 1081px) {
+    :root { --gal-scroll-margin: calc(36px + 2 * 22px + 10px); }
+  }
+
+  /* Below 430px the page nav wraps to its own line, so the rail is three rows.
+     Whether it wraps depends on the rendered font as much as the width, so this
+     is deliberately generous and flat: overshooting only leaves air above the
+     heading, undershooting hides the heading under the header. */
+  @media (max-width: 430px) {
+    :root { --gal-scroll-margin: 152px; }
+  }
 </style>
 </head>
 <body class="fx-grid">
@@ -231,25 +246,44 @@
     <nav class="ftr-family" aria-label="The A11Y Way sites">
       <ul class="ftr-links">
         <li>
-          <a class="ftr-link" href="https://kaseycolian.github.io/a11y-component-examples/">
-            <span class="ftr-name">Component Guide
-              <!-- Leaves the site. Decoration only: the link text already names the
-                   destination, so there is nothing extra to announce. -->
+          <!-- The one target="_blank" in this repo, and a deliberate one: it is the
+               sibling A11Y Way site, not a page of this one. rel="noopener" stays
+               explicit for engines that do not imply it; noreferrer is deliberately
+               NOT set — one owner runs both sites, and it would strip the only
+               signal that the traffic came from the other product. -->
+          <a class="ftr-link" href="https://kaseycolian.github.io/a11y-component-examples/"
+             target="_blank" rel="noopener">
+            <span class="ftr-name">Accessible Component Library
+              <!-- Leaves the site. Decoration only, and aria-hidden, so it announces
+                   nothing — which is exactly why the warning after it is real text. -->
               <svg class="ftr-ext" viewBox="0 0 12 12" aria-hidden="true">
                 <path d="M4.5 1.5h6v6"/><path d="M10.5 1.5 1.5 10.5"/>
-              </svg>
+              </svg><!--
+                CLIPPED, not display:none. The arrow says "new tab" to anyone who can
+                see it, but it is aria-hidden decoration — without this a screen
+                reader user gets a new window with no warning at all, which is the
+                actual SC 3.2.5 complaint. Nothing extra on screen, the whole
+                sentence announced.
+
+                No punctuation in front of it: clipping positions this absolutely,
+                which blockifies it, and the accessible-name algorithm puts its own
+                space between block boxes. A leading comma would be announced as
+                "Library , opens in a new tab" — letting that inserted space be the
+                word space instead makes the name read as one sentence.
+           --><span class="ftr-newtab">opens in a new tab</span>
             </span>
-            <span class="ftr-desc">WCAG 2.2 AA components in plain HTML, CSS and JavaScript. The
-              live demo loads the same files you copy, so the two can never drift.</span>
+            <span class="ftr-desc">A reference library of common UI components meeting WCAG 2.2 AA,
+              written in plain HTML, CSS, and JavaScript. Source code also available with
+              instructions on using the library with agentic development.</span>
           </a>
         </li>
         <li>
           <a class="ftr-link" href="https://kaseycolian.github.io/theme-service/" aria-current="true">
-            <span class="ftr-name">Themes
+            <span class="ftr-name">Accessible Theming Service
               <span class="ftr-here">You are here</span>
             </span>
-            <span class="ftr-desc">Accessible dark and light themes an agent generates and installs
-              into any repo, new or legacy. Nothing is written until it passes AA.</span>
+            <span class="ftr-desc">Create WCAG 2.2 AA compliant color themes guided by an agent to
+              use across your websites.</span>
           </a>
         </li>
       </ul>

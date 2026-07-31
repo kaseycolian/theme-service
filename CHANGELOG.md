@@ -6,10 +6,34 @@ breaking token renames/removals or a default-theme change.
 
 ## Unreleased
 
+**The header rail has room to breathe, and it scales.** `.hdr-inner`'s vertical padding was a flat
+11px at every width; it is now `clamp(13px, 2.2vw, 22px)` — double the old value once there is a
+desktop's worth of width, tapering to 13px on a phone. The taper is the point: the bar is **sticky**,
+so every pixel of padding is a pixel of a small screen permanently spent, and below 620px the rail is
+already two or three rows tall. A clamp rather than a step per breakpoint so it grows smoothly
+instead of jumping 9px at 621px.
+
+- **Side padding is untouched** and stays `clamp(16px, 3vw, 32px)` — that is the shared rail geometry
+  lining header content up with footer content, and it is now commented as independent of the
+  vertical so the two do not get "tidied" into moving together.
+- The `≤620` and `≤430` blocks set **`padding-inline` only**. A padding shorthand there would have
+  silently overwritten the vertical clamp and reinstated the hard step. Measured heights: 106px on a
+  phone, ramping 107 → 124px across 621–1000px, and 80px on the single-rail desktop layout.
+- **`--gal-scroll-margin` moved with it**, which is the part that fails silently. The rail is sticky,
+  so an anchor jump that does not clear it puts the heading *underneath* the header with no overflow
+  or scrollbar to notice. The `themes/preview.html` override is now a `calc()` off the same clamp so
+  it tracks the rail instead of drifting, with steps for the two heights the calc cannot know about:
+  the single-rail layout above 1080px, and the **three-row** layout once the page nav wraps below
+  430px — a case the old flat 104px never covered either. Verified by actually calling
+  `scrollIntoView()` at each width: headings now clear the header by 10–46px everywhere, where before
+  they were hidden under it by up to 37px on a narrow phone.
+- `gallery/gallery.css`'s default rose 104 → 132px and now says it assumes the shipped header and
+  should be overridden per page.
+
 **The mobile header keeps saying which A11Y Way site you are on.** The site header dropped
 `.brand-tag` at 620px and all of `.brand-name` at 400px, so on a phone every sibling site rendered
 the same wordmark — and under 400px the same bare mark. The tag is the only part of the lockup that
-differs between the Component Guide and Themes, so the responsive rules were spending the
+differs between the two sibling sites, so the responsive rules were spending the
 *distinguishing* half of the identity to keep the *shared* half. Nothing in the brand zone is hidden
 for space any more. Header height is unchanged at every width; no token changed.
 
@@ -52,10 +76,54 @@ for space any more. Header height is unchanged at every width; no token changed.
   under ~420px. `order` is used only to position the break — 1, 2, 4, 5 is DOM order untouched, so
   tab order still matches reading order. Verified reproducing the grid's geometry to the pixel: both
   rows centre on 28 and 72 as before, and the unwrapped header is still exactly 100px.
+- **The lockup is a step larger at every width**, and its type ladder now lives on one carrier so
+  there is a single place to look for it. The wordmark's size is on `.brand-name` (`.brand-title` and
+  `.brand-dot` inherit it, so the separator can never fall out of scale with the words); the tag
+  keeps its own because it is a different face. Wordmark **15 / 14 / 13px** and tag
+  **12.5 / 11.5 / 10.5px** across `≥621 / ≤620 / ≤430`, wordmark larger than tag at every step.
+  `.ftr-wordmark` moves to 15px with it — the two lockups are meant to be the same object. Header
+  height is unchanged: the stacked lockup grows to 28.8px, still inside the 36px the nav pill sets.
+- **The narrowest breakpoint moved 400px → 430px, and the number is load-bearing.** That boundary
+  steps the brand *and* the nav at once — ~28px of extra width for 1px of viewport — so it has to sit
+  where the width can pay for it. At 400 it could not once the type grew: with the Verdana fallback,
+  401–424px failed to fit the wider pair on one line and wrapped to three rows **while 390px stayed
+  on two**. A narrower viewport showing fewer rows reads as a bug, and it caught 414px, a real iPhone
+  width. 430px is the widest phone in portrait; measured on both fallback faces the step is
+  affordable there, so the discontinuity is gone rather than relocated. Wrap points after the change:
+  ≤320px on Trebuchet, ≤375px on Verdana, monotonic from there up on both.
 - **Skill docs updated** so sibling sites inherit this on their next sync — `header-footer-anatomy.md`
   (breakpoints, the brand row, the two re-cut traps), `applying-header-footer.md` (the tag is the
   differentiator and is never dropped for space), `page-a11y-checklist.md` (name + tag legible at
   320px; shortened labels must be clipped and name-stable).
+
+**The footer's cross-link to the component library says it is a separate site, and opens in a new
+tab.** The index's two products were annotated asymmetrically: this site's row said `● YOU ARE HERE`,
+the sibling's row said nothing at all — the only signal that it left the site was an 11px `↗` that is
+`aria-hidden` decoration.
+
+- Only the **current** product carries a text label (`.ftr-here`, "You are here"); the sibling is
+  marked by the `↗` alone. A deliberate asymmetry — it keeps a second line of type out of the index.
+- **`target="_blank" rel="noopener"` on that link only.** `noreferrer` is deliberately omitted — one
+  owner runs both sites, and it would strip the only signal that traffic came from the other product.
+  "Source on GitHub" stays same-tab on purpose, so the behaviour reads as "this is the other A11Y Way
+  site" rather than "this is any outbound link".
+- **The warning lives in the accessible name, not in the glyph.** The `↗` says "new tab" only to
+  people who can see it, so `.ftr-newtab` carries a clipped "opens in a new tab" — without it the new
+  window is unannounced, which is the actual SC 3.2.5 complaint. Announced name is *"Accessible
+  Component Library opens in a new tab A reference library of common UI components…"*, read from the
+  a11y tree, not `innerText`.
+- **No punctuation before "opens", and that is deliberate.** Clipping positions the span absolutely,
+  which blockifies it, and the accessible-name algorithm inserts its own space between block boxes —
+  a leading comma announces as "Library **,** opens in a new tab". Letting the inserted space be the
+  word space makes the name read as one sentence. Same family of trap as the header nav's
+  `.seg-tail`, and it is now written into the checklist.
+- **Both products renamed and re-described** in the index, on both pages: "Component Guide" →
+  **Accessible Component Library**, "Themes" → **Accessible Theming Service**, each with new copy.
+  The names are what a visitor is choosing between, so they now say what each thing *is* rather than
+  leaning on the family context to carry it.
+- Note this is the **only** `target="_blank"` in the repo, and `page-a11y-checklist.md` forbids
+  unrequested ones (SC 3.2.5). That item now also carries the recipe for when a new tab *is* asked
+  for, so the source no longer contradicts its own audit.
 
 **The footer's lede lies down on tablets and small laptops.** Between 620px and 1080px the footer is
 a single column, and the lede kept its column shape there — three stacked rows down the left edge

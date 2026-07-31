@@ -55,7 +55,7 @@ except which `.pagenav-seg` carries `aria-current="page"`. Styles: `assets/site-
 |---|---|---|
 | Skip link | `.skip-link` | **First element in `<body>`.** Off-screen via `transform`, not `display:none` — it must be focusable. Targets `#main`. |
 | Rail | `.site-header` | `position: sticky; top: 0`. Glass surface. The lit tube is a `::after` on the **bottom** edge. |
-| Inner | `.hdr-inner` | `max-width: 1600px`, `padding: 11px clamp(16px, 3vw, 32px)`, flex row. |
+| Inner | `.hdr-inner` | `max-width: 1600px`, `padding: clamp(13px, 2.2vw, 22px) clamp(16px, 3vw, 32px)`, flex row. **The two gutters are independent.** Vertical is the rail's breathing room and *must* taper — the bar is sticky, so every pixel is permanently spent on a small screen, and below 620px the rail is already two or three rows. Horizontal is the shared geometry that lines header content up with footer content (`.ftr-inner` carries the identical clamp) — do not change one because you changed the other. The responsive blocks below set **`padding-inline` only**; a shorthand there would silently overwrite the vertical clamp and put a hard step back at 621px. |
 | Brand | `.brand` > `.brand-mark` + `.brand-name` (`.brand-title` + `.brand-dot` + `.brand-tag`) | An `<a>` with **no `aria-label`** — the wordmark and tag are on screen at every width, so the link names itself from its own text and the accessible name can never drift from the rendered one. The `<img>` is `alt=""` so the mark isn't announced twice. Only add an `aria-label` if you hide the words at some width, which this header deliberately does not. |
 | Page nav | `.pagenav` > `.pagenav-seg` | `<nav aria-label="Pages">`. The current page is a `<span>` with `aria-current="page"`, **not** a link. Current state is a lifted chip + full-contrast text, never color alone. |
 | Motion | `.motion` (uses shipped `.switch`) | A real `<label>` wrapping a real checkbox with `[data-motion-toggle]`. Keeps the 44×24 switch geometry. |
@@ -63,7 +63,30 @@ except which `.pagenav-seg` carries `aria-current="page"`. Styles: `assets/site-
 
 Breakpoints: **1080px** two-row grid (`brand | nav` / `motion | theme`), **620px** the rail switches
 to a wrapping flex row, the brand lockup stacks (wordmark over tag) and both the console's cap and
-the nav's `.seg-tail` are clipped, **400px** one step down in type and gutters.
+the nav's `.seg-tail` are clipped, **430px** one step down in type and gutters.
+
+**The lockup's type ladder** lives on two selectors and steps at those same widths. The wordmark's
+size is on `.brand-name` — `.brand-title` has no `font-size` of its own and inherits it, as does
+`.brand-dot`, so the separator can never fall out of scale with the words it separates. The tag
+carries its own size because it is a different face. The wordmark stays the larger of the two at
+every step:
+
+| | ≥621px | ≤620px | ≤430px |
+|---|---|---|---|
+| wordmark (`.brand-name`) | 15px | 14px | 13px |
+| tag (`.brand-tag`) | 12.5px | 11.5px | 10.5px |
+
+`.ftr-wordmark` in `site-footer.css` copies the 15px verbatim so the header and footer lockups stay
+the same object — **move them together.**
+
+**Why 430 and not a round 400.** That boundary steps the brand *and* the nav at once — roughly 28px
+of extra width arriving in exchange for 1px of viewport — so it has to sit where the width can pay
+for it. At 400 it could not: with the Verdana fallback, 401–424px failed to fit the wider pair on one
+line and wrapped to three rows while 390px stayed on two. A **narrower** viewport showing **fewer**
+rows reads as a bug, and it caught 414px, a real iPhone width. 430px is the widest phone in portrait
+(the Pro Max class), and measured on both fallback faces the step is affordable there, so the
+discontinuity is gone rather than relocated. If you raise the type again, re-check this boundary
+first — it is the one that breaks.
 
 **The nav drops under the brand on its own, with no breakpoint.** Under 620px `.hdr-inner` is
 `display: flex; flex-wrap: wrap`, and `.pagenav` is `flex: none` so it keeps its content width and
@@ -118,6 +141,23 @@ ordinary text flow: the space is just a space, in the DOM, on screen, and in the
 Verify by reading the a11y tree, not `innerText` — `innerText` shows clipped text as present and
 hides this class of bug entirely.
 
+**The one `target="_blank"` in the source.** The sibling-site cross-link opens in a new tab; nothing
+else does, deliberately — including "Source on GitHub" in the lede, which is also outbound. Attaching
+the behaviour to *that one link* keeps it meaning "this is the other A11Y Way site" rather than "this
+is any outbound link", so do not "fix" the GitHub link for consistency. It carries `rel="noopener"`
+(explicit, for engines that do not imply it) but **not** `noreferrer`: one owner runs both sites, and
+stripping the referrer would throw away the only signal that traffic came from the other product.
+See the Links section of `page-a11y-checklist.md` for what a requested new tab has to carry.
+
+**If you change the header's height, one value downstream moves with it.** The rail is sticky, so any
+in-page anchor needs a `scroll-margin-top` that clears it or the heading lands underneath — silently,
+with no scrollbar or overflow to notice. In this repo that is `--gal-scroll-margin`
+(`gallery/gallery.css` default, overridden in `themes/preview.html`), and the override is written as
+a `calc()` off the same clamp so it follows the rail instead of drifting out of date. Remember the
+rail has three heights, not one: single row above 1080px, two rows below it, and **three** once the
+page nav wraps on a narrow phone. Verify by actually calling `scrollIntoView()` and measuring where
+the heading lands relative to the header — comparing numbers by eye misses the wrapped case.
+
 **Adapting the header.** The page nav assumes a small number of top-level pages. A repo with many
 pages, or one that already has real navigation, should keep its own and take only the brand, motion
 and theme zones — ask, don't assume (question 4 of the brand interview).
@@ -151,7 +191,8 @@ genuinely wants cards, that's a deliberate deviation to record in `A11Y-WAY-PAGE
 | Rows | `.ftr-links` > `li` > `a.ftr-link` | CSS grid, `repeat(auto-fit, minmax(min(280px, 100%), 1fr))`. The `min(…, 100%)` is what stops a 320px viewport overflowing — keep it. |
 | The row rule | `.ftr-link::before` | 1px, `top: 0`, fading out over the last third. **This is the hover affordance** — see idiom 2 below. |
 | Current product | `a.ftr-link[aria-current="true"]` + `.ftr-here` | `aria-current="true"`, not `"page"`: this marks the current item **in a set** (the product you're inside), which stays true across every page of that site. Its rule sits half-lit at rest, and "You are here" is real text beside a lit dot — never color alone. |
-| External marker | `.ftr-ext` | An `aria-hidden="true"` glyph beside the name. The link text already names the destination. |
+| New-tab warning | `.ftr-newtab` | Clipped, not `display:none` — **only** on a link that really opens a new tab. The `↗` beside it is `aria-hidden`, so without this the new window is announced to nobody and you have the SC 3.2.5 problem the arrow looked like it solved. No punctuation in front of it: clipping positions it absolutely, which blockifies it, and the accessible-name algorithm inserts its own space between block boxes — a leading comma announces as "Library **,** opens in a new tab". Let that inserted space be the word space. |
+| External marker | `.ftr-ext` | An `aria-hidden="true"` glyph beside the name. The link text already names the destination, so it adds nothing to announce. Only the **current** product carries a text label (`.ftr-here`); the other is marked by this glyph alone — a deliberate asymmetry that keeps a second line of type out of the index. |
 
 Breakpoints: both grids collapse on their own; **1080px** splits lede from index (same width the
 header goes two-row), **621–1080px** lays the lede down as a band, **620px** tightens the rail,

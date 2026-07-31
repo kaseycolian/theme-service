@@ -72,9 +72,21 @@
               color-mix(in srgb, var(--accent-purple) 45%, transparent);
 }
 
+/* Both gutters are fluid, and they are independent of each other.
+
+   VERTICAL is the rail's breathing room: 22px once there is a desktop's worth of
+   width, tapering to 13px on a phone. It has to taper — this bar is sticky, so
+   every pixel of padding is a pixel of a small screen permanently spent, and the
+   layout below 620px is already two or three rows tall. A clamp rather than a
+   step at each breakpoint so the rail grows smoothly instead of jumping 9px at
+   621; it is a gutter, which is exactly what this file uses clamp() for.
+
+   HORIZONTAL is the shared rail geometry — it lines header content up with
+   footer content and with .ftr-inner's identical clamp. The two are set together
+   here for readability only; changing one must not drag the other. */
 .hdr-inner {
   max-width: 1600px; margin: 0 auto;
-  padding: 11px clamp(16px, 3vw, 32px);
+  padding: clamp(13px, 2.2vw, 22px) clamp(16px, 3vw, 32px);
   display: flex; align-items: center; gap: 18px;
 }
 
@@ -102,16 +114,30 @@
 }
 .brand:hover .brand-mark { transform: translateY(calc(var(--motion) * -1px)); }
 
+/* The lockup's type ladder, in one place. The WORDMARK's size lives on
+   .brand-name — .brand-title has no font-size of its own and inherits it, as
+   does .brand-dot, so the separator can never fall out of scale with the words
+   it separates. The tag carries its own size because it is a different face.
+   Both step twice, and the wordmark stays the larger of the two at every step:
+
+       wordmark   15px  ->  14px (<=620)  ->  13px (<=400)
+       tag        12.5  ->  11.5          ->  10.5
+
+   These sizes are not free: they set the brand's width, which is what decides
+   the viewport at which the page nav wraps to its own row (see the phones block
+   below). Grow them and that wrap happens sooner — measure, don't assume.
+   .ftr-wordmark in site-footer.css copies the 15px verbatim so the header and
+   footer lockups stay the same object; move them together. */
 .brand-name {
   display: inline-flex; align-items: baseline; gap: 7px;
-  font-size: 13px; white-space: nowrap; min-width: 0;
+  font-size: 15px; white-space: nowrap; min-width: 0;
 }
 .brand-title {
   font-weight: 800; letter-spacing: .13em; text-transform: uppercase;
 }
 .brand-dot { color: var(--accent-pink); font-weight: 700; }
 .brand-tag {
-  font-family: var(--font-mono); font-size: 11.5px; font-weight: 400;
+  font-family: var(--font-mono); font-size: 12.5px; font-weight: 400;
   letter-spacing: .06em; color: var(--text-muted);
 }
 
@@ -402,7 +428,10 @@ a.pagenav-seg:focus-visible { outline: 3px solid var(--focus-ring); outline-offs
      width, including ones nobody tested. Same reasoning as the footer index's
      auto-fit grid. */
   .hdr-inner {
-    padding: 10px 14px;
+    /* padding-INLINE only. The vertical gutter is the clamp on the base rule and
+       is already tapering on its own by this width; a shorthand here would
+       silently overwrite it and put the 9px cliff back at 621px. */
+    padding-inline: 14px;
     display: flex; flex-wrap: wrap; align-items: center;
     column-gap: 10px; row-gap: 8px;
   }
@@ -474,6 +503,7 @@ a.pagenav-seg:focus-visible { outline: 3px solid var(--focus-ring); outline-offs
   .brand-name {
     flex-direction: column; align-items: flex-start;
     gap: 2px; line-height: 1.05;
+    font-size: 14px;   /* wordmark, step 2 of the ladder up top */
   }
   /* A separator between two things side by side. Stacked, the line break is the
      separator, and a leftover dot reads as a bullet. */
@@ -483,7 +513,7 @@ a.pagenav-seg:focus-visible { outline: 3px solid var(--focus-ring); outline-offs
      rather than two, and the descriptor reads as a deliberate sub-line of the
      wordmark rather than as a word that wrapped. */
   .brand-tag {
-    font-size: 10px; letter-spacing: .16em; text-transform: uppercase;
+    font-size: 11.5px; letter-spacing: .16em; text-transform: uppercase;
   }
 
   .pagenav-seg { padding: 0 12px; letter-spacing: .07em; }
@@ -516,18 +546,31 @@ a.pagenav-seg:focus-visible { outline: 3px solid var(--focus-ring); outline-offs
   }
 }
 
-/* Narrowest phones. One step down in type and gutters, and that is all — both
+/* Phones in portrait. One step down in type and gutters, and that is all — both
    lines of the lockup stay. The mark and the wordmark are identical on the
    component site; the descriptor is the only thing in this header that says
    WHICH A11Y Way site you are on, so it is worth more than the pixels it costs.
    Everything here is a step, not a switch: nothing appears or disappears
-   between 620px and 320px. */
-@media (max-width: 400px) {
-  .hdr-inner   { padding: 10px 12px; column-gap: 8px; }
+   between 620px and 320px.
+
+   430px, not the 400px this used to be, and the number is load-bearing. It is
+   the widest phone in portrait (the iPhone Pro Max class), and this boundary
+   steps the brand AND the nav at once — about 28px of extra width arriving in
+   exchange for 1px of viewport. At 400 that overshot: with the Verdana fallback,
+   401-424px could not fit the wider pair on one line and wrapped to three rows,
+   while 390px stayed on two. A NARROWER viewport showing FEWER rows reads as a
+   bug, and it caught 414px, a real iPhone width. Measured both fallbacks: at 431
+   the step is affordable, so the discontinuity is gone rather than moved. Raise
+   the type here again and re-check this boundary first. */
+@media (max-width: 430px) {
+  .hdr-inner   { padding-inline: 12px; column-gap: 8px; }
   .brand       { gap: 8px; }
   .brand-mark  { width: 24px; height: 24px; }
-  .brand-title { font-size: 12px; letter-spacing: .09em; }
-  .brand-tag   { font-size: 9.5px; letter-spacing: .13em; }
+  /* Step 3 of the lockup ladder. Size on .brand-name, same carrier as the other
+     two steps, so there is one place to look for the wordmark's size. */
+  .brand-name  { font-size: 13px; }
+  .brand-title { letter-spacing: .09em; }
+  .brand-tag   { font-size: 10.5px; letter-spacing: .13em; }
   /* The nav gives up its padding and a half point before the brand gives up a
      word. Measured at 320px: without this step the brand clears the nav pill by
      4.6px, which is a fit rather than a gap — the two groups need to read as

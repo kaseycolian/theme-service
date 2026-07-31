@@ -122,7 +122,7 @@
 /* The header's wordmark, verbatim — same size, weight and tracking, so the two
    lockups are the same object rather than two takes on it. */
 .ftr-wordmark {
-  font-size: 13px; font-weight: 800; letter-spacing: .13em;
+  font-size: 15px; font-weight: 800; letter-spacing: .13em;
   text-transform: uppercase; color: var(--text);
 }
 
@@ -242,12 +242,29 @@
 /* "You are here" — the current item in the set, as a lit dot and a micro label
    rather than a chip: the header's .tc-lamps notation, reused because it says the
    same thing. The words carry the meaning, so the dot is free to be decoration
-   and "current" is never left to color. */
+   and "current" is never left to color.
+
+   Only the current item is labelled. The other product is marked by .ftr-ext
+   alone, which is a deliberate asymmetry: the arrow says "elsewhere" without
+   spending a second line of type on it. */
 .ftr-here {
   display: inline-flex; align-items: center; gap: 7px;
   font-family: var(--font-mono); font-size: 9.5px; font-weight: 700;
   letter-spacing: .14em; text-transform: uppercase;
   color: var(--text-muted); white-space: nowrap;
+}
+
+/* The warning that the arrow cannot give. The glyph reads as "new tab" only if
+   you can see it — it is aria-hidden decoration — so this suffix is what stops a
+   screen reader user getting a new window with no notice, which is the actual
+   SC 3.2.5 complaint. CLIPPED, not display:none, so the visible label stays two
+   words while the accessible name keeps the whole sentence.
+
+   No shared utility class in this repo: .tc-cap and .seg-tail in site-header.css
+   write the same six declarations inline. Kept identical to them on purpose. */
+.ftr-newtab {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0;
 }
 .ftr-here::before {
   content: ""; width: 6px; height: 6px; border-radius: 50%; flex: none;

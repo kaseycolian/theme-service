@@ -300,8 +300,10 @@ Do all of it. `page-a11y-checklist.md` is the gate.
    `node tools/contrast-checker/cli.mjs "<fg>" "<bg>" --min 4.5` in the source repo.
    When measuring live in a browser, **wait for CSS transitions to settle** after switching themes —
    `getComputedStyle` mid-transition returns interpolated colors and will report false failures.
-4. **Every size** — 320, 360, 400, 620, 768, 900, 1080, 1440, 2560px: no horizontal scroll, nothing
-   clipped or overlapping. Then 200% and 400% zoom.
+4. **Every size** — 320, 360, 414, 430, 431, 620, 768, 900, 1080, 1440, 2560px: no horizontal scroll,
+   nothing clipped or overlapping, and the header's row count only ever falls as the viewport grows.
+   Then 200% and 400% zoom. Re-walk the narrow end with `--font-ui` forced to its last fallback —
+   the fallback face is wider, so a header that fits on your machine can overlap on a phone.
 5. **Every engine** — Chromium, Firefox, WebKit. Confirm the glass, tube and glow render or degrade
    cleanly.
 6. **Keyboard** — skip link first and reachable; tab order matches reading order; visible focus on

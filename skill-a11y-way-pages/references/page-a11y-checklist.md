@@ -63,7 +63,12 @@ for.
 
 ## Sizes and engines
 
-- [ ] **No horizontal scroll** at 320, 360, 400, 620, 768, 900, 1080, 1440, 2560px.
+- [ ] **No horizontal scroll** at 320, 360, 414, 430, 431, 620, 768, 900, 1080, 1440, 2560px.
+      414 and 430/431 are there on purpose: 414 is a real iPhone width, and 430/431 straddles the
+      header's type step. **Walk the widths in order and watch the header's row count only ever go
+      DOWN as the viewport grows** — a step that adds size faster than the viewport gains it makes a
+      narrower window show fewer rows than a wider one, which reads as a bug and is invisible if you
+      only spot-check round numbers.
 - [ ] **The brand name and its tag are both legible at 320px.** The tag is what tells a visitor which
       A11Y Way site they are on, so a phone header that has shed it has lost the thing it was for.
       Check the nav pills too: right-aligned in a `1fr` track they overflow *leftward*, under the
@@ -94,6 +99,15 @@ for.
 ## Links
 
 - [ ] No `target="_blank"` unless the user explicitly asked (SC 3.2.5 — unrequested new windows).
+      **When they do ask**, all three of these, or it is worse than not doing it:
+      `rel="noopener"` (modern engines imply it, older ones do not); the warning in the link's
+      **accessible name**, not just the `↗` glyph — the glyph is `aria-hidden` decoration, so on its
+      own it warns nobody using a screen reader; and the glyph stays decorative. The source footer
+      ships exactly one such link — the sibling-site cross-link — so one is expected, not drift.
+- [ ] A clipped warning suffix reads correctly **out of the a11y tree, not off `innerText`**. Clipping
+      positions the span absolutely, which blockifies it, and the accessible-name algorithm inserts
+      its own space between block boxes — so a leading comma announces as "Separate site , opens in
+      a new tab". Write the suffix to be joined by that space instead of punctuating it.
 - [ ] External links are marked visually, and the marker adds nothing to announce.
 - [ ] Every link's accessible name makes sense read out of context.
 

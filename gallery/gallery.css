@@ -36,7 +36,11 @@
   --gal-card-pad: 16px;
   --gal-card-gap: 12px;       /* between rows inside a card */
   --gal-title-size: 15px;     /* .cat-title */
-  --gal-scroll-margin: 104px; /* anchor offset under a sticky header */
+  /* Anchor offset under a sticky header. This default assumes the shipped A11Y
+     Way header at its two-row width; override it per page if yours is a
+     different height (themes/preview.html does, tracking the rail's own clamp).
+     Too small hides the heading under the header, too large only adds air. */
+  --gal-scroll-margin: 132px;
 }
 
 /* The mount host is a plumbing element, not a layout one: display:contents lets
