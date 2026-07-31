@@ -4,6 +4,30 @@ All notable changes to the theme-service. Apps record the version they vendored 
 (plus `updating-themes.md`) to migrate. Versioning: minor bump for additive themes/tokens, major for
 breaking token renames/removals or a default-theme change.
 
+## Unreleased
+
+**The brand lockup is a step larger again, and the nav stops stepping where the brand does.** The
+rail's vertical gutter went fluid in 1.1.0, which left the lockup looking small inside a taller
+header — worst on a phone, where a tracked 10.5px cap was at the floor of comfortable reading.
+
+- Wordmark **17 / 16 / 15px** and tag **13.5 / 13 / 12px** across `≥621 / ≤620 / ≤430`, wordmark
+  larger than tag at every step. `.ftr-wordmark` moves to 17px with it. Tag tracking eases as the
+  size grows (`.16em → .13em`, `.13em → .11em`) — the old ratios were tuned for a 10px cap and read
+  loose at 13px. Header height is unchanged: the stacked lockup grows to 32.5px, still inside the
+  36px the nav pill sets.
+- **`.pagenav-seg` no longer steps at 430** — its compact size now covers the whole `≤620` range.
+  This is the same non-monotonic failure as 1.1.0's 400→430 move, and the lesson is that moving the
+  boundary was never the fix: **two zones stepping on one boundary is.** Together the brand and nav
+  wanted ~28px of width for 1px of viewport, and with the Verdana fallback 431–446px wrapped to
+  three rows while 430px stayed on two. Separated, 430 carries only the brand's 1px. Costs 6px per
+  pill between 431 and 620, where there is slack to spare.
+- Measured on both fallback faces, monotonic throughout: one row from 360px (Trebuchet) and 414px
+  (Verdana), 106px unwrapped, 144.3px wrapped. Anchors still clear the sticky rail everywhere —
+  7.2px at the tightest, the wrapped phone case.
+- **Verdana's one-row threshold moved 375px → 414px**, so a 390px iPhone now gets the three-row
+  header rather than two. That is the cost of the larger type, taken deliberately: the wrapped
+  layout is the designed fallback and stays legible, where the smaller type was not.
+
 ## 1.1.0 — 2026-07-31
 
 **The header rail has room to breathe, and it scales.** `.hdr-inner`'s vertical padding was a flat

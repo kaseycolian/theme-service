@@ -120,8 +120,13 @@
    it separates. The tag carries its own size because it is a different face.
    Both step twice, and the wordmark stays the larger of the two at every step:
 
-       wordmark   15px  ->  14px (<=620)  ->  13px (<=400)
-       tag        12.5  ->  11.5          ->  10.5
+       wordmark   17px  ->  16px (<=620)  ->  15px (<=430)
+       tag        13.5  ->  13            ->  12
+
+   The steps are deliberately shallow. The rail's vertical gutter is fluid now
+   (clamp on .hdr-inner), so the header is markedly taller than it was and small
+   type reads as lost in it rather than compact — and the phone end was the worst
+   of it, where a tracked 10.5px cap was at the floor of comfortable reading.
 
    These sizes are not free: they set the brand's width, which is what decides
    the viewport at which the page nav wraps to its own row (see the phones block
@@ -130,14 +135,14 @@
    footer lockups stay the same object; move them together. */
 .brand-name {
   display: inline-flex; align-items: baseline; gap: 7px;
-  font-size: 15px; white-space: nowrap; min-width: 0;
+  font-size: 17px; white-space: nowrap; min-width: 0;
 }
 .brand-title {
   font-weight: 800; letter-spacing: .13em; text-transform: uppercase;
 }
 .brand-dot { color: var(--accent-pink); font-weight: 700; }
 .brand-tag {
-  font-family: var(--font-mono); font-size: 12.5px; font-weight: 400;
+  font-family: var(--font-mono); font-size: 13.5px; font-weight: 400;
   letter-spacing: .06em; color: var(--text-muted);
 }
 
@@ -503,7 +508,7 @@ a.pagenav-seg:focus-visible { outline: 3px solid var(--focus-ring); outline-offs
   .brand-name {
     flex-direction: column; align-items: flex-start;
     gap: 2px; line-height: 1.05;
-    font-size: 14px;   /* wordmark, step 2 of the ladder up top */
+    font-size: 16px;   /* wordmark, step 2 of the ladder up top */
   }
   /* A separator between two things side by side. Stacked, the line break is the
      separator, and a leftover dot reads as a bullet. */
@@ -512,11 +517,22 @@ a.pagenav-seg:focus-visible { outline: 3px solid var(--focus-ring); outline-offs
      muted (.tc-cap below) — so the header has ONE treatment for small labels
      rather than two, and the descriptor reads as a deliberate sub-line of the
      wordmark rather than as a word that wrapped. */
+  /* Tracking eases as the size grows — .16em was tuned for a 10px cap, and at
+     13px the same ratio reads loose rather than deliberate. It also buys back a
+     little of the width the larger wordmark costs. */
   .brand-tag {
-    font-size: 11.5px; letter-spacing: .16em; text-transform: uppercase;
+    font-size: 13px; letter-spacing: .13em; text-transform: uppercase;
   }
 
-  .pagenav-seg { padding: 0 12px; letter-spacing: .07em; }
+  /* The nav's compact values cover this WHOLE range, rather than stepping again
+     at 430 the way the brand does. Two steps landing on one boundary is what
+     breaks this layout: at 430 the brand and the nav together wanted ~28px more
+     width in exchange for 1px of viewport, and with the Verdana fallback
+     431-446px could not pay it — those widths wrapped to three rows while 430px
+     stayed on two. Separating the steps leaves only the brand's 1px at 430,
+     which any width can afford. Costs 6px per pill between 431 and 620, where
+     there is slack to spare. */
+  .pagenav-seg { padding: 0 9px; font-size: 11px; letter-spacing: .05em; }
   /* "Preview Themes" repeats the word the brand descriptor now carries a few
      inches to its left, and it is the widest item on this row. CLIPPED, not
      removed — the same reason .tc-cap below is clipped: the accessible name
@@ -568,15 +584,12 @@ a.pagenav-seg:focus-visible { outline: 3px solid var(--focus-ring); outline-offs
   .brand-mark  { width: 24px; height: 24px; }
   /* Step 3 of the lockup ladder. Size on .brand-name, same carrier as the other
      two steps, so there is one place to look for the wordmark's size. */
-  .brand-name  { font-size: 13px; }
+  .brand-name  { font-size: 15px; }
   .brand-title { letter-spacing: .09em; }
-  .brand-tag   { font-size: 10.5px; letter-spacing: .13em; }
-  /* The nav gives up its padding and a half point before the brand gives up a
-     word. Measured at 320px: without this step the brand clears the nav pill by
-     4.6px, which is a fit rather than a gap — the two groups need to read as
-     two. Still a point above the .tc-cap that already ships at 10px, and the
-     28px pill height (the actual touch target) is untouched. */
-  .pagenav-seg { padding: 0 9px; font-size: 11px; letter-spacing: .05em; }
+  .brand-tag   { font-size: 12px; letter-spacing: .11em; }
+  /* No .pagenav-seg step here on purpose — the nav is already at its compact
+     size from 620px down (see the block above). This boundary steps the brand
+     alone, which is what keeps it affordable. */
 }
 
 /* =============================================================================

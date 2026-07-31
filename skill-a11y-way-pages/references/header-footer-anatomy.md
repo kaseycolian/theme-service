@@ -73,20 +73,25 @@ every step:
 
 | | ≥621px | ≤620px | ≤430px |
 |---|---|---|---|
-| wordmark (`.brand-name`) | 15px | 14px | 13px |
-| tag (`.brand-tag`) | 12.5px | 11.5px | 10.5px |
+| wordmark (`.brand-name`) | 17px | 16px | 15px |
+| tag (`.brand-tag`) | 13.5px | 13px | 12px |
 
-`.ftr-wordmark` in `site-footer.css` copies the 15px verbatim so the header and footer lockups stay
+`.ftr-wordmark` in `site-footer.css` copies the 17px verbatim so the header and footer lockups stay
 the same object — **move them together.**
 
-**Why 430 and not a round 400.** That boundary steps the brand *and* the nav at once — roughly 28px
-of extra width arriving in exchange for 1px of viewport — so it has to sit where the width can pay
-for it. At 400 it could not: with the Verdana fallback, 401–424px failed to fit the wider pair on one
-line and wrapped to three rows while 390px stayed on two. A **narrower** viewport showing **fewer**
-rows reads as a bug, and it caught 414px, a real iPhone width. 430px is the widest phone in portrait
-(the Pro Max class), and measured on both fallback faces the step is affordable there, so the
-discontinuity is gone rather than relocated. If you raise the type again, re-check this boundary
-first — it is the one that breaks.
+The steps are shallow by design. The rail's vertical gutter is fluid, so the header is tall enough
+that small type reads as lost in it rather than compact, and the phone end suffers most — the tag is
+the thing that goes unreadable first.
+
+**Never let two zones step on the same boundary.** This is the rule that keeps the header monotonic,
+and it is the one that has broken twice. When the brand and the nav both grew at 400px, that boundary
+wanted ~28px of extra width in exchange for 1px of viewport, and with the Verdana fallback 401–424px
+could not pay it: those widths wrapped to three rows while 390px stayed on two. Moving the boundary
+to 430 bought room but kept both steps together, so raising the type again reproduced it exactly at
+431–446px. The fix is not a bigger number — it is separating the steps. **The nav now holds its
+compact size across the whole ≤620 range and does not step at 430 at all**, leaving that boundary to
+the brand's 1px, which any width can afford. Verify by walking the ladder on both fallback faces and
+checking the row count only ever falls as the viewport grows.
 
 **The nav drops under the brand on its own, with no breakpoint.** Under 620px `.hdr-inner` is
 `display: flex; flex-wrap: wrap`, and `.pagenav` is `flex: none` so it keeps its content width and
